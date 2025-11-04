@@ -1,5 +1,8 @@
 import { Router } from 'express';
-import { API_ROUTES } from '@joch/shared';
+import authRoutes from './auth.routes';
+import gigRoutes from './gig.routes';
+import newsRoutes from './news.routes';
+import bandMemberRoutes from './bandMember.routes';
 
 const router = Router();
 
@@ -12,13 +15,15 @@ router.get('/health', (_req, res) => {
   });
 });
 
-// TODO: Import and mount route modules
-// router.use(API_ROUTES.AUTH.LOGIN, authRoutes);
-// router.use(API_ROUTES.BAND_MEMBERS.BASE, bandMemberRoutes);
-// router.use(API_ROUTES.NEWS.BASE, newsRoutes);
-// router.use(API_ROUTES.GIGS.BASE, gigRoutes);
-// router.use(API_ROUTES.SONGS.BASE, songRoutes);
-// router.use(API_ROUTES.GALLERY.BASE, galleryRoutes);
-// router.use(API_ROUTES.CONTACT.BASE, contactRoutes);
+// Mount route modules
+router.use('/auth', authRoutes);
+router.use('/gigs', gigRoutes);
+router.use('/news', newsRoutes);
+router.use('/band-members', bandMemberRoutes);
+
+// TODO: Add later
+// router.use('/songs', songRoutes);
+// router.use('/gallery', galleryRoutes);
+// router.use('/contact', contactRoutes);
 
 export default router;

@@ -1,0 +1,14 @@
+feat: Add controllers and API routes for auth, gigs, news, and band members
+
+- Add auth controller with register, login, and me endpoints
+- Add gig controller with CRUD operations, filters, and pagination
+- Add news controller with author population and publish workflow
+- Add band member controller sorted by order field
+- Implement admin-only routes with authenticate and authorize middleware
+- Mount all routes in main router (/auth, /gigs, /news, /band-members)
+- Fix TypeScript _id type issues in controllers
+- Set moduleResolution to node10 for CommonJS compatibility
+
+🤖 Generated with Claude Code
+
+Co-Authored-By: Claude <noreply@anthropic.com>
