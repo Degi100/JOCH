@@ -138,7 +138,11 @@ export class AppError extends Error {
   ) {
     super(message);
     Object.setPrototypeOf(this, AppError.prototype);
-    Error.captureStackTrace(this, this.constructor);
+
+    // captureStackTrace is Node.js specific, check if available
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, this.constructor);
+    }
   }
 }
 
