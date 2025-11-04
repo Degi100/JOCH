@@ -4,7 +4,7 @@ services:
     env: node
     region: frankfurt
     plan: free
-    buildCommand: npm ci && cd shared && npm install && cd .. && npm run build:shared && npm run build:backend
+    buildCommand: npm ci && cd shared && npm ci && cd ../backend && npm ci && cd .. && npm run build:shared && npm run build:backend
     startCommand: npm start
     envVars:
       - key: NODE_ENV
