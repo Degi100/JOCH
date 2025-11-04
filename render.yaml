@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: joch-backend
+    env: node
+    region: frankfurt
+    plan: free
+    buildCommand: npm install && npm run build:backend
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: CORS_ORIGIN
+        sync: false
+      - key: MAX_FILE_SIZE_MB
+        value: 10

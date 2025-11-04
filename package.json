@@ -16,7 +16,8 @@
     "build": "npm run build --workspaces",
     "build:shared": "npm run build --workspace=shared",
     "build:backend": "npm run build --workspace=backend",
-    "build:frontend": "npm run build --workspace=frontend"
+    "build:frontend": "npm run build --workspace=frontend",
+    "start": "node backend/dist/server.js"
   },
   "keywords": [
     "bandpage",
