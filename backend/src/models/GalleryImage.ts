@@ -45,9 +45,8 @@ const galleryImageSchema = new Schema<GalleryImageDocument>(
   }
 );
 
-// Indexes
+// Compound index for category filtering and sorting by order
 galleryImageSchema.index({ category: 1, order: 1 });
-galleryImageSchema.index({ order: 1 });
 
 export const GalleryImageModel = mongoose.model<GalleryImageDocument>(
   'GalleryImage',

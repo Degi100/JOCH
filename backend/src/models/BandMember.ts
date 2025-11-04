@@ -50,8 +50,7 @@ const bandMemberSchema = new Schema<BandMemberDocument>(
   }
 );
 
-// Index for sorting
-bandMemberSchema.index({ order: 1 });
+// Index is already created by unique: true on order field
 
 export const BandMemberModel = mongoose.model<BandMemberDocument>(
   'BandMember',

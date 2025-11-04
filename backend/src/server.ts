@@ -9,7 +9,7 @@ import routes from './routes';
 dotenv.config();
 
 const app: Application = express();
-const PORT = process.env.PORT || 5000;
+const PORT = Number(process.env.PORT) || 5000; // Default: 5000
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // CORS Configuration

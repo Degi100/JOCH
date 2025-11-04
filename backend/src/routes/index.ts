@@ -3,6 +3,10 @@ import authRoutes from './auth.routes';
 import gigRoutes from './gig.routes';
 import newsRoutes from './news.routes';
 import bandMemberRoutes from './bandMember.routes';
+import songRoutes from './song.routes';
+import galleryRoutes from './gallery.routes';
+import contactRoutes from './contact.routes';
+import uploadRoutes from './upload.routes';
 
 const router = Router();
 
@@ -20,10 +24,9 @@ router.use('/auth', authRoutes);
 router.use('/gigs', gigRoutes);
 router.use('/news', newsRoutes);
 router.use('/band-members', bandMemberRoutes);
-
-// TODO: Add later
-// router.use('/songs', songRoutes);
-// router.use('/gallery', galleryRoutes);
-// router.use('/contact', contactRoutes);
+router.use('/songs', songRoutes);
+router.use('/gallery', galleryRoutes);
+router.use('/contact', contactRoutes);
+router.use('/upload', uploadRoutes);
 
 export default router;
