@@ -1,0 +1,21 @@
+{
+  "name": "@joch/shared",
+  "version": "1.0.0",
+  "description": "Shared types and utilities for JOCH Bandpage",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "keywords": ["shared", "types", "validation"],
+  "author": "JOCH",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "zod": "^3.22.4"
+  }
+}
