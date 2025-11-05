@@ -1,0 +1,369 @@
+// ============================================
+// JOCH Bandpage - Typography
+// Kraftvolle, Metal-inspirierte Typografie
+// ============================================
+
+@use '../abstracts/variables' as *;
+
+// ============================================
+// Headings (Bebas Neue / Oswald)
+// ============================================
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: $font-family-heading;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-tight;
+  color: $color-white;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin-bottom: $spacing-md;
+}
+
+h1 {
+  font-size: $font-size-hero;
+  margin-bottom: $spacing-lg;
+
+  @media (max-width: $breakpoint-md) {
+    font-size: $font-size-xxl;
+  }
+}
+
+h2 {
+  font-size: $font-size-xxl;
+
+  @media (max-width: $breakpoint-md) {
+    font-size: $font-size-xl;
+  }
+}
+
+h3 {
+  font-size: $font-size-xl;
+
+  @media (max-width: $breakpoint-md) {
+    font-size: $font-size-lg;
+  }
+}
+
+h4 {
+  font-size: $font-size-lg;
+}
+
+h5 {
+  font-size: $font-size-md;
+}
+
+h6 {
+  font-size: $font-size-base;
+}
+
+// Hero Heading (for landing page)
+.hero-title {
+  font-size: $font-size-mega;
+  line-height: 1;
+  margin-bottom: $spacing-lg;
+
+  @media (max-width: $breakpoint-lg) {
+    font-size: $font-size-hero;
+  }
+
+  @media (max-width: $breakpoint-md) {
+    font-size: $font-size-xxl;
+  }
+}
+
+// ============================================
+// Body Text
+// ============================================
+
+p {
+  font-family: $font-family-base;
+  font-size: $font-size-base;
+  font-weight: $font-weight-regular;
+  line-height: $line-height-base;
+  color: $color-gray-light;
+  margin-bottom: $spacing-md;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Lead paragraph (larger, for intros)
+.lead {
+  font-size: $font-size-lg;
+  line-height: $line-height-relaxed;
+  color: lighten($color-gray-light, 5%);
+}
+
+// Small text
+.text-small {
+  font-size: $font-size-sm;
+}
+
+.text-xs {
+  font-size: $font-size-xs;
+}
+
+// ============================================
+// Text Modifiers
+// ============================================
+
+strong,
+b {
+  font-weight: $font-weight-bold;
+  color: $color-white;
+}
+
+em,
+i {
+  font-style: italic;
+}
+
+mark {
+  background-color: rgba($color-orange, 0.3);
+  color: $color-white;
+  padding: 0 0.2em;
+}
+
+small {
+  font-size: $font-size-sm;
+  color: rgba($color-gray-light, 0.8);
+}
+
+// ============================================
+// Links
+// ============================================
+
+a {
+  color: $color-blue;
+  text-decoration: none;
+  transition: color $transition-base;
+
+  &:hover {
+    color: lighten($color-blue, 10%);
+    text-decoration: underline;
+  }
+
+  &:active {
+    color: darken($color-blue, 5%);
+  }
+}
+
+// ============================================
+// Lists
+// ============================================
+
+ul,
+ol {
+  margin-bottom: $spacing-md;
+  padding-left: $spacing-lg;
+}
+
+ul {
+  list-style-type: disc;
+}
+
+ol {
+  list-style-type: decimal;
+}
+
+li {
+  margin-bottom: $spacing-xs;
+  color: $color-gray-light;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Custom styled lists (no bullets)
+.list-unstyled {
+  padding-left: 0;
+  list-style: none;
+}
+
+// ============================================
+// Blockquotes
+// ============================================
+
+blockquote {
+  margin: $spacing-lg 0;
+  padding: $spacing-md $spacing-lg;
+  border-left: 4px solid $color-red;
+  background: rgba($color-gray-dark, 0.5);
+  font-style: italic;
+  color: lighten($color-gray-light, 5%);
+
+  p {
+    margin-bottom: $spacing-sm;
+  }
+
+  footer,
+  cite {
+    display: block;
+    margin-top: $spacing-sm;
+    font-size: $font-size-sm;
+    font-style: normal;
+    color: rgba($color-gray-light, 0.7);
+
+    &::before {
+      content: '— ';
+    }
+  }
+}
+
+// ============================================
+// Code
+// ============================================
+
+code,
+kbd,
+pre,
+samp {
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: $font-size-sm;
+}
+
+code {
+  padding: 0.2em 0.4em;
+  background: rgba($color-gray-dark, 0.8);
+  border: 1px solid $color-gray-medium;
+  border-radius: $radius-sm;
+  color: $color-orange;
+}
+
+pre {
+  padding: $spacing-md;
+  margin-bottom: $spacing-md;
+  background: rgba($color-gray-dark, 0.8);
+  border: 1px solid $color-gray-medium;
+  border-radius: $radius-md;
+  overflow-x: auto;
+  line-height: $line-height-base;
+
+  code {
+    padding: 0;
+    background: none;
+    border: none;
+    color: $color-gray-light;
+  }
+}
+
+// ============================================
+// Horizontal Rule
+// ============================================
+
+hr {
+  margin: $spacing-xl 0;
+  border: 0;
+  border-top: 1px solid $color-gray-medium;
+}
+
+// ============================================
+// Text Alignment
+// ============================================
+
+.text-left {
+  text-align: left;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+// ============================================
+// Text Colors
+// ============================================
+
+.text-white {
+  color: $color-white;
+}
+
+.text-gray {
+  color: $color-gray-light;
+}
+
+.text-muted {
+  color: rgba($color-gray-light, 0.6);
+}
+
+.text-red {
+  color: $color-red;
+}
+
+.text-orange {
+  color: $color-orange;
+}
+
+.text-blue {
+  color: $color-blue;
+}
+
+.text-error {
+  color: $color-error;
+}
+
+.text-success {
+  color: $color-success;
+}
+
+// ============================================
+// Font Weights
+// ============================================
+
+.font-normal {
+  font-weight: $font-weight-regular;
+}
+
+.font-medium {
+  font-weight: $font-weight-medium;
+}
+
+.font-semibold {
+  font-weight: $font-weight-semibold;
+}
+
+.font-bold {
+  font-weight: $font-weight-bold;
+}
+
+// ============================================
+// Text Transform
+// ============================================
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+.lowercase {
+  text-transform: lowercase;
+}
+
+.capitalize {
+  text-transform: capitalize;
+}
+
+// ============================================
+// Line Height
+// ============================================
+
+.leading-tight {
+  line-height: $line-height-tight;
+}
+
+.leading-normal {
+  line-height: $line-height-base;
+}
+
+.leading-relaxed {
+  line-height: $line-height-relaxed;
+}

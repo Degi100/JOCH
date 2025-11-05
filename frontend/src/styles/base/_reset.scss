@@ -1,0 +1,235 @@
+// ============================================
+// JOCH Bandpage - CSS Reset
+// Modern CSS Reset + Normalization
+// ============================================
+
+@use '../abstracts/variables' as *;
+
+// ============================================
+// Box Sizing & Margins
+// ============================================
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+// ============================================
+// HTML & Body
+// ============================================
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px; // Base font size for rem calculations
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  font-family: $font-family-base;
+  font-size: $font-size-base;
+  font-weight: $font-weight-regular;
+  line-height: $line-height-base;
+  color: $color-gray-light;
+  background-color: $color-black;
+  overflow-x: hidden;
+}
+
+// ============================================
+// Text Selection
+// ============================================
+
+::selection {
+  background: $color-red;
+  color: $color-white;
+  text-shadow: none;
+}
+
+::-moz-selection {
+  background: $color-red;
+  color: $color-white;
+  text-shadow: none;
+}
+
+// ============================================
+// Images & Media
+// ============================================
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+img {
+  border-style: none;
+}
+
+// ============================================
+// Links
+// ============================================
+
+a {
+  color: inherit;
+  text-decoration: none;
+  background-color: transparent;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+// ============================================
+// Buttons
+// ============================================
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+// ============================================
+// Forms
+// ============================================
+
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+}
+
+// Remove default browser styling
+input[type='search']::-webkit-search-decoration,
+input[type='search']::-webkit-search-cancel-button,
+input[type='search']::-webkit-search-results-button,
+input[type='search']::-webkit-search-results-decoration {
+  display: none;
+}
+
+// Number input buttons
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+// ============================================
+// Lists
+// ============================================
+
+ul,
+ol {
+  list-style: none;
+}
+
+// ============================================
+// Tables
+// ============================================
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+// ============================================
+// Headings
+// ============================================
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: inherit;
+  font-size: inherit;
+  margin: 0;
+}
+
+// ============================================
+// Paragraphs
+// ============================================
+
+p {
+  margin: 0;
+}
+
+// ============================================
+// Focus Visible
+// ============================================
+
+*:focus-visible {
+  outline: 2px solid $color-red;
+  outline-offset: 2px;
+}
+
+// ============================================
+// Disabled Elements
+// ============================================
+
+[disabled] {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+// ============================================
+// Hidden Elements
+// ============================================
+
+[hidden] {
+  display: none !important;
+}
+
+// ============================================
+// Smooth Scrolling for Anchor Links
+// ============================================
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+// Respect user's motion preferences
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

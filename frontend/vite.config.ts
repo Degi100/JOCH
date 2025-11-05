@@ -30,7 +30,7 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        additionalData: `@import "@/styles/abstracts/_variables.scss"; @import "@/styles/abstracts/_mixins.scss";`
+        // No additionalData - we use @use in each file instead (modern SASS)
       }
     }
   }

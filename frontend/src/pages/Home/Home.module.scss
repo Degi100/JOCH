@@ -1,0 +1,323 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+// ============================================
+// JOCH Bandpage - Home Page Styles
+// Hero section with overlay + content sections
+// ============================================
+
+.home {
+  min-height: 100vh;
+}
+
+// ============================================
+// Hero Section
+// ============================================
+
+.hero {
+  position: relative;
+  height: 100vh;
+  min-height: 600px;
+  @include flex-center;
+  background: linear-gradient(135deg, $color-black 0%, $color-gray-dark 100%);
+  // TODO: Add background image later
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  overflow: hidden;
+}
+
+.heroOverlay {
+  @include absolute-full;
+  background: linear-gradient(
+    135deg,
+    rgba($color-black, 0.7) 0%,
+    rgba($color-gray-dark, 0.8) 100%
+  );
+  z-index: 1;
+}
+
+.heroContent {
+  @include flex-column-center;
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 0 $spacing-lg;
+  max-width: 800px;
+  animation: fadeInUp 1s $easing-ease-out;
+}
+
+.heroTitle {
+  font-size: clamp($font-size-hero, 10vw, $font-size-mega);
+  font-weight: $font-weight-bold;
+  color: $color-white;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: $spacing-md;
+  text-shadow: 0 4px 8px rgba($color-black, 0.5);
+}
+
+.heroTagline {
+  font-size: clamp($font-size-lg, 3vw, $font-size-xl);
+  font-weight: $font-weight-semibold;
+  color: $color-red;
+  margin-bottom: $spacing-lg;
+  text-shadow: 0 2px 4px rgba($color-black, 0.5);
+}
+
+.heroDescription {
+  font-size: clamp($font-size-base, 2vw, $font-size-md);
+  line-height: $line-height-relaxed;
+  color: $color-gray-light;
+  margin-bottom: $spacing-xl;
+  max-width: 600px;
+}
+
+.heroButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+  justify-content: center;
+}
+
+.heroButton {
+  @include button-base;
+  @include button-primary;
+  padding: $spacing-md $spacing-xl;
+  font-size: $font-size-lg;
+
+  &.secondary {
+    @include button-outline;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ============================================
+// Content Sections
+// ============================================
+
+.section {
+  padding: $spacing-xxl 0;
+
+  @include md {
+    padding: $spacing-mega 0;
+  }
+}
+
+.gigsSection {
+  background: $color-black;
+}
+
+.newsSection {
+  background: $color-gray-dark;
+}
+
+.aboutSection {
+  background: $color-black;
+  text-align: center;
+}
+
+// Section Header
+.sectionHeader {
+  @include flex-between;
+  margin-bottom: $spacing-xl;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+}
+
+.sectionTitle {
+  font-size: clamp($font-size-xl, 4vw, $font-size-xxl);
+  color: $color-white;
+  margin: 0;
+}
+
+.sectionLink {
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  color: $color-red;
+  text-decoration: none;
+  transition: color $transition-base;
+
+  &:hover {
+    color: lighten($color-red, 10%);
+  }
+}
+
+// ============================================
+// Gigs Grid
+// ============================================
+
+.gigsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-lg;
+
+  @include md {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.gigCard {
+  @include card;
+  @include card-hover;
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  cursor: pointer;
+}
+
+.gigDate {
+  @include flex-column-center;
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  background: $color-red;
+  border-radius: $radius-md;
+  color: $color-white;
+}
+
+.gigDay {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  line-height: 1;
+}
+
+.gigMonth {
+  font-size: $font-size-xs;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.gigInfo {
+  flex: 1;
+}
+
+.gigVenue {
+  font-size: $font-size-lg;
+  color: $color-white;
+  margin-bottom: $spacing-xs;
+}
+
+.gigLocation,
+.gigTime {
+  font-size: $font-size-sm;
+  color: rgba($color-gray-light, 0.8);
+  margin: 0;
+}
+
+.gigTicketButton {
+  @include button-base;
+  @include button-primary;
+  padding: $spacing-xs $spacing-md;
+  font-size: $font-size-sm;
+  flex-shrink: 0;
+}
+
+// ============================================
+// News Grid
+// ============================================
+
+.newsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-lg;
+
+  @include md {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.newsCard {
+  @include card;
+  @include card-hover;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.newsImage {
+  width: 100%;
+  height: 200px;
+  background: $color-gray-medium;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform $transition-slow;
+  }
+
+  .newsCard:hover & img {
+    transform: scale(1.05);
+  }
+}
+
+.newsContent {
+  padding: $spacing-lg;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.newsTitle {
+  font-size: $font-size-lg;
+  color: $color-white;
+  margin-bottom: $spacing-sm;
+  @include line-clamp(2);
+}
+
+.newsExcerpt {
+  font-size: $font-size-sm;
+  line-height: $line-height-relaxed;
+  color: rgba($color-gray-light, 0.8);
+  margin-bottom: $spacing-md;
+  flex: 1;
+  @include line-clamp(3);
+}
+
+.newsMeta {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-top: auto;
+}
+
+.newsDate {
+  font-size: $font-size-xs;
+  color: rgba($color-gray-light, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+// ============================================
+// About Section
+// ============================================
+
+.aboutText {
+  max-width: 800px;
+  margin: 0 auto $spacing-xl;
+  font-size: $font-size-lg;
+  line-height: $line-height-relaxed;
+  color: $color-gray-light;
+}
+
+.aboutButton {
+  @include button-base;
+  @include button-outline;
+  padding: $spacing-md $spacing-xl;
+  font-size: $font-size-base;
+}

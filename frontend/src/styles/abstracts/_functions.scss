@@ -1,0 +1,99 @@
+// ============================================
+// JOCH Bandpage - SASS Functions
+// ============================================
+
+@use 'variables' as *;
+@use 'sass:math';
+
+// ============================================
+// Spacing Helper
+// ============================================
+
+// Multiply base spacing unit
+// Usage: spacing(2) => 16px (2 * 8px)
+@function spacing($multiplier) {
+  @return $spacing-unit * $multiplier;
+}
+
+// ============================================
+// Color Manipulation
+// ============================================
+
+// Lighten color
+@function lighten-color($color, $amount: 10%) {
+  @return lighten($color, $amount);
+}
+
+// Darken color
+@function darken-color($color, $amount: 10%) {
+  @return darken($color, $amount);
+}
+
+// Add alpha channel to color
+@function alpha-color($color, $alpha: 0.5) {
+  @return rgba($color, $alpha);
+}
+
+// ============================================
+// Unit Conversion
+// ============================================
+
+// Convert px to rem
+@function rem($px, $base: 16px) {
+  @return math.div($px, $base) * 1rem;
+}
+
+// Convert px to em
+@function em($px, $base: 16px) {
+  @return math.div($px, $base) * 1em;
+}
+
+// ============================================
+// Z-Index Management
+// ============================================
+
+// Get z-index by layer name
+@function z-index($layer) {
+  $z-layers: (
+    'dropdown': $z-index-dropdown,
+    'sticky': $z-index-sticky,
+    'fixed': $z-index-fixed,
+    'modal-backdrop': $z-index-modal-backdrop,
+    'modal': $z-index-modal,
+    'popover': $z-index-popover,
+    'tooltip': $z-index-tooltip,
+  );
+
+  @if map-has-key($z-layers, $layer) {
+    @return map-get($z-layers, $layer);
+  }
+
+  @warn "Unknown z-index layer `#{$layer}`. Using 1.";
+  @return 1;
+}
+
+// ============================================
+// Typography Scale
+// ============================================
+
+// Get font size by name
+@function font-size($size) {
+  $font-sizes: (
+    'xs': $font-size-xs,
+    'sm': $font-size-sm,
+    'base': $font-size-base,
+    'md': $font-size-md,
+    'lg': $font-size-lg,
+    'xl': $font-size-xl,
+    'xxl': $font-size-xxl,
+    'hero': $font-size-hero,
+    'mega': $font-size-mega,
+  );
+
+  @if map-has-key($font-sizes, $size) {
+    @return map-get($font-sizes, $size);
+  }
+
+  @warn "Unknown font size `#{$size}`. Using base size.";
+  @return $font-size-base;
+}

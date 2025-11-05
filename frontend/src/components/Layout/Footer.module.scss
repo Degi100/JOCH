@@ -1,0 +1,151 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+// ============================================
+// JOCH Bandpage - Footer Styles
+// 3-column layout with social links
+// ============================================
+
+.footer {
+  background: $color-gray-dark;
+  border-top: 1px solid $color-gray-medium;
+  padding: $spacing-xxl 0 0;
+  margin-top: auto; // Push footer to bottom
+}
+
+.container {
+  @include container;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-xl;
+
+  @include md {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+// ============================================
+// Columns
+// ============================================
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.columnTitle {
+  font-family: $font-family-heading;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-white;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: $spacing-sm;
+}
+
+.tagline {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+  color: $color-red;
+  margin-bottom: $spacing-xs;
+}
+
+.description {
+  font-size: $font-size-sm;
+  line-height: $line-height-relaxed;
+  color: rgba($color-gray-light, 0.8);
+}
+
+// ============================================
+// Links
+// ============================================
+
+.linkList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.link {
+  font-size: $font-size-base;
+  color: $color-gray-light;
+  text-decoration: none;
+  transition: color $transition-base, padding-left $transition-base;
+  padding-left: 0;
+
+  &:hover {
+    color: $color-red;
+    padding-left: $spacing-xs;
+  }
+}
+
+// ============================================
+// Social Media
+// ============================================
+
+.socialList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.socialLink {
+  @include flex-start;
+  gap: $spacing-sm;
+  padding: $spacing-xs;
+  font-size: $font-size-base;
+  color: $color-gray-light;
+  text-decoration: none;
+  border-radius: $radius-md;
+  transition: background $transition-base, color $transition-base;
+
+  &:hover {
+    background: rgba($color-red, 0.1);
+    color: $color-white;
+
+    .socialIcon {
+      background: $color-red;
+      color: $color-white;
+    }
+  }
+}
+
+.socialIcon {
+  @include flex-center;
+  width: 32px;
+  height: 32px;
+  font-family: $font-family-heading;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  background: $color-gray-medium;
+  color: $color-gray-light;
+  border-radius: $radius-full;
+  transition: background $transition-base, color $transition-base;
+}
+
+.socialName {
+  font-weight: $font-weight-medium;
+}
+
+// ============================================
+// Bottom Bar
+// ============================================
+
+.bottom {
+  margin-top: $spacing-xxl;
+  padding: $spacing-lg 0;
+  border-top: 1px solid rgba($color-gray-medium, 0.5);
+}
+
+.copyright {
+  text-align: center;
+  font-size: $font-size-sm;
+  color: rgba($color-gray-light, 0.6);
+}

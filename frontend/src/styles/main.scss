@@ -1,0 +1,201 @@
+@use 'abstracts/variables';
+@use 'abstracts/mixins';
+@use 'abstracts/functions';
+@use 'base/reset';
+@use 'base/typography';
+
+// ============================================
+// JOCH Bandpage - Main Stylesheet
+// Entry point for global styles
+// ============================================
+
+// ============================================
+// Global Utilities
+// ============================================
+
+// Container
+.container {
+  @include mixins.container;
+}
+
+// Fade-in animation classes (for Intersection Observer)
+.fade-in {
+  @include mixins.fade-in;
+}
+
+.fade-in-up {
+  @include mixins.fade-in-up;
+}
+
+.scale-in {
+  @include mixins.scale-in;
+}
+
+.slide-in-left {
+  @include mixins.slide-in('left');
+}
+
+.slide-in-right {
+  @include mixins.slide-in('right');
+}
+
+// Custom scrollbar for the whole page
+html {
+  @include mixins.custom-scrollbar;
+}
+
+// ============================================
+// Layout Helpers
+// ============================================
+
+.section {
+  padding: variables.$spacing-xxl 0;
+
+  @media (max-width: variables.$breakpoint-md) {
+    padding: variables.$spacing-xl 0;
+  }
+}
+
+.section-dark {
+  background-color: variables.$color-bg-dark;
+}
+
+.section-surface {
+  background-color: variables.$color-bg-surface;
+}
+
+.section-light {
+  background-color: variables.$color-bg-light;
+  color: variables.$color-gray-dark;
+
+  h1, h2, h3, h4, h5, h6 {
+    color: variables.$color-black;
+  }
+
+  p {
+    color: variables.$color-gray-dark;
+  }
+}
+
+// ============================================
+// Grid System
+// ============================================
+
+.grid {
+  display: grid;
+  gap: variables.$grid-gap;
+
+  &.cols-1 {
+    grid-template-columns: repeat(1, 1fr);
+  }
+
+  &.cols-2 {
+    grid-template-columns: repeat(1, 1fr);
+
+    @media (min-width: variables.$breakpoint-md) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  &.cols-3 {
+    grid-template-columns: repeat(1, 1fr);
+
+    @media (min-width: variables.$breakpoint-sm) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (min-width: variables.$breakpoint-lg) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  &.cols-4 {
+    grid-template-columns: repeat(1, 1fr);
+
+    @media (min-width: variables.$breakpoint-sm) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (min-width: variables.$breakpoint-lg) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+}
+
+// ============================================
+// Spacing Utilities
+// ============================================
+
+.mt-0 { margin-top: 0; }
+.mt-xs { margin-top: variables.$spacing-xs; }
+.mt-sm { margin-top: variables.$spacing-sm; }
+.mt-md { margin-top: variables.$spacing-md; }
+.mt-lg { margin-top: variables.$spacing-lg; }
+.mt-xl { margin-top: variables.$spacing-xl; }
+
+.mb-0 { margin-bottom: 0; }
+.mb-xs { margin-bottom: variables.$spacing-xs; }
+.mb-sm { margin-bottom: variables.$spacing-sm; }
+.mb-md { margin-bottom: variables.$spacing-md; }
+.mb-lg { margin-bottom: variables.$spacing-lg; }
+.mb-xl { margin-bottom: variables.$spacing-xl; }
+
+// ============================================
+// Display Utilities
+// ============================================
+
+.hidden {
+  display: none !important;
+}
+
+.block {
+  display: block;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+.flex {
+  display: flex;
+}
+
+.inline-flex {
+  display: inline-flex;
+}
+
+.grid-display {
+  display: grid;
+}
+
+// ============================================
+// Visibility (Mobile/Desktop)
+// ============================================
+
+.hide-mobile {
+  @media (max-width: #{variables.$breakpoint-md - 1px}) {
+    display: none !important;
+  }
+}
+
+.hide-desktop {
+  @media (min-width: variables.$breakpoint-md) {
+    display: none !important;
+  }
+}
+
+.show-mobile {
+  display: none !important;
+
+  @media (max-width: #{variables.$breakpoint-md - 1px}) {
+    display: block !important;
+  }
+}
+
+.show-desktop {
+  display: none !important;
+
+  @media (min-width: variables.$breakpoint-md) {
+    display: block !important;
+  }
+}

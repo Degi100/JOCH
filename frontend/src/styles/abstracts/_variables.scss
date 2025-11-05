@@ -1,0 +1,193 @@
+// ============================================
+// JOCH Bandpage - SASS Variables
+// Dark/Industrial Metal Theme
+// ============================================
+
+// ============================================
+// Colors
+// ============================================
+
+// Base Colors (Dark Theme)
+$color-black: #1a1a1a;
+$color-gray-dark: #2d394b;        // Slightly blue-ish dark gray (from template)
+$color-gray-medium: #38475d;      // Medium gray
+$color-gray: #4a4a4a;             // Standard gray
+$color-gray-light: #f0f0f0;       // Light gray for text
+$color-white: #ffffff;
+
+// Accent Colors
+$color-red: #e63946;              // Primary CTA (kraftvoll, Metal-vibe)
+$color-orange: #f9430a;           // Secondary accent (energetisch)
+$color-blue: #00a3ff;             // Tertiary accent (für Links/Info)
+
+// Background Variations
+$color-bg-dark: $color-black;
+$color-bg-surface: $color-gray-dark;
+$color-bg-light: #f1fafe;         // Light background for contrast sections
+
+// Status Colors
+$color-success: #10b981;          // Green
+$color-error: #ef4444;            // Red
+$color-warning: #f59e0b;          // Amber
+$color-info: $color-blue;
+
+// ============================================
+// Typography
+// ============================================
+
+// Font Families
+$font-family-base: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+$font-family-heading: 'Bebas Neue', 'Oswald', 'Impact', sans-serif;
+
+// Font Sizes (rem-based, 16px base)
+$font-size-xs: 0.75rem;           // 12px
+$font-size-sm: 0.875rem;          // 14px
+$font-size-base: 1rem;            // 16px
+$font-size-md: 1.125rem;          // 18px
+$font-size-lg: 1.25rem;           // 20px
+$font-size-xl: 1.5rem;            // 24px
+$font-size-xxl: 2rem;             // 32px
+$font-size-hero: 3rem;            // 48px
+$font-size-mega: 4rem;            // 64px
+
+// Font Weights
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+// Line Heights
+$line-height-tight: 1.2;
+$line-height-base: 1.6;
+$line-height-relaxed: 1.8;
+
+// ============================================
+// Spacing (8px base unit)
+// ============================================
+
+$spacing-unit: 0.5rem;            // 8px
+$spacing-xs: $spacing-unit;       // 8px
+$spacing-sm: $spacing-unit * 2;   // 16px
+$spacing-md: $spacing-unit * 3;   // 24px
+$spacing-lg: $spacing-unit * 4;   // 32px
+$spacing-xl: $spacing-unit * 6;   // 48px
+$spacing-xxl: $spacing-unit * 8;  // 64px
+$spacing-mega: $spacing-unit * 12; // 96px
+
+// ============================================
+// Layout
+// ============================================
+
+// Container
+$container-max-width: 1280px;
+$container-padding: $spacing-md;
+$container-padding-lg: $spacing-lg;
+
+// Breakpoints (Mobile-first)
+$breakpoint-xs: 480px;
+$breakpoint-sm: 640px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+$breakpoint-xxl: 1536px;
+
+// Grid
+$grid-gap: $spacing-md;
+$grid-columns: 12;
+
+// ============================================
+// Borders & Radius
+// ============================================
+
+$border-width: 1px;
+$border-width-thick: 2px;
+$border-color: $color-gray-medium;
+
+$radius-none: 0;
+$radius-sm: 4px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-xl: 16px;
+$radius-full: 9999px;
+
+// ============================================
+// Shadows
+// ============================================
+
+$shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+$shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+$shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
+$shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.6);
+$shadow-2xl: 0 24px 48px rgba(0, 0, 0, 0.7);
+
+// Colored Shadows (für Glow Effects)
+$shadow-red: 0 4px 12px rgba($color-red, 0.4);
+$shadow-orange: 0 4px 12px rgba($color-orange, 0.4);
+$shadow-blue: 0 4px 12px rgba($color-blue, 0.4);
+
+// ============================================
+// Transitions & Animations
+// ============================================
+
+$transition-fast: 0.15s ease-in-out;
+$transition-base: 0.2s ease-in-out;
+$transition-slow: 0.3s ease-in-out;
+$transition-slower: 0.4s ease-in-out;
+
+$easing-ease: ease;
+$easing-ease-in: ease-in;
+$easing-ease-out: ease-out;
+$easing-ease-in-out: ease-in-out;
+$easing-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+// ============================================
+// Z-Index Layers
+// ============================================
+
+$z-index-dropdown: 1000;
+$z-index-sticky: 1020;
+$z-index-fixed: 1030;
+$z-index-modal-backdrop: 1040;
+$z-index-modal: 1050;
+$z-index-popover: 1060;
+$z-index-tooltip: 1070;
+
+// ============================================
+// Header & Navigation
+// ============================================
+
+$header-height: 80px;
+$header-height-scrolled: 60px;
+$header-bg: rgba($color-gray-dark, 0.95);
+$header-bg-scrolled: rgba($color-gray-dark, 0.98);
+
+// ============================================
+// Forms
+// ============================================
+
+$input-height: 48px;
+$input-padding: $spacing-sm $spacing-md;
+$input-bg: $color-gray-dark;
+$input-border: $border-width solid $border-color;
+$input-border-focus: $border-width-thick solid $color-red;
+$input-radius: $radius-md;
+
+// ============================================
+// Buttons
+// ============================================
+
+$button-height: 48px;
+$button-padding: $spacing-sm $spacing-lg;
+$button-radius: $radius-md;
+$button-font-weight: $font-weight-semibold;
+
+// ============================================
+// Cards
+// ============================================
+
+$card-bg: $color-gray-dark;
+$card-border: $border-width solid $color-gray-medium;
+$card-radius: $radius-lg;
+$card-padding: $spacing-lg;
+$card-shadow: $shadow-md;
+$card-shadow-hover: $shadow-xl;

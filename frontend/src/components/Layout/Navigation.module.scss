@@ -1,0 +1,84 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+// ============================================
+// JOCH Bandpage - Navigation Styles
+// ============================================
+
+.nav {
+  // Default (mobile) styles
+}
+
+.navList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  @include md {
+    flex-direction: row;
+    gap: $spacing-lg;
+  }
+}
+
+.navItem {
+  margin: 0;
+}
+
+.navLink {
+  display: block;
+  padding: $spacing-md $spacing-lg;
+  font-family: $font-family-heading;
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  color: $color-gray-light;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: color $transition-base, background $transition-base;
+  position: relative;
+
+  @include md {
+    padding: $spacing-xs $spacing-sm;
+  }
+
+  // Hover state
+  &:hover {
+    color: $color-white;
+    background: rgba($color-red, 0.1);
+
+    @include md {
+      background: none;
+    }
+  }
+
+  // Active state (current page)
+  &.active {
+    color: $color-white;
+    background: rgba($color-red, 0.2);
+
+    @include md {
+      background: none;
+      color: $color-red;
+
+      // Underline effect on desktop
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -4px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: $color-red;
+      }
+    }
+  }
+
+  // Focus state (keyboard navigation)
+  &:focus-visible {
+    outline: 2px solid $color-red;
+    outline-offset: 2px;
+  }
+}
