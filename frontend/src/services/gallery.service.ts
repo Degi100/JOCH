@@ -4,7 +4,9 @@
 // ============================================
 
 import { api } from './api';
-import type { GalleryImage, GalleryCategory } from '@joch/shared';
+import type { GalleryImage } from '@joch/shared';
+
+type GalleryCategory = 'live' | 'promo' | 'backstage' | 'other';
 
 export const galleryService = {
   /**
@@ -15,7 +17,7 @@ export const galleryService = {
   getAll: async (category?: GalleryCategory): Promise<GalleryImage[]> => {
     const endpoint = category ? `/gallery?category=${category}` : '/gallery';
     const response = await api.get<GalleryImage[]>(endpoint);
-    return response.data;
+    return response.data || [];
   },
 
   /**
@@ -25,6 +27,7 @@ export const galleryService = {
    */
   getById: async (id: string): Promise<GalleryImage> => {
     const response = await api.get<GalleryImage>(`/gallery/${id}`);
+    if (!response.data) throw new Error('Gallery image not found');
     return response.data;
   },
 
@@ -36,6 +39,7 @@ export const galleryService = {
    */
   create: async (data: Partial<GalleryImage>, token: string): Promise<GalleryImage> => {
     const response = await api.post<GalleryImage>('/gallery', data, token);
+    if (!response.data) throw new Error('Failed to create gallery image');
     return response.data;
   },
 
@@ -48,6 +52,7 @@ export const galleryService = {
    */
   update: async (id: string, data: Partial<GalleryImage>, token: string): Promise<GalleryImage> => {
     const response = await api.put<GalleryImage>(`/gallery/${id}`, data, token);
+    if (!response.data) throw new Error('Failed to update gallery image');
     return response.data;
   },
 
@@ -68,6 +73,6 @@ export const galleryService = {
    */
   reorder: async (imageIds: string[], token: string): Promise<GalleryImage[]> => {
     const response = await api.patch<GalleryImage[]>('/gallery/reorder', { imageIds }, token);
-    return response.data;
+    return response.data || [];
   },
 };

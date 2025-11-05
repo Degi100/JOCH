@@ -6,6 +6,7 @@ export interface User {
   _id: ObjectId;
   email: string;
   password: string;
+  name?: string;
   role: 'admin' | 'member';
   createdAt: Date;
   updatedAt: Date;
@@ -21,13 +22,24 @@ export interface LoginCredentials {
   password: string;
 }
 
+export interface RegisterCredentials {
+  email: string;
+  password: string;
+  name?: string;
+}
+
 // Band Member
 export interface BandMember {
   _id: ObjectId;
   name: string;
+  role?: string; // z.B. "Lead Vocals", "Gitarre"
   instrument: string;
   bio: string;
   image: string; // URL/path to image
+  photo?: string; // Alias für image (backward compatibility)
+  instagram?: string;
+  facebook?: string;
+  twitter?: string;
   order: number; // für Sortierung (0=links, 1=mitte, 2=rechts)
   createdAt: Date;
   updatedAt: Date;
@@ -37,11 +49,14 @@ export interface BandMember {
 export interface NewsPost {
   _id: ObjectId;
   title: string;
+  slug?: string;
   content: string;
   excerpt: string;
   coverImage?: string;
-  author: ObjectId; // Reference to User
+  featuredImage?: string; // Alias für coverImage
+  author: ObjectId | User; // Reference to User (can be populated)
   published: boolean;
+  status?: 'draft' | 'published'; // Alias für published
   publishedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -53,10 +68,13 @@ export interface Gig {
   title: string;
   venue: string;
   location: string; // Stadt
+  city?: string; // Alias für location
+  country?: string;
   address?: string;
   date: Date;
   time?: string;
   ticketLink?: string;
+  ticketUrl?: string; // Alias für ticketLink
   price?: string;
   description?: string;
   image?: string;
@@ -69,10 +87,20 @@ export interface Gig {
 export interface Song {
   _id: ObjectId;
   title: string;
+  artist?: string;
+  album?: string;
+  lyrics?: string;
   duration: number; // in Sekunden
   audioFile: string; // URL/path to audio file
+  audioUrl?: string; // Alias für audioFile
   coverArt?: string;
   releaseDate?: Date;
+  streamingLinks?: {
+    spotify?: string;
+    appleMusic?: string;
+    youtube?: string;
+    soundcloud?: string;
+  };
   order: number; // für Playlist-Sortierung
   createdAt: Date;
   updatedAt: Date;
@@ -119,6 +147,22 @@ export interface PaginatedResponse<T> {
     limit: number;
     totalPages: number;
   };
+}
+
+// Specific List Response Types
+export interface GigListResponse {
+  gigs: Gig[];
+  total: number;
+}
+
+export interface NewsListResponse {
+  posts: NewsPost[];
+  total: number;
+}
+
+export interface SongListResponse {
+  songs: Song[];
+  total: number;
 }
 
 // File Upload

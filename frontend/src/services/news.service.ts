@@ -13,7 +13,7 @@ export const newsService = {
    */
   getAll: async (): Promise<NewsPost[]> => {
     const response = await api.get<NewsPost[]>('/news');
-    return response.data;
+    if (!response.data) throw new Error("Not found"); return response.data;
   },
 
   /**
@@ -23,7 +23,7 @@ export const newsService = {
    */
   getById: async (id: string): Promise<NewsPost> => {
     const response = await api.get<NewsPost>(`/news/${id}`);
-    return response.data;
+    if (!response.data) throw new Error("Not found"); return response.data;
   },
 
   /**
@@ -33,7 +33,7 @@ export const newsService = {
    */
   getBySlug: async (slug: string): Promise<NewsPost> => {
     const response = await api.get<NewsPost>(`/news/slug/${slug}`);
-    return response.data;
+    if (!response.data) throw new Error("Not found"); return response.data;
   },
 
   /**
@@ -44,7 +44,7 @@ export const newsService = {
    */
   create: async (data: Partial<NewsPost>, token: string): Promise<NewsPost> => {
     const response = await api.post<NewsPost>('/news', data, token);
-    return response.data;
+    if (!response.data) throw new Error("Not found"); return response.data;
   },
 
   /**
@@ -56,7 +56,7 @@ export const newsService = {
    */
   update: async (id: string, data: Partial<NewsPost>, token: string): Promise<NewsPost> => {
     const response = await api.put<NewsPost>(`/news/${id}`, data, token);
-    return response.data;
+    if (!response.data) throw new Error("Not found"); return response.data;
   },
 
   /**

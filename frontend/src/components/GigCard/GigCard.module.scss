@@ -1,0 +1,186 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+// ============================================
+// GigCard Component Styles
+// ============================================
+
+.gigCard {
+  @include card-base;
+  display: flex;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  transition: all $transition-base;
+
+  &.clickable {
+    cursor: pointer;
+
+    &:hover {
+      @include card-hover;
+    }
+  }
+
+  &.past {
+    opacity: 0.7;
+
+    .dateBadge {
+      background: $color-gray-dark;
+    }
+  }
+
+  &.cancelled {
+    opacity: 0.6;
+    text-decoration: line-through;
+
+    .dateBadge {
+      background: $color-gray-dark;
+    }
+  }
+
+  @include media-query(max, $breakpoint-sm) {
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+}
+
+// ============================================
+// Date Badge
+// ============================================
+
+.dateBadge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, $color-red, $color-orange);
+  border-radius: $border-radius-md;
+  padding: $spacing-sm;
+  min-width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+  text-align: center;
+  box-shadow: $card-shadow;
+
+  @include media-query(max, $breakpoint-sm) {
+    min-width: 100%;
+    height: auto;
+    padding: $spacing-sm;
+  }
+}
+
+.day {
+  font-size: $font-size-xxl;
+  font-weight: 700;
+  line-height: 1;
+  color: $color-white;
+}
+
+.month {
+  font-size: $font-size-sm;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: $color-white;
+  margin-top: 2px;
+}
+
+.year {
+  font-size: $font-size-xs;
+  color: rgba($color-white, 0.8);
+  margin-top: 2px;
+}
+
+// ============================================
+// Gig Info
+// ============================================
+
+.gigInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.venue {
+  font-size: $font-size-xl;
+  font-weight: 700;
+  color: $color-white;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.location,
+.time {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  color: $color-gray-light;
+  font-size: $font-size-sm;
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: $color-red;
+}
+
+.description {
+  margin: $spacing-xs 0 0;
+  color: $color-gray-light;
+  font-size: $font-size-sm;
+  line-height: 1.5;
+}
+
+// ============================================
+// Status Badge
+// ============================================
+
+.statusBadge {
+  display: inline-block;
+  padding: $spacing-xs $spacing-sm;
+  background: rgba($color-red, 0.1);
+  border: 1px solid rgba($color-red, 0.3);
+  border-radius: $border-radius-sm;
+  color: $color-red;
+  font-size: $font-size-xs;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  align-self: flex-start;
+  margin-top: $spacing-xs;
+}
+
+// ============================================
+// Ticket Link
+// ============================================
+
+.ticketLink {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  margin-top: $spacing-sm;
+  padding: $spacing-xs $spacing-sm;
+  background: rgba($color-blue, 0.1);
+  border: 1px solid rgba($color-blue, 0.3);
+  border-radius: $border-radius-sm;
+  color: $color-blue;
+  font-size: $font-size-sm;
+  font-weight: 600;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  align-self: flex-start;
+  transition: all $transition-base;
+
+  &:hover {
+    background: rgba($color-blue, 0.2);
+    border-color: $color-blue;
+    @include hover-lift;
+  }
+}
+
+.externalIcon {
+  width: 14px;
+  height: 14px;
+}

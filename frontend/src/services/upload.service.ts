@@ -25,7 +25,7 @@ export const uploadService = {
     formData.append('image', file);
 
     const response = await api.upload<UploadResponse>('/upload/image', formData, token);
-    return response.data;
+    if (!response.data) throw new Error("Upload failed"); return response.data;
   },
 
   /**
@@ -41,7 +41,7 @@ export const uploadService = {
     });
 
     const response = await api.upload<UploadResponse[]>('/upload/images', formData, token);
-    return response.data;
+    if (!response.data) throw new Error("Upload failed"); return response.data;
   },
 
   /**
@@ -55,6 +55,6 @@ export const uploadService = {
     formData.append('audio', file);
 
     const response = await api.upload<UploadResponse>('/upload/audio', formData, token);
-    return response.data;
+    if (!response.data) throw new Error("Upload failed"); return response.data;
   },
 };

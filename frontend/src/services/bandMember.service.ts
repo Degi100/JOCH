@@ -13,7 +13,7 @@ export const bandMemberService = {
    */
   getAll: async (): Promise<BandMember[]> => {
     const response = await api.get<BandMember[]>('/band-members');
-    return response.data;
+    if (!response.data) throw new Error("Not found"); return response.data;
   },
 
   /**
@@ -23,7 +23,7 @@ export const bandMemberService = {
    */
   getById: async (id: string): Promise<BandMember> => {
     const response = await api.get<BandMember>(`/band-members/${id}`);
-    return response.data;
+    if (!response.data) throw new Error("Not found"); return response.data;
   },
 
   /**
@@ -34,7 +34,7 @@ export const bandMemberService = {
    */
   create: async (data: Partial<BandMember>, token: string): Promise<BandMember> => {
     const response = await api.post<BandMember>('/band-members', data, token);
-    return response.data;
+    if (!response.data) throw new Error("Not found"); return response.data;
   },
 
   /**
@@ -46,7 +46,7 @@ export const bandMemberService = {
    */
   update: async (id: string, data: Partial<BandMember>, token: string): Promise<BandMember> => {
     const response = await api.put<BandMember>(`/band-members/${id}`, data, token);
-    return response.data;
+    if (!response.data) throw new Error("Not found"); return response.data;
   },
 
   /**

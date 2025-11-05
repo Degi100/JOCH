@@ -1,0 +1,144 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+// ============================================
+// BandMemberCard Component Styles
+// ============================================
+
+.memberCard {
+  @include card-base;
+  padding: $spacing-lg;
+  text-align: center;
+  transition: all $transition-base;
+
+  &:hover {
+    @include card-hover;
+
+    .photo {
+      transform: scale(1.05);
+    }
+  }
+}
+
+// ============================================
+// Photo
+// ============================================
+
+.photoWrapper {
+  width: 200px;
+  height: 200px;
+  margin: 0 auto $spacing-md;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid $color-red;
+  background: $color-gray-dark;
+  box-shadow: 0 4px 20px rgba($color-red, 0.3);
+
+  @include media-query(max, $breakpoint-sm) {
+    width: 150px;
+    height: 150px;
+  }
+}
+
+.photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform $transition-slow;
+}
+
+.photoPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, $color-gray-dark, $color-gray-darker);
+}
+
+.placeholderIcon {
+  width: 80px;
+  height: 80px;
+  color: $color-gray-medium;
+}
+
+// ============================================
+// Info
+// ============================================
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.name {
+  font-size: $font-size-xxl;
+  font-weight: 700;
+  color: $color-white;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.role {
+  font-size: $font-size-md;
+  color: $color-red;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.instrument {
+  font-size: $font-size-sm;
+  color: $color-orange;
+  font-weight: 500;
+  margin: 0;
+}
+
+.bio {
+  font-size: $font-size-sm;
+  color: $color-gray-light;
+  line-height: 1.6;
+  margin: $spacing-sm 0 0;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+// ============================================
+// Social Links
+// ============================================
+
+.social {
+  display: flex;
+  justify-content: center;
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
+}
+
+.socialLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba($color-white, 0.05);
+  border: 1px solid rgba($color-white, 0.1);
+  color: $color-gray-light;
+  transition: all $transition-base;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    background: rgba($color-red, 0.1);
+    border-color: $color-red;
+    color: $color-red;
+    @include hover-lift;
+  }
+}

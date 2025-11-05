@@ -3,7 +3,7 @@
 // ============================================
 
 import { api } from './api';
-import type { User, LoginCredentials, RegisterCredentials, ApiResponse } from '@joch/shared';
+import type { User, LoginCredentials, RegisterCredentials } from '@joch/shared';
 
 export interface AuthResponse {
   user: User;
@@ -16,6 +16,7 @@ export const authService = {
    */
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
     const response = await api.post<AuthResponse>('/auth/login', credentials);
+    if (!response.data) throw new Error('Login failed');
     return response.data;
   },
 
@@ -24,6 +25,7 @@ export const authService = {
    */
   register: async (credentials: RegisterCredentials): Promise<AuthResponse> => {
     const response = await api.post<AuthResponse>('/auth/register', credentials);
+    if (!response.data) throw new Error('Registration failed');
     return response.data;
   },
 
@@ -32,6 +34,7 @@ export const authService = {
    */
   me: async (token: string): Promise<User> => {
     const response = await api.get<User>('/auth/me', token);
+    if (!response.data) throw new Error('User not found');
     return response.data;
   },
 
@@ -40,6 +43,7 @@ export const authService = {
    */
   updateProfile: async (data: Partial<User>, token: string): Promise<User> => {
     const response = await api.put<User>('/auth/profile', data, token);
+    if (!response.data) throw new Error('Failed to update profile');
     return response.data;
   },
 

@@ -38,9 +38,8 @@ export async function apiRequest<T>(
   const { token, ...fetchOptions } = options;
 
   // Build headers
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...fetchOptions.headers,
   };
 
   // Inject JWT token if provided

@@ -1,0 +1,58 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+// ============================================
+// Input Component Styles
+// ============================================
+
+.inputWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  &.fullWidth {
+    width: 100%;
+  }
+}
+
+.label {
+  font-size: $font-size-sm;
+  font-weight: 500;
+  color: $color-gray-light;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.required {
+  color: $color-red;
+}
+
+.input {
+  @include form-input-base;
+
+  &.error {
+    border-color: $color-red;
+
+    &:focus {
+      border-color: $color-red;
+      box-shadow: 0 0 0 3px rgba($color-red, 0.1);
+    }
+  }
+}
+
+.errorText {
+  font-size: $font-size-sm;
+  color: $color-red;
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+
+  &::before {
+    content: '⚠';
+  }
+}
+
+.helperText {
+  font-size: $font-size-sm;
+  color: $color-gray-medium;
+}

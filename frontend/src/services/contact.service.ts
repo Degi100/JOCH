@@ -21,7 +21,7 @@ export const contactService = {
    */
   send: async (data: ContactFormData): Promise<ContactMessage> => {
     const response = await api.post<ContactMessage>('/contact', data);
-    return response.data;
+    if (!response.data) throw new Error("Not found"); return response.data;
   },
 
   /**
@@ -31,7 +31,7 @@ export const contactService = {
    */
   getAll: async (token: string): Promise<ContactMessage[]> => {
     const response = await api.get<ContactMessage[]>('/contact', token);
-    return response.data;
+    if (!response.data) throw new Error("Not found"); return response.data;
   },
 
   /**
@@ -42,7 +42,7 @@ export const contactService = {
    */
   getById: async (id: string, token: string): Promise<ContactMessage> => {
     const response = await api.get<ContactMessage>(`/contact/${id}`, token);
-    return response.data;
+    if (!response.data) throw new Error("Not found"); return response.data;
   },
 
   /**
@@ -53,7 +53,7 @@ export const contactService = {
    */
   markAsRead: async (id: string, token: string): Promise<ContactMessage> => {
     const response = await api.patch<ContactMessage>(`/contact/${id}/read`, {}, token);
-    return response.data;
+    if (!response.data) throw new Error("Not found"); return response.data;
   },
 
   /**

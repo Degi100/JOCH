@@ -3,7 +3,7 @@
 // ============================================
 
 import { api } from './api';
-import type { Gig, ApiResponse } from '@joch/shared';
+import type { Gig } from '@joch/shared';
 
 export interface GigListResponse {
   data: Gig[];
@@ -23,7 +23,7 @@ export const gigService = {
     status?: 'upcoming' | 'past' | 'cancelled';
     page?: number;
     limit?: number;
-  }): Promise<GigListResponse> => {
+  }): Promise<Gig[]> => {
     const queryParams = new URLSearchParams();
     if (params?.status) queryParams.append('status', params.status);
     if (params?.page) queryParams.append('page', params.page.toString());
@@ -32,8 +32,8 @@ export const gigService = {
     const query = queryParams.toString();
     const endpoint = query ? `/gigs?${query}` : '/gigs';
 
-    const response = await api.get<GigListResponse>(endpoint);
-    return response.data;
+    const response = await api.get<Gig[]>(endpoint);
+    return response.data || [];
   },
 
   /**
@@ -41,7 +41,7 @@ export const gigService = {
    */
   getUpcoming: async (): Promise<Gig[]> => {
     const response = await api.get<Gig[]>('/gigs/upcoming');
-    return response.data;
+    return response.data || [];
   },
 
   /**
@@ -49,7 +49,7 @@ export const gigService = {
    */
   getPast: async (): Promise<Gig[]> => {
     const response = await api.get<Gig[]>('/gigs/past');
-    return response.data;
+    return response.data || [];
   },
 
   /**
@@ -57,6 +57,7 @@ export const gigService = {
    */
   getById: async (id: string): Promise<Gig> => {
     const response = await api.get<Gig>(`/gigs/${id}`);
+    if (!response.data) throw new Error('Gig not found');
     return response.data;
   },
 
@@ -65,6 +66,7 @@ export const gigService = {
    */
   create: async (data: Partial<Gig>, token: string): Promise<Gig> => {
     const response = await api.post<Gig>('/gigs', data, token);
+    if (!response.data) throw new Error('Failed to create gig');
     return response.data;
   },
 
@@ -73,6 +75,7 @@ export const gigService = {
    */
   update: async (id: string, data: Partial<Gig>, token: string): Promise<Gig> => {
     const response = await api.put<Gig>(`/gigs/${id}`, data, token);
+    if (!response.data) throw new Error('Failed to update gig');
     return response.data;
   },
 

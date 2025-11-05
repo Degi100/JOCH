@@ -1,0 +1,98 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+// ============================================
+// Button Component Styles
+// ============================================
+
+.button {
+  // Base button styles from mixin
+  @include button-base;
+
+  // Disable button state
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+
+    &:hover {
+      transform: none;
+    }
+  }
+}
+
+// ============================================
+// Variants
+// ============================================
+
+.primary {
+  @include button-variant('primary');
+}
+
+.secondary {
+  @include button-variant('secondary');
+}
+
+.outline {
+  @include button-variant('outline');
+}
+
+.ghost {
+  @include button-variant('ghost');
+}
+
+// ============================================
+// Sizes
+// ============================================
+
+.small {
+  padding: $spacing-xs $spacing-sm;
+  font-size: $font-size-sm;
+}
+
+.medium {
+  padding: $spacing-sm $spacing-md;
+  font-size: $font-size-base;
+}
+
+.large {
+  padding: $spacing-md $spacing-lg;
+  font-size: $font-size-lg;
+}
+
+// ============================================
+// Modifiers
+// ============================================
+
+.fullWidth {
+  width: 100%;
+}
+
+.loading {
+  position: relative;
+  pointer-events: none;
+
+  .loadingText {
+    opacity: 0.6;
+  }
+}
+
+// ============================================
+// Loading Spinner
+// ============================================
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: $spacing-xs;
+  border: 2px solid rgba($color-white, 0.3);
+  border-top-color: $color-white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

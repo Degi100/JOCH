@@ -13,7 +13,7 @@ export const songService = {
    */
   getAll: async (): Promise<Song[]> => {
     const response = await api.get<Song[]>('/songs');
-    return response.data;
+    if (!response.data) throw new Error("Not found"); return response.data;
   },
 
   /**
@@ -23,7 +23,7 @@ export const songService = {
    */
   getById: async (id: string): Promise<Song> => {
     const response = await api.get<Song>(`/songs/${id}`);
-    return response.data;
+    if (!response.data) throw new Error("Not found"); return response.data;
   },
 
   /**
@@ -34,7 +34,7 @@ export const songService = {
    */
   create: async (data: Partial<Song>, token: string): Promise<Song> => {
     const response = await api.post<Song>('/songs', data, token);
-    return response.data;
+    if (!response.data) throw new Error("Not found"); return response.data;
   },
 
   /**
@@ -46,7 +46,7 @@ export const songService = {
    */
   update: async (id: string, data: Partial<Song>, token: string): Promise<Song> => {
     const response = await api.put<Song>(`/songs/${id}`, data, token);
-    return response.data;
+    if (!response.data) throw new Error("Not found"); return response.data;
   },
 
   /**
@@ -66,6 +66,6 @@ export const songService = {
    */
   reorder: async (songIds: string[], token: string): Promise<Song[]> => {
     const response = await api.patch<Song[]>('/songs/reorder', { songIds }, token);
-    return response.data;
+    if (!response.data) throw new Error("Not found"); return response.data;
   },
 };
