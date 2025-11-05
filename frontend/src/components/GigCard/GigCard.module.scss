@@ -6,18 +6,14 @@
 // ============================================
 
 .gigCard {
-  @include card-base;
+  @include card;
   display: flex;
   gap: $spacing-md;
   padding: $spacing-md;
-  transition: all $transition-base;
 
   &.clickable {
     cursor: pointer;
-
-    &:hover {
-      @include card-hover;
-    }
+    @include card-hover;
   }
 
   &.past {
@@ -37,7 +33,7 @@
     }
   }
 
-  @include media-query(max, $breakpoint-sm) {
+  @include max-sm {
     flex-direction: column;
     gap: $spacing-sm;
   }
@@ -53,7 +49,7 @@
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, $color-red, $color-orange);
-  border-radius: $border-radius-md;
+  border-radius: $radius-md;
   padding: $spacing-sm;
   min-width: 80px;
   height: 80px;
@@ -61,7 +57,7 @@
   text-align: center;
   box-shadow: $card-shadow;
 
-  @include media-query(max, $breakpoint-sm) {
+  @include max-sm {
     min-width: 100%;
     height: auto;
     padding: $spacing-sm;
@@ -141,7 +137,7 @@
   padding: $spacing-xs $spacing-sm;
   background: rgba($color-red, 0.1);
   border: 1px solid rgba($color-red, 0.3);
-  border-radius: $border-radius-sm;
+  border-radius: $radius-sm;
   color: $color-red;
   font-size: $font-size-xs;
   font-weight: 600;
@@ -163,7 +159,7 @@
   padding: $spacing-xs $spacing-sm;
   background: rgba($color-blue, 0.1);
   border: 1px solid rgba($color-blue, 0.3);
-  border-radius: $border-radius-sm;
+  border-radius: $radius-sm;
   color: $color-blue;
   font-size: $font-size-sm;
   font-weight: 600;

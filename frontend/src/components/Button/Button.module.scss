@@ -25,19 +25,25 @@
 // ============================================
 
 .primary {
-  @include button-variant('primary');
+  @include button-primary;
 }
 
 .secondary {
-  @include button-variant('secondary');
+  @include button-secondary;
 }
 
 .outline {
-  @include button-variant('outline');
+  @include button-outline;
 }
 
 .ghost {
-  @include button-variant('ghost');
+  background: transparent;
+  color: $color-gray-light;
+
+  &:hover:not(:disabled) {
+    background: rgba($color-gray-medium, 0.2);
+    color: $color-white;
+  }
 }
 
 // ============================================

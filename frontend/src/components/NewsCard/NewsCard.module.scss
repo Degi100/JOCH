@@ -6,7 +6,7 @@
 // ============================================
 
 .newsCard {
-  @include card-base;
+  @include card;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -65,7 +65,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  border-radius: $border-radius-sm;
+  border-radius: $radius-sm;
 }
 
 // ============================================

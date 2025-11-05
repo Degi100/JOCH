@@ -28,7 +28,7 @@
 }
 
 .input {
-  @include form-input-base;
+  @include input-base;
 
   &.error {
     border-color: $color-red;

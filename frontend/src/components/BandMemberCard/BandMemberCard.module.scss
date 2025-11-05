@@ -6,7 +6,7 @@
 // ============================================
 
 .memberCard {
-  @include card-base;
+  @include card;
   padding: $spacing-lg;
   text-align: center;
   transition: all $transition-base;
@@ -34,7 +34,7 @@
   background: $color-gray-dark;
   box-shadow: 0 4px 20px rgba($color-red, 0.3);
 
-  @include media-query(max, $breakpoint-sm) {
+  @include max-sm {
     width: 150px;
     height: 150px;
   }
@@ -53,7 +53,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, $color-gray-dark, $color-gray-darker);
+  background: linear-gradient(135deg, $color-gray-dark, $color-gray-dark);
 }
 
 .placeholderIcon {

@@ -12,7 +12,7 @@ export const newsService = {
    * @returns Array of published news posts, sorted by date (newest first)
    */
   getAll: async (): Promise<NewsPost[]> => {
-    const response = await api.get<NewsPost[]>('/news');
+    const response = await api.get<NewsPost[]>('/news/published');
     if (!response.data) throw new Error("Not found"); return response.data;
   },
 
