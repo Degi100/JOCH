@@ -31,6 +31,7 @@ export default defineConfig({
     preprocessorOptions: {
       scss: {
         // No additionalData - we use @use in each file instead (modern SASS)
+        api: 'modern-compiler', // Use modern SASS API instead of legacy JS API
       }
     }
   }

@@ -2,6 +2,8 @@
 // JOCH Bandpage - SASS Mixins
 // ============================================
 
+@use 'sass:color';
+@use 'sass:math';
 @use 'variables' as *;
 
 // ============================================
@@ -45,9 +47,32 @@
 }
 
 // Max-width queries (for edge cases)
+@mixin max-sm {
+  @media (max-width: #{$breakpoint-sm - 1px}) {
+    @content;
+  }
+}
+
 @mixin max-md {
   @media (max-width: #{$breakpoint-md - 1px}) {
     @content;
+  }
+}
+
+// Flexible responsive mixin (accepts breakpoint name)
+@mixin responsive($breakpoint) {
+  @if $breakpoint == xs {
+    @include xs { @content; }
+  } @else if $breakpoint == sm {
+    @include sm { @content; }
+  } @else if $breakpoint == md {
+    @include md { @content; }
+  } @else if $breakpoint == lg {
+    @include lg { @content; }
+  } @else if $breakpoint == xl {
+    @include xl { @content; }
+  } @else if $breakpoint == xxl {
+    @include xxl { @content; }
   }
 }
 
@@ -174,7 +199,7 @@
   color: $color-white;
 
   &:hover:not(:disabled) {
-    background: darken($color-red, 8%);
+    background: color.adjust($color-red, $lightness: -8%);
     transform: translateY(-2px);
     box-shadow: $shadow-red;
   }
@@ -189,7 +214,7 @@
   color: $color-gray-light;
 
   &:hover:not(:disabled) {
-    background: lighten($color-gray-medium, 8%);
+    background: color.adjust($color-gray-medium, $lightness: 8%);
     transform: translateY(-2px);
     box-shadow: $shadow-md;
   }
@@ -435,7 +460,7 @@
     border-radius: $radius-full;
 
     &:hover {
-      background: lighten($color-gray-medium, 10%);
+      background: color.adjust($color-gray-medium, $lightness: 10%);
     }
   }
 }

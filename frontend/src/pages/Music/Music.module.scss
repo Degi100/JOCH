@@ -1,0 +1,306 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+@use 'sass:color';
+@use 'sass:math';
+
+.musicPage {
+  min-height: 100vh;
+}
+
+// Hero Section
+.hero {
+  background: linear-gradient(135deg, $color-black, $color-gray-dark);
+  padding: calc($header-height + $spacing-mega) $spacing-lg $spacing-mega;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, transparent, rgba($color-black, 0.8));
+    pointer-events: none;
+  }
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.heroTitle {
+  font-family: $font-family-heading;
+  font-size: $font-size-mega;
+  font-weight: $font-weight-bold;
+  color: $color-white;
+  margin-bottom: $spacing-lg;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  @include fade-in;
+
+  @include responsive(md) {
+    font-size: $font-size-mega;
+  }
+}
+
+.heroSubtitle {
+  font-size: $font-size-lg;
+  color: $color-gray-light;
+  line-height: 1.6;
+  @include fade-in;
+  animation-delay: 0.2s;
+
+  @include responsive(md) {
+    font-size: $font-size-xl;
+  }
+}
+
+// Content Section
+.content {
+  padding: $spacing-mega $spacing-lg;
+  background: $color-black;
+}
+
+.container {
+  max-width: $container-xl;
+  margin: 0 auto;
+}
+
+// Loading/Error States
+.loadingWrapper {
+  display: flex;
+  justify-content: center;
+  padding: $spacing-mega 0;
+}
+
+.error,
+.empty {
+  text-align: center;
+  padding: $spacing-mega $spacing-lg;
+  color: $color-gray-light;
+  font-size: $font-size-lg;
+}
+
+// Music Layout
+.musicLayout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-xxl;
+
+  @include responsive(lg) {
+    grid-template-columns: 350px 1fr;
+  }
+}
+
+// Song List (Sidebar)
+.songList {
+  background: $color-gray-dark;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $card-shadow;
+  height: fit-content;
+}
+
+.sectionTitle {
+  font-family: $font-family-heading;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-white;
+  margin-bottom: $spacing-lg;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 2px solid $color-red;
+  padding-bottom: $spacing-sm;
+}
+
+.tracks {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.trackItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background: $color-gray-dark;
+  border: 2px solid transparent;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: $transition-base;
+  text-align: left;
+  width: 100%;
+
+  &:hover {
+    background: color.adjust($color-gray-dark, $lightness: 5%);
+    border-color: $color-red;
+    transform: translateX(4px);
+  }
+
+  &.active {
+    background: linear-gradient(135deg, $color-red, $color-orange);
+    border-color: $color-red;
+    box-shadow: $card-shadow;
+
+    .trackNumber,
+    .trackTitle,
+    .trackArtist,
+    .trackDuration {
+      color: $color-white;
+    }
+
+    .trackArtist {
+      opacity: 0.9;
+    }
+  }
+}
+
+.trackNumber {
+  font-family: $font-family-mono;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  color: $color-gray-light;
+  min-width: 24px;
+}
+
+.trackInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: math.div($spacing-xs, 2);
+  min-width: 0;
+}
+
+.trackTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trackArtist {
+  font-size: $font-size-sm;
+  color: $color-gray-light;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trackDuration {
+  font-family: $font-family-mono;
+  font-size: $font-size-sm;
+  color: $color-gray-light;
+  min-width: 45px;
+  text-align: right;
+}
+
+// Player Section
+.playerSection {
+  min-height: 600px;
+}
+
+.noSelection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  background: $color-gray-dark;
+  border-radius: $radius-lg;
+  color: $color-gray-light;
+  font-size: $font-size-lg;
+}
+
+// Call to Action
+.cta {
+  background: linear-gradient(135deg, $color-gray-dark, $color-black);
+  padding: $spacing-mega $spacing-lg;
+  text-align: center;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+      circle at center,
+      rgba($color-red, 0.1),
+      transparent 70%
+    );
+    pointer-events: none;
+  }
+}
+
+.ctaContent {
+  position: relative;
+  z-index: 1;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.ctaTitle {
+  font-family: $font-family-heading;
+  font-size: $font-size-hero;
+  font-weight: $font-weight-bold;
+  color: $color-white;
+  margin-bottom: $spacing-md;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+
+  @include responsive(md) {
+    font-size: $font-size-mega;
+  }
+}
+
+.ctaText {
+  font-size: $font-size-lg;
+  color: $color-gray-light;
+  margin-bottom: $spacing-xxl;
+  line-height: 1.6;
+}
+
+.ctaButtons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: $spacing-md;
+}
+
+.ctaButton {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-md $spacing-xl;
+  background: $color-gray-dark;
+  color: $color-white;
+  text-decoration: none;
+  border-radius: $radius-lg;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  transition: $transition-base;
+  border: 2px solid transparent;
+  box-shadow: $card-shadow;
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  &:hover {
+    background: linear-gradient(135deg, $color-red, $color-orange);
+    border-color: $color-red;
+    transform: translateY(-2px);
+    box-shadow: $card-shadow-hover;
+  }
+}

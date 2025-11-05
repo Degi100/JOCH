@@ -28,7 +28,7 @@
 }
 
 .textarea {
-  @include form-input-base;
+  @include input-base;
   resize: vertical;
   min-height: 100px;
   font-family: $font-family-body;
@@ -41,6 +41,17 @@
       box-shadow: 0 0 0 3px rgba($color-red, 0.1);
     }
   }
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: $spacing-sm;
+}
+
+.messages {
+  flex: 1;
 }
 
 .errorText {
@@ -58,4 +69,11 @@
 .helperText {
   font-size: $font-size-sm;
   color: $color-gray-medium;
+}
+
+.charCount {
+  font-size: $font-size-xs;
+  color: $color-gray-medium;
+  font-family: $font-family-mono;
+  white-space: nowrap;
 }

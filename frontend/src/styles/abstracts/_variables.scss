@@ -38,6 +38,8 @@ $color-info: $color-blue;
 // Font Families
 $font-family-base: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 $font-family-heading: 'Bebas Neue', 'Oswald', 'Impact', sans-serif;
+$font-family-body: $font-family-base;
+$font-family-mono: 'Courier New', 'Consolas', monospace;
 
 // Font Sizes (rem-based, 16px base)
 $font-size-xs: 0.75rem;           // 12px
@@ -80,6 +82,10 @@ $spacing-mega: $spacing-unit * 12; // 96px
 
 // Container
 $container-max-width: 1280px;
+$container-sm: 640px;
+$container-md: 768px;
+$container-lg: 1024px;
+$container-xl: 1280px;
 $container-padding: $spacing-md;
 $container-padding-lg: $spacing-lg;
 
@@ -118,7 +124,7 @@ $shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
 $shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
 $shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
 $shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.6);
-$shadow-2xl: 0 24px 48px rgba(0, 0, 0, 0.7);
+$shadow-xxl: 0 24px 48px rgba(0, 0, 0, 0.7);
 
 // Colored Shadows (für Glow Effects)
 $shadow-red: 0 4px 12px rgba($color-red, 0.4);

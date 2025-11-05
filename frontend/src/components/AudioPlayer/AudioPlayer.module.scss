@@ -1,0 +1,334 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+@use 'sass:color';
+
+.audioPlayer {
+  background: $color-gray-dark;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $card-shadow;
+  transition: $transition-base;
+
+  @include hover-lift;
+}
+
+// Cover Art
+.coverArt {
+  width: 100%;
+  max-width: 300px;
+  aspect-ratio: 1;
+  margin: 0 auto $spacing-lg;
+  border-radius: $radius-md;
+  overflow: hidden;
+  box-shadow: $card-shadow;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.coverPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $color-gray-dark;
+
+  svg {
+    width: 40%;
+    height: 40%;
+    color: $color-gray-light;
+    opacity: 0.3;
+  }
+}
+
+// Song Info
+.songInfo {
+  text-align: center;
+  margin-bottom: $spacing-lg;
+}
+
+.title {
+  font-family: $font-family-heading;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-white;
+  margin-bottom: $spacing-xs;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.artist {
+  font-size: $font-size-md;
+  color: $color-red;
+  font-weight: $font-weight-semibold;
+  margin-bottom: $spacing-xs;
+}
+
+.album {
+  font-size: $font-size-sm;
+  color: $color-gray-light;
+}
+
+// Controls
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+// Play/Pause Button
+.playButton {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $color-red, $color-orange);
+  border: none;
+  color: $color-white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: $transition-base;
+  margin: 0 auto;
+  box-shadow: $card-shadow;
+
+  svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: $card-shadow-hover;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+// Progress Bar
+.progressWrapper {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.time {
+  font-size: $font-size-sm;
+  color: $color-gray-light;
+  font-family: $font-family-mono;
+  min-width: 45px;
+}
+
+.progressBar {
+  flex: 1;
+  height: 8px;
+  background: $color-gray-dark;
+  border-radius: $radius-full;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+
+  &:hover {
+    .progressFill {
+      background: color.adjust($color-red, $lightness: 5%);
+    }
+  }
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, $color-red, $color-orange);
+  border-radius: $radius-full;
+  transition: width 0.1s linear, background $transition-base;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    background: $color-white;
+    border-radius: 50%;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+  }
+}
+
+// Volume Control
+.volumeControl {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  justify-content: center;
+}
+
+.volumeIcon {
+  width: 24px;
+  height: 24px;
+  color: $color-gray-light;
+}
+
+.volumeSlider {
+  width: 100px;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: $color-gray-dark;
+  border-radius: $radius-full;
+  outline: none;
+  cursor: pointer;
+
+  // Webkit (Chrome, Safari)
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    background: $color-blue;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: $transition-base;
+
+    &:hover {
+      transform: scale(1.2);
+    }
+  }
+
+  // Firefox
+  &::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    background: $color-blue;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    transition: $transition-base;
+
+    &:hover {
+      transform: scale(1.2);
+    }
+  }
+}
+
+// Lyrics Button
+.lyricsButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-xs;
+  padding: $spacing-sm $spacing-md;
+  background: $color-gray-dark;
+  color: $color-white;
+  border: 1px solid $color-gray-dark;
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: $transition-base;
+  margin: 0 auto;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background: $color-gray-dark;
+    border-color: $color-red;
+    color: $color-red;
+  }
+}
+
+// Lyrics Display
+.lyrics {
+  margin-top: $spacing-lg;
+  padding: $spacing-lg;
+  background: $color-gray-dark;
+  border-radius: $radius-md;
+  border-left: 4px solid $color-red;
+
+  h4 {
+    font-family: $font-family-heading;
+    font-size: $font-size-lg;
+    color: $color-red;
+    margin-bottom: $spacing-md;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  pre {
+    font-family: $font-family-body;
+    font-size: $font-size-sm;
+    line-height: 1.8;
+    color: $color-gray-light;
+    white-space: pre-wrap;
+    margin: 0;
+  }
+}
+
+// Streaming Links
+.streamingLinks {
+  margin-top: $spacing-lg;
+  padding-top: $spacing-lg;
+  border-top: 1px solid $color-gray-dark;
+  text-align: center;
+}
+
+.streamingLabel {
+  display: block;
+  font-size: $font-size-sm;
+  color: $color-gray-light;
+  margin-bottom: $spacing-sm;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: $spacing-sm;
+}
+
+.streamingLink {
+  padding: $spacing-xs $spacing-md;
+  background: $color-gray-dark;
+  color: $color-white;
+  text-decoration: none;
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  transition: $transition-base;
+  border: 1px solid transparent;
+
+  &:hover {
+    background: $color-blue;
+    border-color: $color-blue;
+    transform: translateY(-2px);
+  }
+}
+
+// Responsive
+@include responsive(md) {
+  .audioPlayer {
+    padding: $spacing-xl;
+  }
+
+  .coverArt {
+    max-width: 400px;
+  }
+
+  .title {
+    font-size: $font-size-xxl;
+  }
+
+  .volumeSlider {
+    width: 120px;
+  }
+}

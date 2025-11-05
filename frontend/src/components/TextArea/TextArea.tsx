@@ -25,6 +25,12 @@ interface TextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
    * @default false
    */
   fullWidth?: boolean;
+
+  /**
+   * Show character count
+   * @default false
+   */
+  showCharCount?: boolean;
 }
 
 /**
@@ -48,16 +54,19 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
       error,
       helperText,
       fullWidth = false,
+      showCharCount = false,
       className = '',
       id,
       rows = 4,
+      value,
+      maxLength,
       ...props
     },
     ref
   ) => {
     // Generate ID if not provided
     const textareaId =
-      id || `textarea-${Math.random().toString(36).substr(2, 9)}`;
+      id || `textarea-${Math.random().toString(36).substring(2, 11)}`;
 
     const wrapperClasses = [
       styles.textareaWrapper,
@@ -70,6 +79,9 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
     const textareaClasses = [styles.textarea, error && styles.error]
       .filter(Boolean)
       .join(' ');
+
+    // Character count
+    const currentLength = value ? String(value).length : 0;
 
     return (
       <div className={wrapperClasses}>
@@ -85,13 +97,24 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
           id={textareaId}
           className={textareaClasses}
           rows={rows}
+          value={value}
+          maxLength={maxLength}
           {...props}
         />
 
-        {error && <span className={styles.errorText}>{error}</span>}
-        {!error && helperText && (
-          <span className={styles.helperText}>{helperText}</span>
-        )}
+        <div className={styles.footer}>
+          <div className={styles.messages}>
+            {error && <span className={styles.errorText}>{error}</span>}
+            {!error && helperText && (
+              <span className={styles.helperText}>{helperText}</span>
+            )}
+          </div>
+          {showCharCount && maxLength && (
+            <span className={styles.charCount}>
+              {currentLength} / {maxLength}
+            </span>
+          )}
+        </div>
       </div>
     );
   }

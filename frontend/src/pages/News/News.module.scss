@@ -1,0 +1,101 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+.newsPage {
+  min-height: 100vh;
+}
+
+// Hero Section
+.hero {
+  background: linear-gradient(135deg, $color-black, $color-gray-dark);
+  padding: calc($header-height + $spacing-mega) $spacing-lg $spacing-mega;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, transparent, rgba($color-black, 0.8));
+    pointer-events: none;
+  }
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.heroTitle {
+  font-family: $font-family-heading;
+  font-size: $font-size-mega;
+  font-weight: $font-weight-bold;
+  color: $color-white;
+  margin-bottom: $spacing-lg;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  @include fade-in;
+
+  @include responsive(md) {
+    font-size: $font-size-mega;
+  }
+}
+
+.heroSubtitle {
+  font-size: $font-size-lg;
+  color: $color-gray-light;
+  line-height: 1.6;
+  @include fade-in;
+  animation-delay: 0.2s;
+
+  @include responsive(md) {
+    font-size: $font-size-xl;
+  }
+}
+
+// Content Section
+.content {
+  padding: $spacing-mega $spacing-lg;
+  background: $color-black;
+}
+
+.container {
+  max-width: $container-xl;
+  margin: 0 auto;
+}
+
+// Loading/Error States
+.loadingWrapper {
+  display: flex;
+  justify-content: center;
+  padding: $spacing-mega 0;
+}
+
+.error,
+.empty {
+  text-align: center;
+  padding: $spacing-mega $spacing-lg;
+  color: $color-gray-light;
+  font-size: $font-size-lg;
+}
+
+// News Grid
+.newsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-xl;
+
+  @include responsive(md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include responsive(lg) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
