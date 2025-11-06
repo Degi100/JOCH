@@ -135,18 +135,41 @@
 }
 
 // ============================================
+// Mobile Menu Overlay
+// ============================================
+
+.overlay {
+  position: fixed;
+  top: $header-height;
+  left: 0;
+  width: 100%;
+  height: calc(100vh - #{$header-height});
+  background: rgba($color-black, 0.8);
+  @include backdrop-blur(4px);
+  z-index: z-index('overlay');
+  animation: fadeIn $transition-base $easing-ease-out;
+
+  @include md {
+    display: none;
+  }
+}
+
+// ============================================
 // Mobile Navigation
 // ============================================
 
 .mobileNav {
-  position: absolute;
-  top: 100%;
+  position: fixed;
+  top: $header-height;
   left: 0;
   width: 100%;
+  max-height: calc(100vh - #{$header-height});
   background: $color-gray-dark;
   @include backdrop-blur(10px);
   border-top: 1px solid rgba($color-gray-medium, 0.3);
   box-shadow: $shadow-lg;
+  overflow-y: auto;
+  z-index: z-index('modal');
   animation: slideDown $transition-base $easing-ease-out;
 
   @include md {
@@ -162,5 +185,14 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }

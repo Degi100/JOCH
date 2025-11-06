@@ -1,0 +1,101 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+// ============================================
+// JOCH Bandpage - Admin Login Page Styles
+// ============================================
+
+.loginPage {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, $color-black 0%, $color-gray-dark 100%);
+  padding: $spacing-xl $spacing-md;
+}
+
+.loginContainer {
+  width: 100%;
+  max-width: 450px;
+}
+
+.loginBox {
+  background: $color-gray-dark;
+  border-radius: $radius-lg;
+  padding: $spacing-xxl $spacing-xl;
+  box-shadow: $shadow-xl;
+  border: 1px solid rgba($color-gray-medium, 0.2);
+
+  @include md {
+    padding: calc($spacing-xxl * 1.5) $spacing-xxl;
+  }
+}
+
+// ============================================
+// Header
+// ============================================
+
+.header {
+  text-align: center;
+  margin-bottom: $spacing-xxl;
+}
+
+.title {
+  font-family: $font-family-heading;
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-white;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: $spacing-xs;
+}
+
+.subtitle {
+  font-size: $font-size-base;
+  color: $color-gray-light;
+  font-weight: $font-weight-regular;
+}
+
+// ============================================
+// Form
+// ============================================
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.error {
+  padding: $spacing-md;
+  background: rgba($color-red, 0.1);
+  border: 1px solid rgba($color-red, 0.3);
+  border-radius: $radius-md;
+  color: $color-red;
+  font-size: $font-size-sm;
+  text-align: center;
+  animation: shake 0.5s;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+// ============================================
+// Footer
+// ============================================
+
+.footer {
+  margin-top: $spacing-xl;
+  padding-top: $spacing-lg;
+  border-top: 1px solid rgba($color-gray-medium, 0.2);
+  text-align: center;
+}
+
+.footerText {
+  font-size: $font-size-sm;
+  color: $color-gray-light;
+  line-height: 1.6;
+}

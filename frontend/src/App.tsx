@@ -15,6 +15,9 @@ import Music from './pages/Music/Music';
 import News from './pages/News/News';
 import NewsDetail from './pages/News/NewsDetail';
 import Contact from './pages/Contact/Contact';
+import Login from './pages/Admin/Login';
+import Dashboard from './pages/Admin/Dashboard';
+import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import './styles/main.scss';
 
 const App: React.FC = () => {
@@ -32,8 +35,18 @@ const App: React.FC = () => {
               <Route path="/news" element={<News />} />
               <Route path="/news/:id" element={<NewsDetail />} />
               <Route path="/contact" element={<Contact />} />
-              {/* TODO: Add admin routes later */}
-              {/* <Route path="/admin/*" element={<Admin />} /> */}
+
+              {/* Admin Routes */}
+              <Route path="/admin/login" element={<Login />} />
+              <Route
+                path="/admin/dashboard"
+                element={
+                  <PrivateRoute>
+                    <Dashboard />
+                  </PrivateRoute>
+                }
+              />
+
               {/* <Route path="*" element={<NotFound />} /> */}
             </Routes>
           </main>
