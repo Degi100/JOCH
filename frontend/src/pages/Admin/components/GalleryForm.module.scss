@@ -1,0 +1,251 @@
+@use '../../../styles/abstracts/variables' as *;
+@use '../../../styles/abstracts/mixins' as *;
+
+// ============================================
+// JOCH Bandpage - Gallery Form Styles
+// (Reuses same styles as GigForm/NewsForm/MusicForm)
+// ============================================
+
+// ============================================
+// Modal Overlay
+// ============================================
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba($color-black, 0.8);
+  @include backdrop-blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-md;
+  z-index: z-index('modal');
+  animation: fadeIn $transition-base $easing-ease-out;
+}
+
+.modalContent {
+  background: $color-gray-dark;
+  border-radius: $radius-lg;
+  border: 1px solid rgba($color-gray-medium, 0.3);
+  box-shadow: $shadow-xl;
+  width: 100%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp $transition-base $easing-ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ============================================
+// Modal Header
+// ============================================
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-xl $spacing-lg;
+  border-bottom: 1px solid rgba($color-gray-medium, 0.2);
+
+  @include md {
+    padding: $spacing-xl $spacing-xxl;
+  }
+}
+
+.modalTitle {
+  font-family: $font-family-heading;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-white;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+
+  @include md {
+    font-size: $font-size-xxl;
+  }
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: $color-gray-light;
+  font-size: $font-size-xxl;
+  line-height: 1;
+  cursor: pointer;
+  padding: $spacing-xs;
+  transition: color $transition-base;
+
+  &:hover:not(:disabled) {
+    color: $color-white;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// ============================================
+// Form
+// ============================================
+
+.form {
+  padding: $spacing-lg;
+
+  @include md {
+    padding: $spacing-xl $spacing-xxl $spacing-xxl;
+  }
+}
+
+.error {
+  padding: $spacing-md;
+  background: rgba($color-red, 0.1);
+  border: 1px solid rgba($color-red, 0.3);
+  border-radius: $radius-md;
+  color: $color-red;
+  font-size: $font-size-sm;
+  margin-bottom: $spacing-lg;
+  animation: shake 0.5s;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-lg;
+
+  @include md {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.formGroupFull {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  @include md {
+    grid-column: 1 / -1;
+  }
+}
+
+.label {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-gray-light;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.select {
+  background: rgba($color-black, 0.3);
+  border: 1px solid rgba($color-gray-medium, 0.3);
+  border-radius: $radius-md;
+  padding: $spacing-sm $spacing-md;
+  font-size: $font-size-base;
+  color: $color-white;
+  font-family: $font-family-base;
+  transition: border-color $transition-base, background-color $transition-base;
+
+  &:hover:not(:disabled) {
+    border-color: rgba($color-gray-medium, 0.5);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $color-red;
+    background: rgba($color-black, 0.5);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  option {
+    background: $color-gray-dark;
+    color: $color-white;
+  }
+}
+
+.textarea {
+  background: rgba($color-black, 0.3);
+  border: 1px solid rgba($color-gray-medium, 0.3);
+  border-radius: $radius-md;
+  padding: $spacing-sm $spacing-md;
+  font-size: $font-size-base;
+  color: $color-white;
+  font-family: $font-family-base;
+  line-height: 1.6;
+  resize: vertical;
+  transition: border-color $transition-base, background-color $transition-base;
+
+  &::placeholder {
+    color: rgba($color-gray-light, 0.5);
+  }
+
+  &:hover:not(:disabled) {
+    border-color: rgba($color-gray-medium, 0.5);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $color-red;
+    background: rgba($color-black, 0.5);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// ============================================
+// Form Actions
+// ============================================
+
+.formActions {
+  display: flex;
+  gap: $spacing-md;
+  justify-content: flex-end;
+  margin-top: $spacing-xl;
+  padding-top: $spacing-xl;
+  border-top: 1px solid rgba($color-gray-medium, 0.2);
+
+  @include sm {
+    gap: $spacing-lg;
+  }
+}

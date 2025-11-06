@@ -1,0 +1,223 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+// ============================================
+// JOCH Bandpage - Admin Music Manager Styles
+// ============================================
+
+.musicManagerPage {
+  min-height: 100vh;
+  background: linear-gradient(135deg, $color-black 0%, $color-gray-dark 100%);
+  padding: calc($header-height + $spacing-xl) $spacing-md $spacing-xl;
+
+  @include md {
+    padding: calc($header-height + $spacing-xxl) $spacing-xl $spacing-xxl;
+  }
+}
+
+.container {
+  @include container;
+  max-width: 1400px;
+}
+
+// ============================================
+// Header
+// ============================================
+
+.header {
+  margin-bottom: $spacing-xxl;
+}
+
+.headerTop {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  @include md {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+}
+
+.title {
+  font-family: $font-family-heading;
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-white;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: $spacing-xs;
+
+  @include md {
+    font-size: $font-size-hero;
+  }
+}
+
+.subtitle {
+  font-size: $font-size-base;
+  color: $color-gray-light;
+}
+
+// ============================================
+// Error & Empty States
+// ============================================
+
+.error {
+  text-align: center;
+  padding: $spacing-xxl;
+  background: $color-gray-dark;
+  border-radius: $radius-lg;
+  border: 1px solid rgba($color-red, 0.3);
+
+  p {
+    color: $color-red;
+    font-size: $font-size-lg;
+    margin-bottom: $spacing-lg;
+  }
+}
+
+.empty {
+  text-align: center;
+  padding: calc($spacing-xxl * 2) $spacing-xl;
+  background: $color-gray-dark;
+  border-radius: $radius-lg;
+  border: 1px solid rgba($color-gray-medium, 0.2);
+}
+
+.emptyIcon {
+  font-size: 64px;
+  margin-bottom: $spacing-lg;
+  opacity: 0.5;
+}
+
+.emptyTitle {
+  font-family: $font-family-heading;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-white;
+  margin-bottom: $spacing-sm;
+}
+
+.emptyText {
+  font-size: $font-size-base;
+  color: $color-gray-light;
+  margin-bottom: $spacing-xl;
+  line-height: 1.6;
+}
+
+// ============================================
+// Table
+// ============================================
+
+.songsTable {
+  background: $color-gray-dark;
+  border-radius: $radius-lg;
+  border: 1px solid rgba($color-gray-medium, 0.2);
+  overflow: hidden;
+}
+
+.tableHeader {
+  display: none;
+  background: rgba($color-black, 0.3);
+  border-bottom: 1px solid rgba($color-gray-medium, 0.2);
+  padding: $spacing-md $spacing-lg;
+
+  @include md {
+    display: grid;
+    grid-template-columns: 1fr 200px 100px 150px 200px;
+    gap: $spacing-md;
+  }
+}
+
+.headerCell {
+  font-family: $font-family-heading;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  color: $color-gray-light;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tableBody {
+  display: flex;
+  flex-direction: column;
+}
+
+.tableRow {
+  padding: $spacing-lg;
+  border-bottom: 1px solid rgba($color-gray-medium, 0.1);
+  transition: background-color $transition-base;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: rgba($color-black, 0.2);
+  }
+
+  @include md {
+    display: grid;
+    grid-template-columns: 1fr 200px 100px 150px 200px;
+    gap: $spacing-md;
+    align-items: center;
+    padding: $spacing-md $spacing-lg;
+  }
+}
+
+.cell {
+  margin-bottom: $spacing-md;
+
+  @include md {
+    margin-bottom: 0;
+  }
+}
+
+// ============================================
+// Cell Content
+// ============================================
+
+.songCell {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.songTitle {
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  color: $color-white;
+}
+
+.songArtist {
+  font-size: $font-size-sm;
+  color: $color-gray-light;
+}
+
+.album {
+  font-size: $font-size-base;
+  color: $color-white;
+}
+
+.duration {
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  color: $color-white;
+  font-family: $font-family-mono;
+}
+
+.date {
+  font-size: $font-size-base;
+  color: $color-white;
+}
+
+// ============================================
+// Actions
+// ============================================
+
+.actions {
+  display: flex;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+}

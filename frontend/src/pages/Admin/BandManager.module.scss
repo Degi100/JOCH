@@ -1,0 +1,217 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+// ============================================
+// JOCH Bandpage - Admin Band Manager Styles
+// ============================================
+
+.bandManagerPage {
+  min-height: 100vh;
+  background: linear-gradient(135deg, $color-black 0%, $color-gray-dark 100%);
+  padding: calc($header-height + $spacing-xl) $spacing-md $spacing-xl;
+
+  @include md {
+    padding: calc($header-height + $spacing-xxl) $spacing-xl $spacing-xxl;
+  }
+}
+
+.container {
+  @include container;
+  max-width: 1400px;
+}
+
+// ============================================
+// Header
+// ============================================
+
+.header {
+  margin-bottom: $spacing-xxl;
+}
+
+.headerTop {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  @include md {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+}
+
+.title {
+  font-family: $font-family-heading;
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-white;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: $spacing-xs;
+
+  @include md {
+    font-size: $font-size-hero;
+  }
+}
+
+.subtitle {
+  font-size: $font-size-base;
+  color: $color-gray-light;
+}
+
+// ============================================
+// Error & Empty States
+// ============================================
+
+.error {
+  text-align: center;
+  padding: $spacing-xxl;
+  background: $color-gray-dark;
+  border-radius: $radius-lg;
+  border: 1px solid rgba($color-red, 0.3);
+
+  p {
+    color: $color-red;
+    font-size: $font-size-lg;
+    margin-bottom: $spacing-lg;
+  }
+}
+
+.empty {
+  text-align: center;
+  padding: calc($spacing-xxl * 2) $spacing-xl;
+  background: $color-gray-dark;
+  border-radius: $radius-lg;
+  border: 1px solid rgba($color-gray-medium, 0.2);
+}
+
+.emptyIcon {
+  font-size: 64px;
+  margin-bottom: $spacing-lg;
+  opacity: 0.5;
+}
+
+.emptyTitle {
+  font-family: $font-family-heading;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-white;
+  margin-bottom: $spacing-sm;
+}
+
+.emptyText {
+  font-size: $font-size-base;
+  color: $color-gray-light;
+  margin-bottom: $spacing-xl;
+  line-height: 1.6;
+}
+
+// ============================================
+// Members Grid
+// ============================================
+
+.membersGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-xl;
+
+  @include md {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include lg {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.memberCard {
+  background: $color-gray-dark;
+  border-radius: $radius-lg;
+  border: 1px solid rgba($color-gray-medium, 0.2);
+  overflow: hidden;
+  transition: transform $transition-base, box-shadow $transition-base;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-lg;
+  }
+}
+
+.memberImage {
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: rgba($color-black, 0.3);
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform $transition-base;
+
+  .memberCard:hover & {
+    transform: scale(1.05);
+  }
+}
+
+.memberInfo {
+  padding: $spacing-lg;
+}
+
+.memberName {
+  font-family: $font-family-heading;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-white;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: $spacing-xs;
+}
+
+.memberInstrument {
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  color: $color-red;
+  margin-bottom: $spacing-xs;
+}
+
+.memberRole {
+  font-size: $font-size-sm;
+  color: $color-gray-light;
+  margin-bottom: $spacing-sm;
+}
+
+.memberBio {
+  font-size: $font-size-sm;
+  color: $color-gray-light;
+  line-height: 1.6;
+  margin-bottom: $spacing-md;
+}
+
+.memberSocials {
+  display: flex;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+  margin-bottom: $spacing-md;
+}
+
+.socialLink {
+  font-size: $font-size-xs;
+  color: $color-gray-light;
+  text-decoration: none;
+  padding: $spacing-xs $spacing-sm;
+  background: rgba($color-black, 0.3);
+  border-radius: $radius-sm;
+  transition: background-color $transition-base, color $transition-base;
+
+  &:hover {
+    background: rgba($color-red, 0.2);
+    color: $color-red;
+  }
+}
+
+.memberActions {
+  display: flex;
+  gap: $spacing-sm;
+  padding: $spacing-md $spacing-lg $spacing-lg;
+}

@@ -1,0 +1,295 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+// ============================================
+// JOCH Bandpage - Admin Messages Manager Styles
+// ============================================
+
+.messagesManagerPage {
+  min-height: 100vh;
+  background: linear-gradient(135deg, $color-black 0%, $color-gray-dark 100%);
+  padding: calc($header-height + $spacing-xl) $spacing-md $spacing-xl;
+
+  @include md {
+    padding: calc($header-height + $spacing-xxl) $spacing-xl $spacing-xxl;
+  }
+}
+
+.container {
+  @include container;
+  max-width: 1200px;
+}
+
+// ============================================
+// Header
+// ============================================
+
+.header {
+  margin-bottom: $spacing-xxl;
+}
+
+.headerTop {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  @include md {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+}
+
+.title {
+  font-family: $font-family-heading;
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-white;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: $spacing-xs;
+
+  @include md {
+    font-size: $font-size-hero;
+  }
+}
+
+.subtitle {
+  font-size: $font-size-base;
+  color: $color-gray-light;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.unreadBadge {
+  display: inline-block;
+  padding: $spacing-xs $spacing-sm;
+  background: rgba($color-red, 0.2);
+  color: $color-red;
+  border: 1px solid rgba($color-red, 0.4);
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+// ============================================
+// Error & Empty States
+// ============================================
+
+.error {
+  text-align: center;
+  padding: $spacing-xxl;
+  background: $color-gray-dark;
+  border-radius: $radius-lg;
+  border: 1px solid rgba($color-red, 0.3);
+
+  p {
+    color: $color-red;
+    font-size: $font-size-lg;
+    margin-bottom: $spacing-lg;
+  }
+}
+
+.empty {
+  text-align: center;
+  padding: calc($spacing-xxl * 2) $spacing-xl;
+  background: $color-gray-dark;
+  border-radius: $radius-lg;
+  border: 1px solid rgba($color-gray-medium, 0.2);
+}
+
+.emptyIcon {
+  font-size: 64px;
+  margin-bottom: $spacing-lg;
+  opacity: 0.5;
+}
+
+.emptyTitle {
+  font-family: $font-family-heading;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-white;
+  margin-bottom: $spacing-sm;
+}
+
+.emptyText {
+  font-size: $font-size-base;
+  color: $color-gray-light;
+  line-height: 1.6;
+}
+
+// ============================================
+// Messages List
+// ============================================
+
+.messagesList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.messageCard {
+  background: $color-gray-dark;
+  border-radius: $radius-lg;
+  border: 1px solid rgba($color-gray-medium, 0.2);
+  overflow: hidden;
+  transition: border-color $transition-base, box-shadow $transition-base;
+
+  &.unread {
+    border-color: rgba($color-red, 0.3);
+    box-shadow: 0 0 0 1px rgba($color-red, 0.1);
+  }
+
+  &.expanded {
+    border-color: rgba($color-gray-medium, 0.4);
+    box-shadow: $shadow-md;
+  }
+}
+
+.messageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: $spacing-lg;
+  cursor: pointer;
+  transition: background-color $transition-base;
+
+  &:hover {
+    background: rgba($color-black, 0.2);
+  }
+}
+
+.messageInfo {
+  flex: 1;
+}
+
+.messageMeta {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-xs;
+  flex-wrap: wrap;
+}
+
+.unreadIndicator {
+  color: $color-red;
+  font-size: $font-size-xs;
+  line-height: 1;
+}
+
+.messageName {
+  font-family: $font-family-heading;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-white;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.messageDate {
+  font-size: $font-size-xs;
+  color: $color-gray-light;
+}
+
+.messageEmail {
+  font-size: $font-size-sm;
+  color: $color-gray-light;
+  margin-bottom: $spacing-xs;
+}
+
+.messageSubject {
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  color: $color-white;
+}
+
+.expandButton {
+  background: none;
+  border: none;
+  color: $color-gray-light;
+  font-size: $font-size-xxl;
+  line-height: 1;
+  cursor: pointer;
+  padding: $spacing-xs;
+  transition: color $transition-base, transform $transition-base;
+  flex-shrink: 0;
+
+  &:hover {
+    color: $color-white;
+  }
+
+  .expanded & {
+    transform: rotate(180deg);
+  }
+}
+
+// ============================================
+// Message Body (Expanded)
+// ============================================
+
+.messageBody {
+  padding: 0 $spacing-lg $spacing-lg;
+  border-top: 1px solid rgba($color-gray-medium, 0.2);
+  animation: slideDown $transition-base $easing-ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.messageContent {
+  padding: $spacing-lg 0;
+}
+
+.contentLabel {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-gray-light;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: $spacing-sm;
+}
+
+.messageText {
+  font-size: $font-size-base;
+  color: $color-white;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.messageActions {
+  display: flex;
+  gap: $spacing-sm;
+  padding-top: $spacing-lg;
+  border-top: 1px solid rgba($color-gray-medium, 0.2);
+}
+
+.replyButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-sm $spacing-md;
+  background: rgba($color-red, 0.1);
+  border: 1px solid rgba($color-red, 0.3);
+  border-radius: $radius-md;
+  color: $color-red;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  text-decoration: none;
+  transition: background-color $transition-base, border-color $transition-base;
+
+  &:hover {
+    background: rgba($color-red, 0.2);
+    border-color: rgba($color-red, 0.5);
+  }
+}

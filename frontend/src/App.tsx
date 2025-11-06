@@ -19,6 +19,10 @@ import Login from './pages/Admin/Login';
 import Dashboard from './pages/Admin/Dashboard';
 import GigManager from './pages/Admin/GigManager';
 import NewsManager from './pages/Admin/NewsManager';
+import MusicManager from './pages/Admin/MusicManager';
+import GalleryManager from './pages/Admin/GalleryManager';
+import BandManager from './pages/Admin/BandManager';
+import MessagesManager from './pages/Admin/MessagesManager';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import './styles/main.scss';
 
@@ -61,6 +65,38 @@ const App: React.FC = () => {
                 element={
                   <PrivateRoute>
                     <NewsManager />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/admin/music"
+                element={
+                  <PrivateRoute>
+                    <MusicManager />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/admin/gallery"
+                element={
+                  <PrivateRoute>
+                    <GalleryManager />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/admin/band"
+                element={
+                  <PrivateRoute>
+                    <BandManager />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/admin/messages"
+                element={
+                  <PrivateRoute>
+                    <MessagesManager />
                   </PrivateRoute>
                 }
               />
