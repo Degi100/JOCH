@@ -5,7 +5,7 @@
 
 import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 import { authService, ApiError } from '../services';
-import type { User, LoginCredentials } from '@joch/shared';
+import type { User, LoginCredentials, RegisterCredentials } from '@joch/shared';
 
 // ============================================
 // Types
@@ -17,6 +17,7 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (credentials: LoginCredentials) => Promise<void>;
+  register: (credentials: RegisterCredentials) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
 }
@@ -93,6 +94,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   /**
+   * Register new user
+   */
+  const register = async (credentials: RegisterCredentials): Promise<void> => {
+    try {
+      const response = await authService.register(credentials);
+
+      // Store token
+      localStorage.setItem('joch_token', response.token);
+
+      // Update state
+      setUser(response.user);
+      setToken(response.token);
+    } catch (error) {
+      if (error instanceof ApiError) {
+        throw new Error(error.message);
+      }
+      throw new Error('Registration failed');
+    }
+  };
+
+  /**
    * Logout user
    */
   const logout = (): void => {
@@ -127,6 +149,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isLoading,
     isAuthenticated,
     login,
+    register,
     logout,
     refreshUser,
   };

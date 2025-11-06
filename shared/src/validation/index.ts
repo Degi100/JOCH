@@ -9,7 +9,8 @@ export const loginSchema = z.object({
 export const createUserSchema = z.object({
   email: z.string().email('Ungültige E-Mail Adresse'),
   password: z.string().min(8, 'Passwort muss mindestens 8 Zeichen lang sein'),
-  role: z.enum(['admin', 'member']).default('member'),
+  name: z.string().min(2, 'Name muss mindestens 2 Zeichen lang sein').max(100).optional(),
+  role: z.enum(['admin', 'member', 'user']).default('user'),
 });
 
 // Band Member Validation

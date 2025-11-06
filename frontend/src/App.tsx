@@ -16,6 +16,7 @@ import News from './pages/News/News';
 import NewsDetail from './pages/News/NewsDetail';
 import Contact from './pages/Contact/Contact';
 import Login from './pages/Admin/Login';
+import Register from './pages/Admin/Register';
 import Dashboard from './pages/Admin/Dashboard';
 import GigManager from './pages/Admin/GigManager';
 import NewsManager from './pages/Admin/NewsManager';
@@ -23,6 +24,7 @@ import MusicManager from './pages/Admin/MusicManager';
 import GalleryManager from './pages/Admin/GalleryManager';
 import BandManager from './pages/Admin/BandManager';
 import MessagesManager from './pages/Admin/MessagesManager';
+import UserManager from './pages/Admin/UserManager';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import './styles/main.scss';
 
@@ -42,12 +44,16 @@ const App: React.FC = () => {
               <Route path="/news/:id" element={<NewsDetail />} />
               <Route path="/contact" element={<Contact />} />
 
+              {/* Auth Routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+
               {/* Admin Routes */}
               <Route path="/admin/login" element={<Login />} />
               <Route
                 path="/admin/dashboard"
                 element={
-                  <PrivateRoute>
+                  <PrivateRoute requiredRoles={['admin', 'member']}>
                     <Dashboard />
                   </PrivateRoute>
                 }
@@ -55,7 +61,7 @@ const App: React.FC = () => {
               <Route
                 path="/admin/gigs"
                 element={
-                  <PrivateRoute>
+                  <PrivateRoute requiredRoles={['admin', 'member']}>
                     <GigManager />
                   </PrivateRoute>
                 }
@@ -63,7 +69,7 @@ const App: React.FC = () => {
               <Route
                 path="/admin/news"
                 element={
-                  <PrivateRoute>
+                  <PrivateRoute requiredRoles={['admin', 'member']}>
                     <NewsManager />
                   </PrivateRoute>
                 }
@@ -71,7 +77,7 @@ const App: React.FC = () => {
               <Route
                 path="/admin/music"
                 element={
-                  <PrivateRoute>
+                  <PrivateRoute requiredRoles={['admin', 'member']}>
                     <MusicManager />
                   </PrivateRoute>
                 }
@@ -79,7 +85,7 @@ const App: React.FC = () => {
               <Route
                 path="/admin/gallery"
                 element={
-                  <PrivateRoute>
+                  <PrivateRoute requiredRoles={['admin', 'member']}>
                     <GalleryManager />
                   </PrivateRoute>
                 }
@@ -87,7 +93,7 @@ const App: React.FC = () => {
               <Route
                 path="/admin/band"
                 element={
-                  <PrivateRoute>
+                  <PrivateRoute requiredRoles={['admin', 'member']}>
                     <BandManager />
                   </PrivateRoute>
                 }
@@ -95,8 +101,16 @@ const App: React.FC = () => {
               <Route
                 path="/admin/messages"
                 element={
-                  <PrivateRoute>
+                  <PrivateRoute requiredRoles={['admin', 'member']}>
                     <MessagesManager />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/admin/users"
+                element={
+                  <PrivateRoute requiredRoles={['admin']}>
+                    <UserManager />
                   </PrivateRoute>
                 }
               />

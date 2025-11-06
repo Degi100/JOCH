@@ -1,6 +1,6 @@
 // ============================================
-// JOCH Bandpage - Admin Login Page
-// Authentication for band members
+// JOCH Bandpage - Register Page
+// User registration for fans
 // ============================================
 
 import React, { useState, FormEvent } from 'react';
@@ -10,25 +10,40 @@ import Button from '../../components/Button/Button';
 import Input from '../../components/Input/Input';
 import styles from './Login.module.scss';
 
-const Login: React.FC = () => {
+const Register: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { register } = useAuth();
 
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // Validate passwords match
+    if (password !== confirmPassword) {
+      setError('Passwörter stimmen nicht überein');
+      return;
+    }
+
+    // Validate password length
+    if (password.length < 8) {
+      setError('Passwort muss mindestens 8 Zeichen lang sein');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      await login({ email, password });
-      navigate('/admin/dashboard');
+      await register({ email, password, name });
+      navigate('/');
     } catch (err: any) {
-      setError(err.message || 'Login fehlgeschlagen. Bitte überprüfe deine Zugangsdaten.');
+      setError(err.message || 'Registrierung fehlgeschlagen. Bitte versuche es erneut.');
     } finally {
       setIsLoading(false);
     }
@@ -40,17 +55,27 @@ const Login: React.FC = () => {
         <div className={styles.loginBox}>
           {/* Header */}
           <div className={styles.header}>
-            <h1 className={styles.title}>JOCH Admin</h1>
-            <p className={styles.subtitle}>Bandmitglieder Login</p>
+            <h1 className={styles.title}>JOCH Account</h1>
+            <p className={styles.subtitle}>Registriere dich für exklusive Inhalte</p>
           </div>
 
-          {/* Login Form */}
+          {/* Register Form */}
           <form onSubmit={handleSubmit} className={styles.form}>
             {error && (
               <div className={styles.error} role="alert">
                 {error}
               </div>
             )}
+
+            <Input
+              label="Name (optional)"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Dein Name"
+              autoComplete="name"
+              autoFocus
+            />
 
             <Input
               label="E-Mail"
@@ -60,7 +85,6 @@ const Login: React.FC = () => {
               placeholder="deine@email.com"
               required
               autoComplete="email"
-              autoFocus
             />
 
             <Input
@@ -70,7 +94,19 @@ const Login: React.FC = () => {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
-              autoComplete="current-password"
+              autoComplete="new-password"
+              minLength={8}
+            />
+
+            <Input
+              label="Passwort bestätigen"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+              autoComplete="new-password"
+              minLength={8}
             />
 
             <Button
@@ -78,18 +114,18 @@ const Login: React.FC = () => {
               variant="primary"
               fullWidth
               isLoading={isLoading}
-              disabled={isLoading || !email || !password}
+              disabled={isLoading || !email || !password || !confirmPassword}
             >
-              {isLoading ? 'Einloggen...' : 'Einloggen'}
+              {isLoading ? 'Registrieren...' : 'Registrieren'}
             </Button>
           </form>
 
           {/* Footer */}
           <div className={styles.footer}>
             <p className={styles.footerText}>
-              Noch kein Account?{' '}
-              <Link to="/register" className={styles.link}>
-                Jetzt registrieren
+              Bereits registriert?{' '}
+              <Link to="/login" className={styles.link}>
+                Zum Login
               </Link>
             </p>
           </div>
@@ -99,4 +135,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default Register;

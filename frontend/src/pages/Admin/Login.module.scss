@@ -99,3 +99,15 @@
   color: $color-gray-light;
   line-height: 1.6;
 }
+
+.link {
+  color: $color-red;
+  text-decoration: none;
+  font-weight: $font-weight-semibold;
+  transition: color $transition-base;
+
+  &:hover {
+    color: lighten($color-red, 10%);
+    text-decoration: underline;
+  }
+}

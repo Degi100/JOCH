@@ -87,3 +87,33 @@
     outline-offset: 2px;
   }
 }
+
+// ============================================
+// Special Link Styles
+// ============================================
+
+// Logout Button (styled like a link)
+.logoutButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+
+  &:hover {
+    color: $color-red;
+  }
+}
+
+// Register Link (highlighted)
+.registerLink {
+  color: $color-red;
+  font-weight: $font-weight-bold;
+
+  &:hover {
+    color: lighten($color-red, 10%);
+  }
+
+  &.active {
+    color: lighten($color-red, 15%);
+  }
+}

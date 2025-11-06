@@ -43,6 +43,7 @@ export const register = async (
         user: {
           _id: user._id,
           email: user.email,
+          name: user.name,
           role: user.role,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
@@ -93,6 +94,7 @@ export const login = async (
         user: {
           _id: user._id,
           email: user.email,
+          name: user.name,
           role: user.role,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
@@ -126,6 +128,82 @@ export const me = async (
       data: {
         _id: user._id,
         email: user.email,
+        name: user.name,
+        role: user.role,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Get all users (admin only)
+export const getAllUsers = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const users = await UserModel.find().sort({ createdAt: -1 });
+
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      data: users.map((user) => ({
+        _id: user._id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      })),
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Update user role (admin only)
+export const updateUserRole = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { userId } = req.params;
+    const { role } = req.body;
+
+    // Validate role
+    if (!['admin', 'member', 'user'].includes(role)) {
+      throw new AppError(HTTP_STATUS.BAD_REQUEST, 'Ungültige Rolle');
+    }
+
+    // Prevent admin from changing their own role
+    if (req.user?.userId === userId) {
+      throw new AppError(
+        HTTP_STATUS.FORBIDDEN,
+        'Du kannst deine eigene Rolle nicht ändern'
+      );
+    }
+
+    const user = await UserModel.findByIdAndUpdate(
+      userId,
+      { role },
+      { new: true, runValidators: true }
+    );
+
+    if (!user) {
+      throw new AppError(HTTP_STATUS.NOT_FOUND, ERROR_MESSAGES.USER_NOT_FOUND);
+    }
+
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: 'Benutzerrolle erfolgreich aktualisiert',
+      data: {
+        _id: user._id,
+        email: user.email,
+        name: user.name,
         role: user.role,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,

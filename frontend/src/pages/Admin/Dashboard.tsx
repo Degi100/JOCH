@@ -181,6 +181,26 @@ const Dashboard: React.FC = () => {
                 Nachrichten ansehen
               </Button>
             </div>
+
+            {/* User Management (Admin only) */}
+            {user?.role === 'admin' && (
+              <div className={styles.managementCard}>
+                <div className={styles.cardHeader}>
+                  <h3 className={styles.cardTitle}>Benutzerverwaltung</h3>
+                  <span className={styles.cardIcon}>👤</span>
+                </div>
+                <p className={styles.cardDescription}>
+                  Benutzerrollen verwalten und Zugriffsrechte festlegen
+                </p>
+                <Button
+                  variant="primary"
+                  fullWidth
+                  onClick={() => navigate('/admin/users')}
+                >
+                  Benutzer verwalten
+                </Button>
+              </div>
+            )}
           </div>
         </section>
 

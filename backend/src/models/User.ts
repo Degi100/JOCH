@@ -2,7 +2,9 @@ import mongoose, { Schema, Document } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import type { User as IUser } from '@joch/shared';
 
-export interface UserDocument extends Omit<IUser, '_id'>, Document {
+export interface UserDocument extends Omit<IUser, '_id' | 'role'>, Document {
+  role: 'admin' | 'member' | 'user';
+  password: string;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
@@ -27,8 +29,12 @@ const userSchema = new Schema<UserDocument>(
     },
     role: {
       type: String,
-      enum: ['admin', 'member'],
-      default: 'member',
+      enum: ['admin', 'member', 'user'],
+      default: 'user',
+    },
+    name: {
+      type: String,
+      trim: true,
     },
   },
   {

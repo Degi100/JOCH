@@ -1,6 +1,6 @@
 // ============================================
 // JOCH Bandpage - Private Route Component
-// Protects routes that require authentication
+// Protects routes that require authentication and specific roles
 // ============================================
 
 import React from 'react';
@@ -9,14 +9,19 @@ import { useAuth } from '../../context/AuthContext';
 
 interface PrivateRouteProps {
   children: React.ReactElement;
+  requiredRoles?: ('admin' | 'member' | 'user')[];
 }
 
 /**
  * PrivateRoute Component
  * Redirects to login if user is not authenticated
+ * Optionally checks if user has required role(s)
  */
-const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
-  const { isAuthenticated, isLoading } = useAuth();
+const PrivateRoute: React.FC<PrivateRouteProps> = ({
+  children,
+  requiredRoles = []
+}) => {
+  const { user, isAuthenticated, isLoading } = useAuth();
 
   // Show nothing while checking auth status
   if (isLoading) {
@@ -38,6 +43,15 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
     return <Navigate to="/admin/login" replace />;
+  }
+
+  // Check role-based access
+  if (requiredRoles.length > 0 && user) {
+    const hasRequiredRole = requiredRoles.includes(user.role);
+    if (!hasRequiredRole) {
+      // Redirect to home if user doesn't have required role
+      return <Navigate to="/" replace />;
+    }
   }
 
   // Render protected content

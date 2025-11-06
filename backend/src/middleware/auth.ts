@@ -33,7 +33,7 @@ export const authenticate = (
   }
 };
 
-export const authorize = (...roles: ('admin' | 'member')[]) => {
+export const authorize = (...roles: ('admin' | 'member' | 'user')[]) => {
   return (req: Request, _res: Response, next: NextFunction): void => {
     if (!req.user) {
       return next(
