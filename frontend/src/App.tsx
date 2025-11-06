@@ -17,6 +17,8 @@ import NewsDetail from './pages/News/NewsDetail';
 import Contact from './pages/Contact/Contact';
 import Login from './pages/Admin/Login';
 import Dashboard from './pages/Admin/Dashboard';
+import GigManager from './pages/Admin/GigManager';
+import NewsManager from './pages/Admin/NewsManager';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import './styles/main.scss';
 
@@ -43,6 +45,22 @@ const App: React.FC = () => {
                 element={
                   <PrivateRoute>
                     <Dashboard />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/admin/gigs"
+                element={
+                  <PrivateRoute>
+                    <GigManager />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/admin/news"
+                element={
+                  <PrivateRoute>
+                    <NewsManager />
                   </PrivateRoute>
                 }
               />
