@@ -12,3 +12,4 @@ export * from './bandMember.service';
 export * from './gallery.service';
 export * from './contact.service';
 export * from './upload.service';
+export * from './user.service';
