@@ -12,7 +12,7 @@ export const bandService = {
    * @returns Array of band members
    */
   getAll: async (): Promise<BandMember[]> => {
-    const response = await api.get<BandMember[]>('/band');
+    const response = await api.get<BandMember[]>('/band-members');
     return response.data || [];
   },
 
@@ -22,7 +22,7 @@ export const bandService = {
    * @returns Single band member
    */
   getById: async (id: string): Promise<BandMember> => {
-    const response = await api.get<BandMember>(`/band/${id}`);
+    const response = await api.get<BandMember>(`/band-members/${id}`);
     if (!response.data) throw new Error('Band member not found');
     return response.data;
   },
@@ -34,7 +34,7 @@ export const bandService = {
    * @returns Created band member
    */
   create: async (data: Partial<BandMember>, token: string): Promise<BandMember> => {
-    const response = await api.post<BandMember>('/band', data, token);
+    const response = await api.post<BandMember>('/band-members', data, token);
     if (!response.data) throw new Error('Failed to create band member');
     return response.data;
   },
@@ -47,7 +47,7 @@ export const bandService = {
    * @returns Updated band member
    */
   update: async (id: string, data: Partial<BandMember>, token: string): Promise<BandMember> => {
-    const response = await api.put<BandMember>(`/band/${id}`, data, token);
+    const response = await api.put<BandMember>(`/band-members/${id}`, data, token);
     if (!response.data) throw new Error('Failed to update band member');
     return response.data;
   },
@@ -58,7 +58,7 @@ export const bandService = {
    * @param token - JWT auth token
    */
   delete: async (id: string, token: string): Promise<void> => {
-    await api.delete<void>(`/band/${id}`, token);
+    await api.delete<void>(`/band-members/${id}`, token);
   },
 
   /**
@@ -68,7 +68,7 @@ export const bandService = {
    * @returns Updated band members
    */
   reorder: async (memberIds: string[], token: string): Promise<BandMember[]> => {
-    const response = await api.patch<BandMember[]>('/band/reorder', { memberIds }, token);
+    const response = await api.patch<BandMember[]>('/band-members/reorder', { memberIds }, token);
     return response.data || [];
   },
 };

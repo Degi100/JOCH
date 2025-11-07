@@ -1,12 +1,32 @@
+// Load environment variables FIRST (before any local imports)
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express, { Application } from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
-import { connectDatabase } from './config';
+import fs from 'fs';
+import path from 'path';
+import { connectDatabase, initCloudinary } from './config';
 import { errorHandler, notFoundHandler } from './middleware';
 import routes from './routes';
 
-// Load environment variables
-dotenv.config();
+// Initialize Cloudinary after dotenv is loaded
+initCloudinary();
+
+// Ensure upload directories exist
+const uploadDirs = [
+  'uploads',
+  'uploads/images',
+  'uploads/audio',
+  'uploads/other',
+];
+
+uploadDirs.forEach((dir) => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+    console.log(`📁 Created directory: ${dir}`);
+  }
+});
 
 const app: Application = express();
 const PORT = Number(process.env.PORT) || 5000; // Default: 5000
