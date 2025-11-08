@@ -11,6 +11,7 @@ export interface UploadResponse {
   size: number;
   mimetype: string;
   url: string;
+  thumbnailUrl?: string; // For gallery images with auto-generated thumbnails
 }
 
 export const uploadService = {

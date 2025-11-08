@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { AppError, HTTP_STATUS } from '@joch/shared';
-import { uploadToCloudinary } from '../config';
+import { uploadToCloudinary, uploadImageWithThumbnail } from '../config';
 import fs from 'fs';
 
 /**
@@ -52,7 +52,7 @@ export const uploadSingleImage = async (
 };
 
 /**
- * Upload multiple images
+ * Upload multiple images with automatic thumbnail generation
  * @route POST /api/upload/images
  * @access Private (Admin/Member)
  */
@@ -70,9 +70,9 @@ export const uploadMultipleImages = async (
 
     uploadedFiles.push(...req.files);
 
-    // Upload all files to Cloudinary
+    // Upload all files to Cloudinary with thumbnail generation
     const uploadPromises = req.files.map(async (file) => {
-      const result = await uploadToCloudinary(file.path, 'gallery');
+      const result = await uploadImageWithThumbnail(file.path, 'gallery');
 
       // Delete local file after upload
       fs.unlinkSync(file.path);
@@ -83,6 +83,7 @@ export const uploadMultipleImages = async (
         mimetype: file.mimetype,
         size: result.size,
         url: result.url,
+        thumbnailUrl: result.thumbnailUrl,
       };
     });
 

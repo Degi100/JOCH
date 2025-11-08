@@ -65,6 +65,54 @@ export const uploadToCloudinary = async (
 };
 
 /**
+ * Upload image with automatic thumbnail generation
+ * @param filePath - Local file path
+ * @param folder - Cloudinary folder name
+ * @returns Object with main image URL and thumbnail URL
+ */
+export const uploadImageWithThumbnail = async (
+  filePath: string,
+  folder: string = 'gallery'
+) => {
+  try {
+    // Upload main image
+    const result = await cloudinary.uploader.upload(filePath, {
+      folder: `joch-band/${folder}`,
+      resource_type: 'image',
+      transformation: [
+        { quality: 'auto:good' },
+        { fetch_format: 'auto' },
+      ],
+    });
+
+    // Generate thumbnail URL using Cloudinary transformations
+    const thumbnailUrl = cloudinary.url(result.public_id, {
+      transformation: [
+        { width: 400, height: 400, crop: 'fill', gravity: 'auto' },
+        { quality: 'auto:good' },
+        { fetch_format: 'auto' },
+      ],
+    });
+
+    return {
+      url: result.secure_url,
+      thumbnailUrl,
+      publicId: result.public_id,
+      format: result.format,
+      width: result.width,
+      height: result.height,
+      size: result.bytes,
+    };
+  } catch (error) {
+    console.error('Cloudinary upload error:', error);
+    throw new AppError(
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      'Fehler beim Hochladen des Bildes'
+    );
+  }
+};
+
+/**
  * Delete image from Cloudinary
  * @param publicId - Cloudinary public ID
  */
