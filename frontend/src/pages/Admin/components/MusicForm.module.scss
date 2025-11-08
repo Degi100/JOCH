@@ -214,6 +214,175 @@
 }
 
 // ============================================
+// Duration Display
+// ============================================
+
+.durationDisplay {
+  background: rgba($color-black, 0.3);
+  border: 1px solid rgba($color-gray-medium, 0.3);
+  border-radius: $radius-md;
+  padding: $spacing-sm $spacing-md;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  min-height: 42px;
+}
+
+.durationTime {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-white;
+  font-family: $font-family-mono;
+}
+
+.durationSeconds {
+  font-size: $font-size-sm;
+  color: $color-gray-light;
+}
+
+.durationPlaceholder {
+  font-size: $font-size-sm;
+  color: rgba($color-gray-light, 0.5);
+  font-style: italic;
+}
+
+// ============================================
+// File Upload (Audio & Image)
+// ============================================
+
+.audioPreview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md;
+  background: rgba($color-black, 0.3);
+  border: 1px solid rgba($color-gray-medium, 0.3);
+  border-radius: $radius-md;
+  margin-bottom: $spacing-md;
+}
+
+.audioInfo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  flex: 1;
+}
+
+.audioIcon {
+  font-size: $font-size-xl;
+}
+
+.audioName {
+  font-size: $font-size-sm;
+  color: $color-white;
+  font-weight: $font-weight-medium;
+}
+
+.audioSize {
+  font-size: $font-size-xs;
+  color: $color-gray-light;
+  margin-left: $spacing-sm;
+}
+
+.removeAudioButton {
+  background: rgba($color-red, 0.2);
+  border: 1px solid rgba($color-red, 0.3);
+  color: $color-red;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover:not(:disabled) {
+    background: rgba($color-red, 0.3);
+    border-color: $color-red;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.imagePreview {
+  position: relative;
+  margin-bottom: $spacing-md;
+  border-radius: $radius-md;
+  overflow: hidden;
+  background: $color-black;
+}
+
+.previewImage {
+  width: 100%;
+  height: auto;
+  max-height: 300px;
+  object-fit: contain;
+  display: block;
+}
+
+.removeImageButton {
+  position: absolute;
+  top: $spacing-sm;
+  right: $spacing-sm;
+  background: rgba($color-red, 0.9);
+  border: none;
+  color: $color-white;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: background $transition-base;
+
+  &:hover:not(:disabled) {
+    background: $color-red;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.fileInputWrapper {
+  position: relative;
+}
+
+.fileInput {
+  position: absolute;
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.fileInputLabel {
+  display: block;
+  padding: $spacing-lg;
+  background: rgba($color-black, 0.3);
+  border: 2px dashed rgba($color-gray-medium, 0.3);
+  border-radius: $radius-md;
+  color: $color-gray-light;
+  text-align: center;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover {
+    border-color: $color-red;
+    background: rgba($color-black, 0.5);
+    color: $color-white;
+  }
+
+  .fileInput:disabled + & {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// ============================================
 // Form Actions
 // ============================================
 

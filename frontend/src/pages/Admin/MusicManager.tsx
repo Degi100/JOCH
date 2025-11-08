@@ -176,14 +176,17 @@ export default function MusicManager() {
                   </div>
 
                   <div className={styles.cell}>
+                    <div className={styles.mobileLabel}>Album</div>
                     <span className={styles.album}>{song.album || '-'}</span>
                   </div>
 
                   <div className={styles.cell}>
+                    <div className={styles.mobileLabel}>Dauer</div>
                     <span className={styles.duration}>{formatDuration(song.duration)}</span>
                   </div>
 
                   <div className={styles.cell}>
+                    <div className={styles.mobileLabel}>Release</div>
                     <span className={styles.date}>{formatDate(song.releaseDate)}</span>
                   </div>
 
