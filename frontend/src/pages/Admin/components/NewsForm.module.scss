@@ -239,6 +239,94 @@
 }
 
 // ============================================
+// File Upload
+// ============================================
+
+.uploadingMessage {
+  padding: $spacing-md;
+  background: rgba($color-blue, 0.1);
+  border: 1px solid rgba($color-blue, 0.3);
+  border-radius: $radius-md;
+  color: $color-blue;
+  font-size: $font-size-sm;
+  text-align: center;
+}
+
+.imagePreview {
+  position: relative;
+  border-radius: $radius-md;
+  overflow: hidden;
+  border: 2px solid rgba($color-gray-medium, 0.3);
+}
+
+.previewImage {
+  width: 100%;
+  height: auto;
+  max-height: 300px;
+  object-fit: cover;
+  display: block;
+}
+
+.removeButton {
+  position: absolute;
+  top: $spacing-sm;
+  right: $spacing-sm;
+  background: rgba($color-red, 0.9);
+  color: $color-white;
+  border: none;
+  border-radius: $radius-md;
+  padding: $spacing-xs $spacing-sm;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: background-color $transition-base;
+
+  &:hover:not(:disabled) {
+    background: $color-red;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.fileInputWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.fileInput {
+  display: none;
+}
+
+.fileInputLabel {
+  display: inline-block;
+  padding: $spacing-md $spacing-lg;
+  background: rgba($color-blue, 0.1);
+  border: 2px dashed rgba($color-blue, 0.4);
+  border-radius: $radius-md;
+  color: $color-blue;
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  text-align: center;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover {
+    background: rgba($color-blue, 0.2);
+    border-color: $color-blue;
+  }
+}
+
+.fileInputHint {
+  font-size: $font-size-xs;
+  color: $color-gray-light;
+  text-align: center;
+}
+
+// ============================================
 // Form Actions
 // ============================================
 

@@ -3,9 +3,10 @@
 // Modal form for creating and editing news posts
 // ============================================
 
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect, FormEvent, ChangeEvent } from 'react';
 import { NewsPost } from '@joch/shared';
 import { newsService } from '@/services/news.service';
+import { uploadService } from '@/services/upload.service';
 import { useAuth } from '@/context/AuthContext';
 import Button from '@/components/Button/Button';
 import Input from '@/components/Input/Input';
@@ -28,6 +29,11 @@ export default function NewsForm({ newsPost, onSuccess, onCancel }: NewsFormProp
   const [coverImage, setCoverImage] = useState('');
   const [published, setPublished] = useState(false);
 
+  // File upload state
+  const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
+  const [coverImagePreview, setCoverImagePreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,10 +43,51 @@ export default function NewsForm({ newsPost, onSuccess, onCancel }: NewsFormProp
       setTitle(newsPost.title);
       setExcerpt(newsPost.excerpt);
       setContent(newsPost.content);
-      setCoverImage(newsPost.coverImage ?? newsPost.featuredImage ?? '');
+      const existingCoverImage = newsPost.coverImage ?? newsPost.featuredImage ?? '';
+      setCoverImage(existingCoverImage);
+      if (existingCoverImage) {
+        setCoverImagePreview(existingCoverImage);
+      }
       setPublished(newsPost.published);
     }
   }, [newsPost]);
+
+  // Handle cover image file selection
+  const handleCoverImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      setError('Bitte wähle ein Bild aus (JPG, PNG, WEBP)');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      setError('Bild ist zu groß (max. 5MB)');
+      return;
+    }
+
+    setCoverImageFile(file);
+    setError(null);
+
+    // Generate preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setCoverImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Remove cover image
+  const handleRemoveCoverImage = () => {
+    setCoverImageFile(null);
+    setCoverImagePreview(null);
+    setCoverImage('');
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -59,13 +106,23 @@ export default function NewsForm({ newsPost, onSuccess, onCancel }: NewsFormProp
 
     try {
       setIsSubmitting(true);
+      setIsUploading(true);
+
+      // Upload cover image to Cloudinary if a new file was selected
+      let coverImageUrl = coverImage;
+      if (coverImageFile) {
+        const uploadResponse = await uploadService.uploadImage(coverImageFile, token);
+        coverImageUrl = uploadResponse.url;
+      }
+
+      setIsUploading(false);
 
       const newsData: Partial<NewsPost> = {
         title: title.trim(),
         excerpt: excerpt.trim(),
         content: content.trim(),
-        coverImage: coverImage.trim() || undefined,
-        featuredImage: coverImage.trim() || undefined, // Also set alias
+        coverImage: coverImageUrl || undefined,
+        featuredImage: coverImageUrl || undefined, // Also set alias
         published,
       };
 
@@ -81,6 +138,7 @@ export default function NewsForm({ newsPost, onSuccess, onCancel }: NewsFormProp
       setError(err.message || 'Fehler beim Speichern des News-Posts');
     } finally {
       setIsSubmitting(false);
+      setIsUploading(false);
     }
   };
 
@@ -182,16 +240,57 @@ export default function NewsForm({ newsPost, onSuccess, onCancel }: NewsFormProp
               />
             </div>
 
-            {/* Cover Image */}
+            {/* Cover Image Upload */}
             <div className={styles.formGroupFull}>
-              <Input
-                label="Cover Bild URL"
-                type="url"
-                value={coverImage}
-                onChange={(e) => setCoverImage(e.target.value)}
-                placeholder="https://..."
-                disabled={isSubmitting}
-              />
+              <label htmlFor="coverImage" className={styles.label}>
+                Cover Bild
+              </label>
+
+              {/* Show upload status */}
+              {isUploading && (
+                <div className={styles.uploadingMessage}>
+                  📤 Bild wird hochgeladen...
+                </div>
+              )}
+
+              {/* Show preview if available */}
+              {coverImagePreview && !isUploading && (
+                <div className={styles.imagePreview}>
+                  <img
+                    src={coverImagePreview}
+                    alt="Cover Preview"
+                    className={styles.previewImage}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleRemoveCoverImage}
+                    className={styles.removeButton}
+                    disabled={isSubmitting}
+                  >
+                    ✕ Entfernen
+                  </button>
+                </div>
+              )}
+
+              {/* File input */}
+              {!coverImagePreview && !isUploading && (
+                <div className={styles.fileInputWrapper}>
+                  <input
+                    type="file"
+                    id="coverImage"
+                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                    onChange={handleCoverImageChange}
+                    className={styles.fileInput}
+                    disabled={isSubmitting}
+                  />
+                  <label htmlFor="coverImage" className={styles.fileInputLabel}>
+                    📷 Bild auswählen
+                  </label>
+                  <span className={styles.fileInputHint}>
+                    JPG, PNG oder WEBP (max. 5MB)
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Published Checkbox */}
