@@ -1,5 +1,6 @@
 @use '../../styles/abstracts/variables' as *;
 @use '../../styles/abstracts/mixins' as *;
+@use 'sass:color';
 
 // ============================================
 // JOCH Bandpage - Navigation Styles
@@ -110,10 +111,10 @@
   font-weight: $font-weight-bold;
 
   &:hover {
-    color: lighten($color-red, 10%);
+    color: color.adjust($color-red, $lightness: 10%);
   }
 
   &.active {
-    color: lighten($color-red, 15%);
+    color: color.adjust($color-red, $lightness: 15%);
   }
 }
