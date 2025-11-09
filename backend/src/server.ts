@@ -58,15 +58,28 @@ app.use('/uploads', express.static('uploads'));
 // API Routes
 app.use('/api', routes);
 
-// Root route
-app.get('/', (_req, res) => {
-  res.json({
-    success: true,
-    message: 'JOCH Bandpage API 🎸',
-    version: '1.0.0',
-    environment: NODE_ENV,
+// Serve Frontend (Production only)
+if (NODE_ENV === 'production') {
+  const frontendDistPath = path.join(__dirname, '../../frontend/dist');
+
+  // Serve static files from frontend/dist
+  app.use(express.static(frontendDistPath));
+
+  // Handle React Router - send all non-API requests to index.html
+  app.get('*', (_req, res) => {
+    res.sendFile(path.join(frontendDistPath, 'index.html'));
   });
-});
+} else {
+  // Root route (Development only)
+  app.get('/', (_req, res) => {
+    res.json({
+      success: true,
+      message: 'JOCH Bandpage API 🎸',
+      version: '1.0.0',
+      environment: NODE_ENV,
+    });
+  });
+}
 
 // Error Handlers (must be last!)
 app.use(notFoundHandler);
