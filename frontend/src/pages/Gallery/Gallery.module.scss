@@ -1,0 +1,421 @@
+// ============================================
+// JOCH Bandpage - Gallery Page Styles
+// ============================================
+
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+.galleryPage {
+  min-height: 100vh;
+  padding: $spacing-xl 0;
+  background: linear-gradient(
+    135deg,
+    rgba($color-black, 0.95) 0%,
+    rgba($color-gray-dark, 0.95) 100%
+  );
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 $spacing-md;
+
+  @include md {
+    padding: 0 $spacing-lg;
+  }
+}
+
+// ============================================
+// Header
+// ============================================
+.header {
+  text-align: center;
+  margin-bottom: $spacing-xxl;
+  padding-top: $spacing-lg;
+}
+
+.title {
+  font-size: $font-size-hero;
+  font-weight: $font-weight-bold;
+  color: $color-white;
+  margin-bottom: $spacing-md;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+
+  @include md {
+    font-size: $font-size-mega;
+  }
+}
+
+.subtitle {
+  font-size: $font-size-lg;
+  color: $color-gray-light;
+  max-width: 600px;
+  margin: 0 auto;
+
+  @include md {
+    font-size: $font-size-xl;
+  }
+}
+
+// ============================================
+// Filter Bar
+// ============================================
+.filterBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+  justify-content: center;
+  margin-bottom: $spacing-xl;
+  padding: $spacing-md;
+  background: rgba($color-black, 0.5);
+  border-radius: $radius-lg;
+  border: 1px solid rgba($color-gray-medium, 0.2);
+}
+
+.filterButton {
+  padding: $spacing-sm $spacing-lg;
+  background: rgba($color-gray-dark, 0.5);
+  color: $color-gray-light;
+  border: 1px solid rgba($color-gray-medium, 0.3);
+  border-radius: $radius-md;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover {
+    background: rgba($color-gray-medium, 0.3);
+    border-color: rgba($color-gray-light, 0.4);
+    color: $color-white;
+  }
+
+  &.active {
+    background: $color-blue;
+    border-color: $color-blue;
+    color: $color-white;
+    font-weight: $font-weight-semibold;
+  }
+
+  @include md {
+    padding: $spacing-sm $spacing-xl;
+    font-size: $font-size-md;
+  }
+}
+
+// ============================================
+// Gallery Grid
+// ============================================
+.galleryGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-lg;
+  margin-bottom: $spacing-xl;
+
+  @include sm {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include md {
+    grid-template-columns: repeat(3, 1fr);
+    gap: $spacing-xl;
+  }
+
+  @include lg {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.galleryItem {
+  cursor: pointer;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  background: rgba($color-black, 0.5);
+  border: 1px solid rgba($color-gray-medium, 0.2);
+  transition: all $transition-base;
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: rgba($color-blue, 0.5);
+    box-shadow: 0 8px 24px rgba($color-blue, 0.2);
+
+    .imageOverlay {
+      opacity: 1;
+    }
+  }
+}
+
+.imageWrapper {
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%; // 1:1 aspect ratio
+  overflow: hidden;
+  background: rgba($color-black, 0.8);
+}
+
+.thumbnail {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform $transition-base;
+
+  .galleryItem:hover & {
+    transform: scale(1.05);
+  }
+}
+
+.imageOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba($color-black, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity $transition-base;
+}
+
+.viewIcon {
+  font-size: $font-size-xxl;
+  color: $color-white;
+}
+
+.imageInfo {
+  padding: $spacing-md;
+  background: rgba($color-black, 0.8);
+}
+
+.imageTitle {
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  color: $color-white;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  @include md {
+    font-size: $font-size-md;
+  }
+}
+
+// ============================================
+// Messages
+// ============================================
+.loadingMessage,
+.errorMessage,
+.emptyMessage {
+  text-align: center;
+  padding: $spacing-xxl;
+  font-size: $font-size-lg;
+}
+
+.loadingMessage {
+  color: $color-gray-light;
+}
+
+.errorMessage {
+  color: $color-red;
+}
+
+.emptyMessage {
+  color: $color-gray-medium;
+}
+
+.imageCount {
+  text-align: center;
+  color: $color-gray-medium;
+  font-size: $font-size-sm;
+  margin-top: $spacing-lg;
+  padding: $spacing-md;
+}
+
+// ============================================
+// Lightbox Modal
+// ============================================
+.lightbox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba($color-black, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: $spacing-md;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.lightboxContent {
+  position: relative;
+  max-width: 1200px;
+  max-height: 90vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: zoomIn 0.3s ease;
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.lightboxClose {
+  position: absolute;
+  top: -$spacing-xl;
+  right: 0;
+  background: rgba($color-red, 0.8);
+  color: $color-white;
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  font-size: $font-size-xl;
+  cursor: pointer;
+  transition: all $transition-base;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: $color-red;
+    transform: scale(1.1);
+  }
+
+  @include md {
+    top: 0;
+    right: -60px;
+  }
+}
+
+.lightboxNav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba($color-blue, 0.8);
+  color: $color-white;
+  border: none;
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  font-size: $font-size-xxl;
+  cursor: pointer;
+  transition: all $transition-base;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: $color-blue;
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  &.prev {
+    left: -$spacing-md;
+
+    @include md {
+      left: -70px;
+    }
+  }
+
+  &.next {
+    right: -$spacing-md;
+
+    @include md {
+      right: -70px;
+    }
+  }
+}
+
+.lightboxImageWrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-height: 70vh;
+  width: 100%;
+  overflow: hidden;
+  border-radius: $radius-lg;
+  background: rgba($color-black, 0.5);
+}
+
+.lightboxImage {
+  max-width: 100%;
+  max-height: 70vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: $radius-lg;
+}
+
+.lightboxInfo {
+  margin-top: $spacing-lg;
+  text-align: center;
+  max-width: 800px;
+  background: rgba($color-black, 0.8);
+  padding: $spacing-lg;
+  border-radius: $radius-lg;
+  border: 1px solid rgba($color-gray-medium, 0.2);
+}
+
+.lightboxTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-white;
+  margin: 0 0 $spacing-sm 0;
+
+  @include md {
+    font-size: $font-size-xxl;
+  }
+}
+
+.lightboxDescription {
+  font-size: $font-size-base;
+  color: $color-gray-light;
+  margin: 0 0 $spacing-md 0;
+  line-height: 1.6;
+
+  @include md {
+    font-size: $font-size-md;
+  }
+}
+
+.lightboxCategory {
+  display: inline-block;
+  padding: $spacing-xs $spacing-md;
+  background: rgba($color-blue, 0.2);
+  color: $color-blue;
+  border: 1px solid rgba($color-blue, 0.4);
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
