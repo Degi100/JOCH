@@ -1,5 +1,6 @@
 @use '../../styles/abstracts/variables' as *;
 @use '../../styles/abstracts/mixins' as *;
+@use 'sass:color';
 
 // ============================================
 // JOCH Bandpage - Admin Login Page Styles
@@ -107,7 +108,7 @@
   transition: color $transition-base;
 
   &:hover {
-    color: lighten($color-red, 10%);
+    color: color.adjust($color-red, $lightness: 10%);
     text-decoration: underline;
   }
 }

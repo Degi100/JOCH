@@ -1,14 +1,14 @@
 // ============================================
 // JOCH Bandpage - Gallery Form Component
-// Modal form for creating and editing gallery images
+// Modal form for uploading multiple gallery images
 // ============================================
 
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect, FormEvent, ChangeEvent } from 'react';
 import { GalleryImage } from '@joch/shared';
 import { galleryService } from '@/services/gallery.service';
+import { uploadService } from '@/services/upload.service';
 import { useAuth } from '@/context/AuthContext';
 import Button from '@/components/Button/Button';
-import Input from '@/components/Input/Input';
 import styles from './GalleryForm.module.scss';
 
 interface GalleryFormProps {
@@ -17,32 +17,103 @@ interface GalleryFormProps {
   onCancel: () => void;
 }
 
+interface ImageToUpload {
+  file: File;
+  preview: string;
+  title: string;
+  description: string;
+  category: 'live' | 'promo' | 'backstage' | 'other';
+}
+
 export default function GalleryForm({ image, onSuccess, onCancel }: GalleryFormProps) {
   const { token } = useAuth();
   const isEditMode = !!image;
 
-  // Form state
+  // Multi-upload mode state
+  const [imagesToUpload, setImagesToUpload] = useState<ImageToUpload[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  // Single edit mode state
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
-  const [thumbnailUrl, setThumbnailUrl] = useState('');
   const [category, setCategory] = useState<'live' | 'promo' | 'backstage' | 'other'>('other');
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Initialize form with image data in edit mode
+  // Initialize form in edit mode
   useEffect(() => {
     if (image) {
       setTitle(image.title ?? '');
       setDescription(image.description ?? '');
-      setImageUrl(image.imageUrl);
-      setThumbnailUrl(image.thumbnailUrl ?? '');
       setCategory(image.category ?? 'other');
     }
   }, [image]);
 
-  const handleSubmit = async (e: FormEvent) => {
+  // Handle multiple file selection
+  const handleFilesChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    // Validate files
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const maxSize = 10 * 1024 * 1024; // 10MB
+
+    const validFiles: ImageToUpload[] = [];
+
+    files.forEach((file) => {
+      if (!validTypes.includes(file.type)) {
+        setError(`${file.name}: Ungültiger Dateityp (nur JPG, PNG, WEBP)`);
+        return;
+      }
+
+      if (file.size > maxSize) {
+        setError(`${file.name}: Datei zu groß (max. 10MB)`);
+        return;
+      }
+
+      // Generate preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        validFiles.push({
+          file,
+          preview: reader.result as string,
+          title: '',
+          description: '',
+          category: 'other',
+        });
+
+        // Update state when all previews are loaded
+        if (validFiles.length === files.length) {
+          setImagesToUpload((prev) => [...prev, ...validFiles]);
+          setError(null);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Remove image from upload queue
+  const handleRemoveImage = (index: number) => {
+    setImagesToUpload((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // Update image metadata
+  const handleUpdateImageMeta = (
+    index: number,
+    field: keyof Omit<ImageToUpload, 'file' | 'preview'>,
+    value: string
+  ) => {
+    setImagesToUpload((prev) =>
+      prev.map((img, i) =>
+        i === index ? { ...img, [field]: value } : img
+      )
+    );
+  };
+
+  // Submit multiple images
+  const handleSubmitMultiple = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
 
@@ -51,9 +122,57 @@ export default function GalleryForm({ image, onSuccess, onCancel }: GalleryFormP
       return;
     }
 
-    // Basic validation
-    if (!imageUrl.trim()) {
-      setError('Bitte füge eine Bild-URL hinzu');
+    if (imagesToUpload.length === 0) {
+      setError('Bitte wähle mindestens ein Bild aus');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      setIsUploading(true);
+      setUploadProgress(0);
+
+      // Upload all images to Cloudinary (with auto-thumbnail generation)
+      const files = imagesToUpload.map((img) => img.file);
+      const uploadedImages = await uploadService.uploadImages(files, token);
+
+      setUploadProgress(50);
+
+      // Create gallery entries in database
+      const createPromises = uploadedImages.map(async (uploaded, index) => {
+        const metadata = imagesToUpload[index];
+        const imageData: Partial<GalleryImage> = {
+          title: metadata.title.trim() || metadata.file.name,
+          description: metadata.description.trim() || undefined,
+          imageUrl: uploaded.url,
+          thumbnailUrl: uploaded.thumbnailUrl, // Auto-generated by backend
+          category: metadata.category,
+          order: 0,
+        };
+
+        return galleryService.create(imageData, token);
+      });
+
+      await Promise.all(createPromises);
+      setUploadProgress(100);
+
+      onSuccess();
+    } catch (err: any) {
+      console.error('Error uploading images:', err);
+      setError(err.message || 'Fehler beim Hochladen der Bilder');
+    } finally {
+      setIsSubmitting(false);
+      setIsUploading(false);
+    }
+  };
+
+  // Submit single image edit
+  const handleSubmitEdit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (!token || !image?._id) {
+      setError('Du musst eingeloggt sein');
       return;
     }
 
@@ -63,22 +182,14 @@ export default function GalleryForm({ image, onSuccess, onCancel }: GalleryFormP
       const imageData: Partial<GalleryImage> = {
         title: title.trim() || undefined,
         description: description.trim() || undefined,
-        imageUrl: imageUrl.trim(),
-        thumbnailUrl: thumbnailUrl.trim() || undefined,
         category,
-        order: image?.order ?? 0,
       };
 
-      if (isEditMode && image?._id) {
-        await galleryService.update(image._id, imageData, token);
-      } else {
-        await galleryService.create(imageData, token);
-      }
-
+      await galleryService.update(image._id, imageData, token);
       onSuccess();
     } catch (err: any) {
-      console.error('Error saving image:', err);
-      setError(err.message || 'Fehler beim Speichern des Bildes');
+      console.error('Error updating image:', err);
+      setError(err.message || 'Fehler beim Aktualisieren des Bildes');
     } finally {
       setIsSubmitting(false);
     }
@@ -110,7 +221,7 @@ export default function GalleryForm({ image, onSuccess, onCancel }: GalleryFormP
         {/* Header */}
         <div className={styles.modalHeader}>
           <h2 className={styles.modalTitle}>
-            {isEditMode ? 'Bild bearbeiten' : 'Neues Bild'}
+            {isEditMode ? 'Bild bearbeiten' : 'Bilder hochladen'}
           </h2>
           <button
             className={styles.closeButton}
@@ -123,86 +234,173 @@ export default function GalleryForm({ image, onSuccess, onCancel }: GalleryFormP
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className={styles.form}>
+        <form
+          onSubmit={isEditMode ? handleSubmitEdit : handleSubmitMultiple}
+          className={styles.form}
+        >
           {error && (
             <div className={styles.error} role="alert">
               {error}
             </div>
           )}
 
-          <div className={styles.formGrid}>
-            {/* Image URL */}
-            <div className={styles.formGroupFull}>
-              <Input
-                label="Bild URL *"
-                type="url"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="https://..."
-                required
-                disabled={isSubmitting}
-              />
+          {/* Upload Progress */}
+          {isUploading && (
+            <div className={styles.uploadingMessage}>
+              📤 Bilder werden hochgeladen... {uploadProgress}%
+              <div className={styles.progressBar}>
+                <div
+                  className={styles.progressFill}
+                  style={{ width: `${uploadProgress}%` }}
+                />
+              </div>
             </div>
+          )}
 
-            {/* Thumbnail URL */}
-            <div className={styles.formGroupFull}>
-              <Input
-                label="Thumbnail URL (optional)"
-                type="url"
-                value={thumbnailUrl}
-                onChange={(e) => setThumbnailUrl(e.target.value)}
-                placeholder="https://..."
-                disabled={isSubmitting}
-              />
-            </div>
+          {/* Edit Mode - Single Image */}
+          {isEditMode && (
+            <div className={styles.formGrid}>
+              <div className={styles.formGroupFull}>
+                <label htmlFor="title" className={styles.label}>
+                  Titel
+                </label>
+                <input
+                  id="title"
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="z.B. Live in Bremen"
+                  className={styles.input}
+                  disabled={isSubmitting}
+                />
+              </div>
 
-            {/* Title */}
-            <div className={styles.formGroup}>
-              <Input
-                label="Titel"
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="z.B. Live in Bremen"
-                disabled={isSubmitting}
-              />
-            </div>
+              <div className={styles.formGroup}>
+                <label htmlFor="category" className={styles.label}>
+                  Kategorie
+                </label>
+                <select
+                  id="category"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value as typeof category)}
+                  className={styles.select}
+                  disabled={isSubmitting}
+                >
+                  <option value="live">Live</option>
+                  <option value="promo">Promo</option>
+                  <option value="backstage">Backstage</option>
+                  <option value="other">Andere</option>
+                </select>
+              </div>
 
-            {/* Category */}
-            <div className={styles.formGroup}>
-              <label htmlFor="category" className={styles.label}>
-                Kategorie
-              </label>
-              <select
-                id="category"
-                value={category}
-                onChange={(e) => setCategory(e.target.value as typeof category)}
-                className={styles.select}
-                disabled={isSubmitting}
-              >
-                <option value="live">Live</option>
-                <option value="promo">Promo</option>
-                <option value="backstage">Backstage</option>
-                <option value="other">Andere</option>
-              </select>
+              <div className={styles.formGroupFull}>
+                <label htmlFor="description" className={styles.label}>
+                  Beschreibung
+                </label>
+                <textarea
+                  id="description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Beschreibung des Bildes..."
+                  className={styles.textarea}
+                  rows={4}
+                  disabled={isSubmitting}
+                />
+              </div>
             </div>
+          )}
 
-            {/* Description */}
-            <div className={styles.formGroupFull}>
-              <label htmlFor="description" className={styles.label}>
-                Beschreibung
-              </label>
-              <textarea
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Beschreibung des Bildes..."
-                className={styles.textarea}
-                rows={4}
-                disabled={isSubmitting}
-              />
-            </div>
-          </div>
+          {/* Upload Mode - Multiple Images */}
+          {!isEditMode && (
+            <>
+              {/* File Input */}
+              {!isUploading && (
+                <div className={styles.fileInputWrapper}>
+                  <input
+                    type="file"
+                    id="multipleImages"
+                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                    onChange={handleFilesChange}
+                    className={styles.fileInput}
+                    disabled={isSubmitting}
+                    multiple
+                  />
+                  <label htmlFor="multipleImages" className={styles.fileInputLabel}>
+                    📷 Bilder auswählen (mehrfach möglich)
+                  </label>
+                  <span className={styles.fileInputHint}>
+                    JPG, PNG oder WEBP (max. 10MB pro Bild)
+                    <br />
+                    <strong>Thumbnails werden automatisch erstellt!</strong>
+                  </span>
+                </div>
+              )}
+
+              {/* Image Previews Grid */}
+              {imagesToUpload.length > 0 && !isUploading && (
+                <div className={styles.imagesGrid}>
+                  {imagesToUpload.map((img, index) => (
+                    <div key={index} className={styles.imageCard}>
+                      <div className={styles.imagePreview}>
+                        <img
+                          src={img.preview}
+                          alt={`Preview ${index + 1}`}
+                          className={styles.previewImage}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveImage(index)}
+                          className={styles.removeButton}
+                          disabled={isSubmitting}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                      <div className={styles.imageMetadata}>
+                        <input
+                          type="text"
+                          value={img.title}
+                          onChange={(e) =>
+                            handleUpdateImageMeta(index, 'title', e.target.value)
+                          }
+                          placeholder="Titel (optional)"
+                          className={styles.input}
+                          disabled={isSubmitting}
+                        />
+                        <select
+                          value={img.category}
+                          onChange={(e) =>
+                            handleUpdateImageMeta(
+                              index,
+                              'category',
+                              e.target.value
+                            )
+                          }
+                          className={styles.select}
+                          disabled={isSubmitting}
+                        >
+                          <option value="live">Live</option>
+                          <option value="promo">Promo</option>
+                          <option value="backstage">Backstage</option>
+                          <option value="other">Andere</option>
+                        </select>
+                        <input
+                          type="text"
+                          value={img.description}
+                          onChange={(e) =>
+                            handleUpdateImageMeta(index, 'description', e.target.value)
+                          }
+                          placeholder="Beschreibung (optional)"
+                          className={styles.input}
+                          disabled={isSubmitting}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
 
           {/* Actions */}
           <div className={styles.formActions}>
@@ -218,15 +416,15 @@ export default function GalleryForm({ image, onSuccess, onCancel }: GalleryFormP
               type="submit"
               variant="primary"
               isLoading={isSubmitting}
-              disabled={isSubmitting}
+              disabled={isSubmitting || (!isEditMode && imagesToUpload.length === 0)}
             >
               {isSubmitting
                 ? isEditMode
                   ? 'Speichern...'
-                  : 'Erstellen...'
+                  : `${imagesToUpload.length} Bilder hochladen...`
                 : isEditMode
                 ? 'Speichern'
-                : 'Erstellen'}
+                : `${imagesToUpload.length} Bilder hochladen`}
             </Button>
           </div>
         </form>

@@ -3,9 +3,10 @@
 // Modal form for creating and editing band members
 // ============================================
 
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect, FormEvent, ChangeEvent } from 'react';
 import { BandMember } from '@joch/shared';
 import { bandService } from '@/services/band.service';
+import { uploadService } from '@/services/upload.service';
 import { useAuth } from '@/context/AuthContext';
 import Button from '@/components/Button/Button';
 import Input from '@/components/Input/Input';
@@ -33,6 +34,9 @@ export default function BandMemberForm({ member, onSuccess, onCancel }: BandMemb
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   // Initialize form with member data in edit mode
   useEffect(() => {
@@ -41,12 +45,50 @@ export default function BandMemberForm({ member, onSuccess, onCancel }: BandMemb
       setInstrument(member.instrument);
       setRole(member.role ?? '');
       setBio(member.bio);
-      setImage(member.image ?? member.photo ?? '');
+      const existingImage = member.image ?? member.photo ?? '';
+      setImage(existingImage);
+      setImagePreview(existingImage);
       setInstagram(member.instagram ?? '');
       setFacebook(member.facebook ?? '');
       setTwitter(member.twitter ?? '');
     }
   }, [member]);
+
+  // Handle image file selection
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setError('Bitte wähle eine Bilddatei aus');
+      return;
+    }
+
+    // Validate file size (max 10MB)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      setError('Bild ist zu groß (max. 10MB)');
+      return;
+    }
+
+    setImageFile(file);
+    setError(null);
+
+    // Generate preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Remove selected image
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview(member?.image ?? member?.photo ?? null);
+    setImage(member?.image ?? member?.photo ?? '');
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -58,21 +100,43 @@ export default function BandMemberForm({ member, onSuccess, onCancel }: BandMemb
     }
 
     // Basic validation
-    if (!name.trim() || !instrument.trim() || !bio.trim() || !image.trim()) {
+    if (!name.trim() || !instrument.trim() || !bio.trim()) {
       setError('Bitte fülle alle Pflichtfelder aus');
+      return;
+    }
+
+    // Check if image is provided (only file upload now)
+    if (!imageFile && !image.trim()) {
+      setError('Bitte lade ein Bild hoch');
       return;
     }
 
     try {
       setIsSubmitting(true);
+      let imageUrl = image.trim();
+
+      // Upload image to Cloudinary
+      if (imageFile) {
+        setIsUploading(true);
+        try {
+          const uploadResponse = await uploadService.uploadImage(imageFile, token);
+          imageUrl = uploadResponse.url;
+        } catch (uploadErr: any) {
+          console.error('Error uploading image:', uploadErr);
+          setError('Fehler beim Hochladen des Bildes: ' + uploadErr.message);
+          return;
+        } finally {
+          setIsUploading(false);
+        }
+      }
 
       const memberData: Partial<BandMember> = {
         name: name.trim(),
         instrument: instrument.trim(),
         role: role.trim() || undefined,
         bio: bio.trim(),
-        image: image.trim(),
-        photo: image.trim(), // Also set alias
+        image: imageUrl,
+        photo: imageUrl, // Also set alias
         instagram: instagram.trim() || undefined,
         facebook: facebook.trim() || undefined,
         twitter: twitter.trim() || undefined,
@@ -91,6 +155,7 @@ export default function BandMemberForm({ member, onSuccess, onCancel }: BandMemb
       setError(err.message || 'Fehler beim Speichern des Bandmitglieds');
     } finally {
       setIsSubmitting(false);
+      setIsUploading(false);
     }
   };
 
@@ -179,17 +244,41 @@ export default function BandMemberForm({ member, onSuccess, onCancel }: BandMemb
               />
             </div>
 
-            {/* Image URL */}
+            {/* Image Upload */}
             <div className={styles.formGroupFull}>
-              <Input
-                label="Bild URL *"
-                type="url"
-                value={image}
-                onChange={(e) => setImage(e.target.value)}
-                placeholder="https://..."
-                required
-                disabled={isSubmitting}
-              />
+              <label className={styles.label}>Bild *</label>
+
+              {/* Preview */}
+              {imagePreview && (
+                <div className={styles.imagePreview}>
+                  <img src={imagePreview} alt="Preview" className={styles.previewImage} />
+                  {imageFile && (
+                    <button
+                      type="button"
+                      onClick={handleRemoveImage}
+                      className={styles.removeImageButton}
+                      disabled={isSubmitting}
+                    >
+                      ✕ Bild entfernen
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* File Input */}
+              <div className={styles.fileInputWrapper}>
+                <input
+                  type="file"
+                  id="image-upload"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className={styles.fileInput}
+                  disabled={isSubmitting || isUploading}
+                />
+                <label htmlFor="image-upload" className={styles.fileInputLabel}>
+                  {imageFile ? imageFile.name : 'Bild auswählen oder hier ablegen'}
+                </label>
+              </div>
             </div>
 
             {/* Bio */}
@@ -264,7 +353,9 @@ export default function BandMemberForm({ member, onSuccess, onCancel }: BandMemb
               isLoading={isSubmitting}
               disabled={isSubmitting}
             >
-              {isSubmitting
+              {isUploading
+                ? 'Bild wird hochgeladen...'
+                : isSubmitting
                 ? isEditMode
                   ? 'Speichern...'
                   : 'Erstellen...'

@@ -56,11 +56,21 @@ export const updateGigSchema = createGigSchema.partial();
 // Song Validation
 export const createSongSchema = z.object({
   title: z.string().min(1, 'Titel muss angegeben werden').max(200),
+  artist: z.string().max(200).optional(),
+  album: z.string().max(200).optional(),
+  lyrics: z.string().max(10000).optional(),
   duration: z.number().int().positive('Duration muss positiv sein'),
   audioFile: z.string().min(1, 'Audio-Datei muss angegeben werden'),
-  coverArt: z.string().url('Ungültige Cover-URL').optional(),
-  releaseDate: z.string().datetime().optional(),
-  order: z.number().int().min(0),
+  audioUrl: z.string().optional(),
+  coverArt: z.union([z.string().url('Ungültige Cover-URL'), z.literal('')]).optional(),
+  releaseDate: z.union([z.string().datetime(), z.date()]).optional(),
+  streamingLinks: z.object({
+    spotify: z.union([z.string().url('Ungültiger Spotify-Link'), z.literal('')]).optional(),
+    appleMusic: z.union([z.string().url('Ungültiger Apple Music-Link'), z.literal('')]).optional(),
+    youtube: z.union([z.string().url('Ungültiger YouTube-Link'), z.literal('')]).optional(),
+    soundcloud: z.union([z.string().url('Ungültiger SoundCloud-Link'), z.literal('')]).optional(),
+  }).optional(),
+  order: z.number().int().min(0).default(0),
 });
 
 export const updateSongSchema = createSongSchema.partial();

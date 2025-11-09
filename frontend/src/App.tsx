@@ -14,6 +14,7 @@ import Live from './pages/Live/Live';
 import Music from './pages/Music/Music';
 import News from './pages/News/News';
 import NewsDetail from './pages/News/NewsDetail';
+import Gallery from './pages/Gallery/Gallery';
 import Contact from './pages/Contact/Contact';
 import Login from './pages/Admin/Login';
 import Register from './pages/Admin/Register';
@@ -31,7 +32,12 @@ import './styles/main.scss';
 const App: React.FC = () => {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <BrowserRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
         <div className="app">
           <Header />
           <main className="main-content">
@@ -42,6 +48,7 @@ const App: React.FC = () => {
               <Route path="/music" element={<Music />} />
               <Route path="/news" element={<News />} />
               <Route path="/news/:id" element={<NewsDetail />} />
+              <Route path="/galerie" element={<Gallery />} />
               <Route path="/contact" element={<Contact />} />
 
               {/* Auth Routes */}
