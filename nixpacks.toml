@@ -1,0 +1,15 @@
+[phases.setup]
+nixPkgs = ['nodejs-22_x']
+
+[phases.install]
+cmds = ['npm install --workspaces']
+
+[phases.build]
+cmds = [
+  'npm run build:shared',
+  'npm run build:backend',
+  'npm run build:frontend'
+]
+
+[start]
+cmd = 'npm start --workspace=backend'
