@@ -12,4 +12,4 @@ cmds = [
 ]
 
 [start]
-cmd = 'npm start --workspace=backend'
+cmd = 'NODE_ENV=production npm start --workspace=backend'
