@@ -258,6 +258,75 @@ feat: Add admin authentication with login, dashboard and protected routes
 
 ---
 
+### ✅ TAG 3 (Abend) - User Registration & Role Management System Complete!
+
+**Geplant:** Woche 6 Tag 3-4 (Admin CMS Features)
+**Geschafft:** User Registration + 3-Tier Role System + User Management UI!
+
+#### User Management Achievements:
+- ✅ **User Registration System**:
+  - Public registration endpoint (`POST /auth/register`)
+  - New users get role 'user' by default
+  - Register.tsx page with form validation
+  - Auto-login after successful registration
+  - Navigation to public home page after registration
+- ✅ **3-Tier Role System**:
+  - **'user'** - Registered users (default, no admin access)
+  - **'member'** - Band members (full admin access)
+  - **'admin'** - Full admin rights (can manage user roles)
+- ✅ **Backend Role Management**:
+  - `GET /auth/users` - Get all users (admin only)
+  - `PATCH /auth/users/:userId/role` - Update user role (admin only)
+  - Protection: Admins cannot change their own role
+  - Validation: Only valid roles allowed ('admin', 'member', 'user')
+- ✅ **Frontend User Management**:
+  - `UserManager.tsx` - Admin-only page to manage user roles
+  - Table view with all users (email, name, role, dates)
+  - Role dropdown for each user (except current admin)
+  - Visual indicators: role badges, "YOU" badge for current user
+  - Real-time updates after role changes
+  - Proper loading states and error handling
+- ✅ **Role-Based Access Control**:
+  - Updated `PrivateRoute` component with `requiredRoles` prop
+  - Dashboard shows UserManager card only to admins
+  - `/admin/users` route protected (admin only)
+  - Member role has full admin access to all CMS features
+- ✅ **SASS Fixes**:
+  - Fixed `$font-size-3xl` → `$font-size-xxl`
+  - Added missing `$border-radius` variables to `_variables.scss`
+  - UserManager.module.scss with proper table styling
+- ✅ **Build Success**:
+  - Fixed TypeScript errors (api imports)
+  - `npm run build` - 0 errors
+  - All services properly exported
+
+**Herausforderungen gelöst:**
+1. **Zod Validation Schema**: Changed default role from 'member' to 'user'
+2. **SASS Variables**: Fixed missing $border-radius variables
+3. **API Service Imports**: Fixed user.service.ts imports (api, ApiError)
+4. **Service Exports**: Added user.service to services/index.ts
+5. **Role Protection**: Implemented admin-cannot-change-own-role logic
+
+**Zeitaufwand:** ~4-5h (ursprünglich geplant: 1-2 Tage!)
+
+**Commit Message:**
+```
+feat: Add user registration and admin role management system
+
+- Implement public user registration with role 'user' by default
+- Add 3-tier role system (user, member, admin)
+- Create backend endpoints for user management (admin only)
+- Build UserManager component with role assignment UI
+- Add role-based access control for admin features
+- Fix SASS variable issues ($border-radius, $font-size-xxl)
+- Update services to support user management operations
+
+🤖 Generated with Claude Code
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
+
+---
+
 ## 📊 Fortschritt vs. Planung
 
 | Geplant (Timeline) | Tatsächlich geschafft | Status |
@@ -278,7 +347,7 @@ feat: Add admin authentication with login, dashboard and protected routes
 
 ---
 
-## 🎯 Was fehlt noch (Stand 05. Nov - Ende Tag 2)
+## 🎯 Was fehlt noch (Stand 06. Nov - Ende Tag 3 Abend)
 
 ### ✅ Woche 4-5 Tasks (COMPLETE!):
 - **Public Pages**:
@@ -299,21 +368,37 @@ feat: Add admin authentication with login, dashboard and protected routes
   - ✅ LoadingSpinner Component (3 sizes)
   - ✅ AudioPlayer Component (HTML5 audio, custom controls, progress bar)
 
+### ✅ Woche 6 Tasks Tag 1-4 (COMPLETE!):
+- ✅ **Auth System**:
+  - ✅ Login Page + AuthContext
+  - ✅ User Registration (public)
+  - ✅ JWT Token Storage (localStorage)
+  - ✅ Protected Routes (PrivateRoute component)
+  - ✅ Role-Based Access Control (3 tiers: user, member, admin)
+- ✅ **Admin Dashboard**:
+  - ✅ Dashboard with stats and management cards
+  - ✅ User Manager (admin only - role assignment)
+  - ✅ Logout functionality
+- ✅ **Mobile Enhancements**:
+  - ✅ Body scroll lock
+  - ✅ Overlay backdrop
+  - ✅ Touch-optimized navigation
+
 ### Woche 6-8 Tasks (noch offen):
-- ⏳ **Custom Hooks** (optional - können services direkt nutzen):
-  - useAuth hook (für AuthContext)
-  - useGigs, useNews, useSongs hooks (optional)
-- ⏳ **Admin/CMS Pages**:
-  - Login Page + AuthContext
-  - Dashboard (Stats, Overview)
-  - Gig Manager (CRUD Interface)
-  - News Manager (CRUD Interface)
-  - Song Manager (CRUD + MP3 Upload)
-  - BandMember Manager
-  - Gallery Manager (Image Upload)
-- ⏳ **Protected Routes** (React Router + Auth Guard)
-- ⏳ **File Upload UI** (Image/Audio upload with preview)
-- ⏳ **Responsive Design finalisieren** (Mobile Menu, Touch Optimization)
+- ⏳ **Admin CMS Manager Pages** (KRITISCH - Hauptaufgabe für morgen!):
+  - ⏳ Gig Manager (CRUD Interface)
+  - ⏳ News Manager (CRUD Interface)
+  - ⏳ Song Manager (CRUD + MP3 Upload)
+  - ⏳ BandMember Manager (CRUD Interface)
+  - ⏳ Gallery Manager (CRUD + Image Upload)
+  - ⏳ Messages Manager (View contact messages)
+- ⏳ **File Upload UI** (Image/Audio upload with preview & drag-drop)
+- ⏳ **Public Pages Testing & Bugfixes**:
+  - ⏳ Test alle API calls funktionieren
+  - ⏳ Error handling überprüfen
+  - ⏳ Loading states testen
+  - ⏳ Responsive Design auf Mobile testen
+- ⏳ **Responsive Design finalisieren** (Touch Optimization)
 - ⏳ **Performance Optimierung** (Code Splitting, Lazy Loading, Image Optimization)
 - ⏳ **Testing** (Manual testing, Bug fixing)
 - ⏳ **Content befüllen** (Band Story, Gigs, Songs, News, Photos)
@@ -321,7 +406,12 @@ feat: Add admin authentication with login, dashboard and protected routes
 - ⏳ **Backend API Fix**: Public routes 401 errors (auth middleware optional machen)
 - ✅ **SASS Deprecation Warnings**: FIXED! All warnings eliminated ✅
 
-**Geschätzte verbleibende Zeit:** 1-2 Wochen (bei gleichem Tempo!) 🚀
+**Geschätzte verbleibende Zeit:** 5-7 Tage (bei gleichem Tempo!) 🚀
+
+**Nächste Priorität (Tag 4):**
+1. **GigManager** - CRUD Interface für Gigs verwalten
+2. **NewsManager** - CRUD Interface für News verwalten
+3. **Testing** - Public Pages testen & bugfixen
 
 **Commits (Tag 2):**
 ```
@@ -1070,5 +1160,5 @@ Evening:
 
 ---
 
-**Stand:** 2025-11-06
-**Status:** Weeks 1-5 + Admin Start COMPLETED ✅ | Login + Dashboard READY | Authentication WORKING 🚀🔐
+**Stand:** 2025-11-06 (Abend)
+**Status:** Weeks 1-5 + Admin Auth Complete ✅ | User Registration & Role Management DONE ✅ | Next: CMS Managers 🚀
