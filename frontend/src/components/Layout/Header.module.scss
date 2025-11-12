@@ -1,5 +1,6 @@
 @use '../../styles/abstracts/variables' as *;
 @use '../../styles/abstracts/mixins' as *;
+@use '../../styles/abstracts/functions' as *;
 
 // ============================================
 // JOCH Bandpage - Header Styles
@@ -15,12 +16,11 @@
   background: $header-bg;
   @include backdrop-blur(10px);
   border-bottom: 1px solid rgba($color-gray-medium, 0.3);
-  transition: height $transition-base, background $transition-base;
+  transition: background $transition-base, box-shadow $transition-base;
   z-index: z-index('fixed');
 
-  // Scrolled state (smaller header)
+  // Scrolled state (darker background & shadow)
   &.scrolled {
-    height: $header-height-scrolled;
     background: $header-bg-scrolled;
     box-shadow: $shadow-md;
   }
@@ -53,10 +53,6 @@
   color: $color-white;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-
-  .scrolled & {
-    font-size: $font-size-xl;
-  }
 }
 
 // ============================================

@@ -95,9 +95,9 @@ export default function Contact() {
     <div className={styles.contactPage}>
       {/* Hero Section */}
       <section className={styles.hero}>
-        <div className={styles.heroContent}>
-          <h1 className={styles.heroTitle}>Kontakt</h1>
-          <p className={styles.heroSubtitle}>
+        <div className="container">
+          <h1 className={styles.title}>Kontakt</h1>
+          <p className={styles.subtitle}>
             Habt ihr Fragen, wollt uns buchen oder einfach mal Hallo sagen?
             <br />
             Wir freuen uns auf eure Nachricht!

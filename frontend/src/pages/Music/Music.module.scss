@@ -9,55 +9,40 @@
 
 // Hero Section
 .hero {
-  background: linear-gradient(135deg, $color-black, $color-gray-dark);
-  padding: calc($header-height + $spacing-mega) $spacing-lg $spacing-mega;
+  padding: calc($header-height + $spacing-xxl) 0 $spacing-xxl;
+  background: linear-gradient(
+    135deg,
+    rgba($color-black, 0.9),
+    rgba($color-gray-dark, 0.8)
+  );
   text-align: center;
-  position: relative;
-  overflow: hidden;
 
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(180deg, transparent, rgba($color-black, 0.8));
-    pointer-events: none;
+  @include responsive(max-md) {
+    padding: calc($header-height + $spacing-xl) 0 $spacing-xl;
   }
 }
 
-.heroContent {
-  position: relative;
-  z-index: 1;
-  max-width: 800px;
-  margin: 0 auto;
-}
+.title {
+  font-size: $font-size-hero;
+  margin: 0 0 $spacing-md;
+  background: linear-gradient(135deg, $color-red, $color-orange);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 
-.heroTitle {
-  font-family: $font-family-heading;
-  font-size: $font-size-mega;
-  font-weight: $font-weight-bold;
-  color: $color-white;
-  margin-bottom: $spacing-lg;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  @include fade-in;
-
-  @include responsive(md) {
+  @include responsive(max-md) {
     font-size: $font-size-mega;
   }
 }
 
-.heroSubtitle {
-  font-size: $font-size-lg;
+.subtitle {
+  font-size: $font-size-xl;
   color: $color-gray-light;
-  line-height: 1.6;
-  @include fade-in;
-  animation-delay: 0.2s;
+  margin: 0;
+  font-weight: 300;
 
-  @include responsive(md) {
-    font-size: $font-size-xl;
+  @include responsive(max-md) {
+    font-size: $font-size-lg;
   }
 }
 

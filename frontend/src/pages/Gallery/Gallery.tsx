@@ -107,14 +107,17 @@ export default function Gallery() {
 
   return (
     <div className={styles.galleryPage}>
-      <div className={styles.container}>
-        {/* Header */}
-        <header className={styles.header}>
+      {/* Hero Section */}
+      <section className={styles.hero}>
+        <div className="container">
           <h1 className={styles.title}>Galerie</h1>
           <p className={styles.subtitle}>
             Einblicke in unsere Welt – Live, Backstage und mehr
           </p>
-        </header>
+        </div>
+      </section>
+
+      <div className={styles.container}>
 
         {/* Category Filter */}
         <div className={styles.filterBar}>

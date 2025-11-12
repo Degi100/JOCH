@@ -60,9 +60,9 @@ export default function Music() {
     <div className={styles.musicPage}>
       {/* Hero Section */}
       <section className={styles.hero}>
-        <div className={styles.heroContent}>
-          <h1 className={styles.heroTitle}>Unsere Musik</h1>
-          <p className={styles.heroSubtitle}>
+        <div className="container">
+          <h1 className={styles.title}>Unsere Musik</h1>
+          <p className={styles.subtitle}>
             Ehrliche Musik, kraftvolle Texte. Vom echten Leben inspiriert – mal laut, mal
             leise, mal wütend, mal nachdenklich. Sozialkritisch. Direkt. Ohne Filter.
           </p>

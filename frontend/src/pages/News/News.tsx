@@ -51,9 +51,9 @@ export default function News() {
     <div className={styles.newsPage}>
       {/* Hero Section */}
       <section className={styles.hero}>
-        <div className={styles.heroContent}>
-          <h1 className={styles.heroTitle}>News</h1>
-          <p className={styles.heroSubtitle}>
+        <div className="container">
+          <h1 className={styles.title}>News</h1>
+          <p className={styles.subtitle}>
             Bleibt auf dem Laufenden! Hier findet ihr alle News, Updates und Stories rund um
             JOCH – von neuen Releases über Tour-Ankündigungen bis hin zu Behind-the-Scenes
             Einblicken.
