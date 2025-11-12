@@ -29,6 +29,7 @@ import BandManager from './pages/Admin/BandManager';
 import MessagesManager from './pages/Admin/MessagesManager';
 import UserManager from './pages/Admin/UserManager';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
+import ScrollToTop from './components/ScrollToTop/ScrollToTop';
 import './styles/main.scss';
 
 const App: React.FC = () => {
@@ -40,6 +41,7 @@ const App: React.FC = () => {
           v7_relativeSplatPath: true,
         }}
       >
+        <ScrollToTop />
         <div className="app">
           <Header />
           <main className="main-content">

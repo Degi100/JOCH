@@ -54,9 +54,22 @@
   &:hover {
     color: $color-white;
     background: rgba($color-red, 0.1);
+    text-decoration: none;
 
     @include md {
       background: none;
+      color: $color-red;
+
+      // Underline effect on desktop hover
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -4px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: $color-red;
+      }
     }
   }
 
