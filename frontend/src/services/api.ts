@@ -62,8 +62,8 @@ export async function apiRequest<T>(
     if (!response.ok) {
       throw new ApiError(
         response.status,
-        data.message || 'Request failed',
-        data
+        data.error || data.message || 'Request failed',
+        data.details || data
       );
     }
 
@@ -157,8 +157,8 @@ export const api = {
       if (!response.ok) {
         throw new ApiError(
           response.status,
-          data.message || 'Upload failed',
-          data
+          data.error || data.message || 'Upload failed',
+          data.details || data
         );
       }
 

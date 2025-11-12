@@ -11,8 +11,8 @@ export const errorHandler = (
   console.error('❌ Error:', err);
 
   // Zod Validation Error
-  if (err instanceof ZodError) {
-    const errors = err.errors.map((e) => ({
+  if (err instanceof ZodError || err.name === 'ZodError') {
+    const errors = (err as ZodError).errors.map((e) => ({
       field: e.path.join('.'),
       message: e.message,
     }));

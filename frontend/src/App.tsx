@@ -15,6 +15,7 @@ import Music from './pages/Music/Music';
 import News from './pages/News/News';
 import NewsDetail from './pages/News/NewsDetail';
 import Gallery from './pages/Gallery/Gallery';
+import Guestbook from './pages/Guestbook/Guestbook';
 import Contact from './pages/Contact/Contact';
 import Login from './pages/Admin/Login';
 import Register from './pages/Admin/Register';
@@ -23,6 +24,7 @@ import GigManager from './pages/Admin/GigManager';
 import NewsManager from './pages/Admin/NewsManager';
 import MusicManager from './pages/Admin/MusicManager';
 import GalleryManager from './pages/Admin/GalleryManager';
+import GuestbookManager from './pages/Admin/GuestbookManager';
 import BandManager from './pages/Admin/BandManager';
 import MessagesManager from './pages/Admin/MessagesManager';
 import UserManager from './pages/Admin/UserManager';
@@ -49,6 +51,7 @@ const App: React.FC = () => {
               <Route path="/news" element={<News />} />
               <Route path="/news/:id" element={<NewsDetail />} />
               <Route path="/galerie" element={<Gallery />} />
+              <Route path="/gaestebuch" element={<Guestbook />} />
               <Route path="/contact" element={<Contact />} />
 
               {/* Auth Routes */}
@@ -94,6 +97,14 @@ const App: React.FC = () => {
                 element={
                   <PrivateRoute requiredRoles={['admin', 'member']}>
                     <GalleryManager />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/admin/guestbook"
+                element={
+                  <PrivateRoute requiredRoles={['admin', 'member']}>
+                    <GuestbookManager />
                   </PrivateRoute>
                 }
               />

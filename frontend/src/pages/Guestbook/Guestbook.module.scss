@@ -1,0 +1,243 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+// ============================================
+// Guestbook Page Styles
+// ============================================
+
+.guestbookPage {
+  min-height: 100vh;
+}
+
+// ============================================
+// Hero Section
+// ============================================
+
+.hero {
+  padding: calc($header-height + $spacing-xxl) 0 $spacing-xxl;
+  background: linear-gradient(
+    135deg,
+    rgba($color-black, 0.9),
+    rgba($color-gray-dark, 0.8)
+  );
+  text-align: center;
+
+  @include responsive(max-md) {
+    padding: calc($header-height + $spacing-xl) 0 $spacing-xl;
+  }
+}
+
+.title {
+  font-size: $font-size-hero;
+  margin: 0 0 $spacing-md;
+  background: linear-gradient(135deg, $color-red, $color-orange);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+
+  @include responsive(max-md) {
+    font-size: $font-size-mega;
+  }
+}
+
+.subtitle {
+  font-size: $font-size-xl;
+  color: $color-gray-light;
+  margin: 0;
+  font-weight: 300;
+
+  @include responsive(max-md) {
+    font-size: $font-size-lg;
+  }
+}
+
+// ============================================
+// Content Section
+// ============================================
+
+.content {
+  padding: $spacing-xxl 0;
+  background: $color-bg-dark;
+
+  @include responsive(max-md) {
+    padding: $spacing-xl 0;
+  }
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-mega;
+
+  @include responsive(lg) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+// ============================================
+// Form Section
+// ============================================
+
+.formSection {
+  background: $color-gray-dark;
+  border-radius: $radius-lg;
+  padding: $spacing-xxl;
+  box-shadow: $card-shadow;
+}
+
+.sectionTitle {
+  font-size: $font-size-xxl;
+  text-align: center;
+  margin: 0 0 $spacing-xl;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  position: relative;
+
+  &::after {
+    content: '';
+    display: block;
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, $color-red, $color-orange);
+    margin: $spacing-md auto 0;
+    border-radius: $radius-sm;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+// Success/Error Messages
+.successMessage,
+.errorMessage {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-md;
+  padding: $spacing-lg;
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+  line-height: 1.5;
+
+  svg {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.successMessage {
+  background: rgba($color-success, 0.1);
+  border: 1px solid $color-success;
+  color: $color-success;
+
+  svg {
+    color: $color-success;
+  }
+}
+
+.errorMessage {
+  background: rgba($color-red, 0.1);
+  border: 1px solid $color-red;
+  color: $color-red;
+
+  svg {
+    color: $color-red;
+  }
+}
+
+// ============================================
+// Entries Section
+// ============================================
+
+.entriesSection {
+  background: $color-bg-surface;
+  border-radius: $radius-lg;
+  padding: $spacing-xxl;
+  box-shadow: $card-shadow;
+}
+
+.entriesList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.entryCard {
+  background: $color-gray-dark;
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+  border: 1px solid rgba($color-gray-medium, 0.3);
+  transition: $transition-base;
+
+  &:hover {
+    border-color: rgba($color-red, 0.5);
+    box-shadow: $card-shadow-hover;
+  }
+}
+
+.entryHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+  padding-bottom: $spacing-sm;
+  border-bottom: 1px solid rgba($color-gray-medium, 0.2);
+}
+
+.entryAuthor {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-white;
+}
+
+.entryDate {
+  font-family: $font-family-mono;
+  font-size: $font-size-sm;
+  color: $color-gray-light;
+}
+
+.entryMessage {
+  font-size: $font-size-base;
+  color: $color-gray-light;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+// ============================================
+// States
+// ============================================
+
+.error {
+  text-align: center;
+  padding: $spacing-xxl 0;
+
+  p {
+    color: $color-red;
+    font-size: $font-size-lg;
+    margin-bottom: $spacing-md;
+  }
+}
+
+.retryButton {
+  @include button-base;
+  @include button-primary;
+}
+
+.empty {
+  text-align: center;
+  padding: $spacing-xxl 0;
+
+  p {
+    color: $color-gray-medium;
+    font-size: $font-size-lg;
+  }
+}

@@ -6,6 +6,7 @@ import bandMemberRoutes from './bandMember.routes';
 import songRoutes from './song.routes';
 import galleryRoutes from './gallery.routes';
 import contactRoutes from './contact.routes';
+import guestbookRoutes from './guestbook.routes';
 import uploadRoutes from './upload.routes';
 
 const router = Router();
@@ -27,6 +28,7 @@ router.use('/band-members', bandMemberRoutes);
 router.use('/songs', songRoutes);
 router.use('/gallery', galleryRoutes);
 router.use('/contact', contactRoutes);
+router.use('/guestbook', guestbookRoutes);
 router.use('/upload', uploadRoutes);
 
 export default router;

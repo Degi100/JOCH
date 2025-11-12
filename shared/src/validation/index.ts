@@ -95,6 +95,13 @@ export const createContactMessageSchema = z.object({
   message: z.string().min(10, 'Nachricht muss mindestens 10 Zeichen lang sein').max(2000),
 });
 
+// Guestbook Entry Validation
+export const createGuestbookEntrySchema = z.object({
+  name: z.string().trim().min(2, 'Name muss mindestens 2 Zeichen lang sein').max(100),
+  email: z.string().trim().email('Bitte eine gültige Email-Adresse eingeben').max(255),
+  message: z.string().trim().min(10, 'Nachricht muss mindestens 10 Zeichen lang sein').max(1000),
+});
+
 // Query Params Validation
 export const paginationSchema = z.object({
   page: z.string().transform(Number).pipe(z.number().int().positive()).default('1'),
@@ -144,6 +151,7 @@ export type UpdateSongInput = z.infer<typeof updateSongSchema>;
 export type CreateGalleryImageInput = z.infer<typeof createGalleryImageSchema>;
 export type UpdateGalleryImageInput = z.infer<typeof updateGalleryImageSchema>;
 export type CreateContactMessageInput = z.infer<typeof createContactMessageSchema>;
+export type CreateGuestbookEntryInput = z.infer<typeof createGuestbookEntrySchema>;
 export type PaginationInput = z.infer<typeof paginationSchema>;
 export type GigFilterInput = z.infer<typeof gigFilterSchema>;
 export type NewsFilterInput = z.infer<typeof newsFilterSchema>;

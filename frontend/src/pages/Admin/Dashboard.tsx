@@ -182,6 +182,24 @@ const Dashboard: React.FC = () => {
               </Button>
             </div>
 
+            {/* Guestbook Management */}
+            <div className={styles.managementCard}>
+              <div className={styles.cardHeader}>
+                <h3 className={styles.cardTitle}>Gästebuch</h3>
+                <span className={styles.cardIcon}>📖</span>
+              </div>
+              <p className={styles.cardDescription}>
+                Gästebuch-Einträge moderieren und verwalten
+              </p>
+              <Button
+                variant="primary"
+                fullWidth
+                onClick={() => navigate('/admin/guestbook')}
+              >
+                Gästebuch verwalten
+              </Button>
+            </div>
+
             {/* User Management (Admin only) */}
             {user?.role === 'admin' && (
               <div className={styles.managementCard}>

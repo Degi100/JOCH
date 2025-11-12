@@ -22,6 +22,7 @@ const Navigation: React.FC<NavigationProps> = ({ onLinkClick }) => {
     { to: '/music', label: 'Musik' },
     { to: '/news', label: 'News' },
     { to: '/galerie', label: 'Galerie' },
+    { to: '/gaestebuch', label: 'Gästebuch' },
     { to: '/contact', label: 'Kontakt' },
   ];
 

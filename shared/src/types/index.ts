@@ -130,6 +130,22 @@ export interface ContactMessage {
   createdAt: Date;
 }
 
+// Guestbook Entry
+export interface GuestbookEntry {
+  _id: ObjectId;
+  name: string;
+  email: string;
+  message: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CreateGuestbookEntryDto {
+  name: string;
+  email: string;
+  message: string;
+}
+
 // API Response Types
 export interface ApiResponse<T> {
   success: boolean;
