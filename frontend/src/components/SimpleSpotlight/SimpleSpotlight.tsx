@@ -20,6 +20,15 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive })
   const lastBeatTimeRef = useRef<number>(0);
   const beatIntervalRef = useRef<number>(500); // Standard: 120 BPM = 500ms zwischen Beats
   const speedMultiplierRef = useRef<number>(1); // Geschwindigkeitsmultiplikator
+  const fogOffsetRef = useRef<number>(0); // Für animierten Nebel
+
+  // Fog machine state
+  const fogMachineActiveRef = useRef<boolean>(false);
+  const fogBurstStartTimeRef = useRef<number>(0);
+  const fogBurstDurationRef = useRef<number>(15000); // Burst dauert 15 Sekunden
+  const fogNextBurstTimeRef = useRef<number>(Date.now() + 5000); // Erster Burst nach 5 Sekunden
+  const fogIntensityRef = useRef<number>(0); // 0 bis 1, kontrolliert Opazität
+  const fogMachinePositionRef = useRef<number>(Math.random()); // Position der Nebelmaschine (0-1)
 
   // Bild laden
   useEffect(() => {
@@ -94,14 +103,16 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive })
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
 
-    // Drei Spotlights mit unterschiedlichen Startwinkeln
-    let angleLeft = -30;
-    let angleCenter = 0;
-    let angleRight = 30;
+    // Vier Spotlights gleichmäßig verteilt mit unterschiedlichen Startwinkeln
+    let angleSpot1 = -20;
+    let angleSpot2 = -10;
+    let angleSpot3 = 10;
+    let angleSpot4 = 20;
 
-    let directionLeft = 1;
-    let directionCenter = -1;
-    let directionRight = 1;
+    let directionSpot1 = 1;
+    let directionSpot2 = -1;
+    let directionSpot3 = 1;
+    let directionSpot4 = -1;
 
     // Spotlight-Farben für zufällige Auswahl - JETZT RICHTIG KRASS!
     const spotlightColors = [
@@ -120,7 +131,8 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive })
     const drawSpotlight = (
       spotX: number,
       angle: number,
-      color: { r: number; g: number; b: number }
+      color: { r: number; g: number; b: number },
+      isCenter: boolean = false
     ) => {
       const spotY = -50; // Über dem Canvas (von oben)
       const stageY = canvas.height * 0.7; // Bühnenhöhe
@@ -132,7 +144,7 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive })
       ctx.save();
 
       // Erstelle konischen Clipping-Pfad - breiter bei schnellerer Musik!
-      const beamWidth = 100 * speedMultiplierRef.current; // Schmaler für 3 Spots
+      const beamWidth = (isCenter ? 180 : 100) * speedMultiplierRef.current; // Breiter für mittleren Spot!
       ctx.beginPath();
       ctx.moveTo(spotX - 5, spotY);
       ctx.lineTo(spotX + 5, spotY);
@@ -178,8 +190,8 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive })
     };
 
     const draw = () => {
-      // Canvas mit schwarz füllen (dunkle Bühne)
-      ctx.fillStyle = 'black';
+      // Canvas mit semi-transparentem Schwarz füllen (dunkle Bühne mit mehr Durchblick)
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.65)'; // 65% Schwarz, 35% transparent - viel mehr durchsichtig!
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Beat-Flash-Effekt (fade out)
@@ -193,49 +205,316 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive })
 
       // Unterschiedliche Bewegungsradien für die Spots
       const maxAngleOuter = 45 + (speedMultiplierRef.current - 1) * 20; // Größerer Radius für außen (45-65°)
-      const maxAngleCenter = 25 + (speedMultiplierRef.current - 1) * 10; // Kleinerer für Mitte (25-35°)
+      const maxAngleCenter = 35 + (speedMultiplierRef.current - 1) * 15; // Sanfter für Mitte (35-50°)
 
-      // Update alle drei Winkel
-      angleLeft += currentSpeed * directionLeft;
-      angleCenter += currentSpeed * directionCenter;
-      angleRight += currentSpeed * directionRight;
+      // Update alle vier Winkel - Spots 2&3 bewegen sich sanfter!
+      angleSpot1 += currentSpeed * directionSpot1;
+      angleSpot2 += currentSpeed * 0.7 * directionSpot2; // 0.7x langsamer für sanftere Bewegung!
+      angleSpot3 += currentSpeed * 0.7 * directionSpot3; // 0.7x langsamer für sanftere Bewegung!
+      angleSpot4 += currentSpeed * directionSpot4;
 
-      // Grenzen für linken Spotlight (größerer Radius!)
-      if (angleLeft >= maxAngleOuter) {
-        angleLeft = maxAngleOuter;
-        directionLeft = -1;
-      } else if (angleLeft <= -maxAngleOuter) {
-        angleLeft = -maxAngleOuter;
-        directionLeft = 1;
+      // Grenzen für Spot 1 (äußerer Radius)
+      if (angleSpot1 >= maxAngleOuter) {
+        angleSpot1 = maxAngleOuter;
+        directionSpot1 = -1;
+      } else if (angleSpot1 <= -maxAngleOuter) {
+        angleSpot1 = -maxAngleOuter;
+        directionSpot1 = 1;
       }
 
-      // Grenzen für mittleren Spotlight (kleinerer Radius)
-      if (angleCenter >= maxAngleCenter) {
-        angleCenter = maxAngleCenter;
-        directionCenter = -1;
-      } else if (angleCenter <= -maxAngleCenter) {
-        angleCenter = -maxAngleCenter;
-        directionCenter = 1;
+      // Grenzen für Spot 2 (mittlerer Radius)
+      if (angleSpot2 >= maxAngleCenter) {
+        angleSpot2 = maxAngleCenter;
+        directionSpot2 = -1;
+      } else if (angleSpot2 <= -maxAngleCenter) {
+        angleSpot2 = -maxAngleCenter;
+        directionSpot2 = 1;
       }
 
-      // Grenzen für rechten Spotlight (größerer Radius!)
-      if (angleRight >= maxAngleOuter) {
-        angleRight = maxAngleOuter;
-        directionRight = -1;
-      } else if (angleRight <= -maxAngleOuter) {
-        angleRight = -maxAngleOuter;
-        directionRight = 1;
+      // Grenzen für Spot 3 (mittlerer Radius)
+      if (angleSpot3 >= maxAngleCenter) {
+        angleSpot3 = maxAngleCenter;
+        directionSpot3 = -1;
+      } else if (angleSpot3 <= -maxAngleCenter) {
+        angleSpot3 = -maxAngleCenter;
+        directionSpot3 = 1;
       }
 
-      // Farben für die drei Spotlights (verschiedene Farben!)
-      const colorLeft = spotlightColors[colorChangeRef.current % spotlightColors.length];
-      const colorCenter = spotlightColors[(colorChangeRef.current + 3) % spotlightColors.length];
-      const colorRight = spotlightColors[(colorChangeRef.current + 6) % spotlightColors.length];
+      // Grenzen für Spot 4 (äußerer Radius)
+      if (angleSpot4 >= maxAngleOuter) {
+        angleSpot4 = maxAngleOuter;
+        directionSpot4 = -1;
+      } else if (angleSpot4 <= -maxAngleOuter) {
+        angleSpot4 = -maxAngleOuter;
+        directionSpot4 = 1;
+      }
 
-      // Zeichne alle drei Spotlights
-      drawSpotlight(canvas.width * 0.05, angleLeft, colorLeft);    // Links (5%)
-      drawSpotlight(canvas.width * 0.5, angleCenter, colorCenter);  // Mitte (50%)
-      drawSpotlight(canvas.width * 0.95, angleRight, colorRight);   // Rechts (95%)
+      // Farben für die vier Spotlights (verschiedene Farben!)
+      const colorSpot1 = spotlightColors[colorChangeRef.current % spotlightColors.length];
+      const colorSpot2 = spotlightColors[(colorChangeRef.current + 2) % spotlightColors.length];
+      const colorSpot3 = spotlightColors[(colorChangeRef.current + 4) % spotlightColors.length];
+      const colorSpot4 = spotlightColors[(colorChangeRef.current + 6) % spotlightColors.length];
+
+      // GRUND-BELEUCHTUNG ZUERST ZEICHNEN (unter den Spotlights!)
+      // Beide Grundlichter haben die GLEICHE FARBE wie die äußeren Spots
+      const groundLightColor = colorSpot1; // Beide Grundlichter nutzen die Farbe des ersten Spots!
+
+      // Linke Grundbeleuchtung NUR als Lichteffekt (ohne Bild-Aufdeckung)
+      ctx.save();
+      const leftGroundIntensity = 0.3 + Math.abs(Math.sin(angleSpot1 * Math.PI / 180)) * 0.2;
+      const leftGroundRadius = canvas.width * 0.3;
+
+      // Weicher Gradient für Grundbeleuchtung
+      const leftGroundGradient = ctx.createRadialGradient(
+        0, canvas.height, 0,
+        0, canvas.height, leftGroundRadius
+      );
+      leftGroundGradient.addColorStop(0, `rgba(${groundLightColor.r}, ${groundLightColor.g}, ${groundLightColor.b}, ${leftGroundIntensity * 0.4})`);
+      leftGroundGradient.addColorStop(0.3, `rgba(${groundLightColor.r}, ${groundLightColor.g}, ${groundLightColor.b}, ${leftGroundIntensity * 0.2})`);
+      leftGroundGradient.addColorStop(0.6, `rgba(${groundLightColor.r}, ${groundLightColor.g}, ${groundLightColor.b}, ${leftGroundIntensity * 0.08})`);
+      leftGroundGradient.addColorStop(0.85, `rgba(${groundLightColor.r}, ${groundLightColor.g}, ${groundLightColor.b}, ${leftGroundIntensity * 0.02})`);
+      leftGroundGradient.addColorStop(1, `rgba(${groundLightColor.r}, ${groundLightColor.g}, ${groundLightColor.b}, 0)`);
+
+      ctx.fillStyle = leftGroundGradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.restore();
+
+      // Rechte Grundbeleuchtung NUR als Lichteffekt (ohne Bild-Aufdeckung)
+      ctx.save();
+      const rightGroundIntensity = 0.3 + Math.abs(Math.sin(angleSpot4 * Math.PI / 180)) * 0.2;
+      const rightGroundRadius = canvas.width * 0.3;
+
+      // Weicher Gradient für Grundbeleuchtung
+      const rightGroundGradient = ctx.createRadialGradient(
+        canvas.width, canvas.height, 0,
+        canvas.width, canvas.height, rightGroundRadius
+      );
+      rightGroundGradient.addColorStop(0, `rgba(${groundLightColor.r}, ${groundLightColor.g}, ${groundLightColor.b}, ${rightGroundIntensity * 0.4})`);
+      rightGroundGradient.addColorStop(0.3, `rgba(${groundLightColor.r}, ${groundLightColor.g}, ${groundLightColor.b}, ${rightGroundIntensity * 0.2})`);
+      rightGroundGradient.addColorStop(0.6, `rgba(${groundLightColor.r}, ${groundLightColor.g}, ${groundLightColor.b}, ${rightGroundIntensity * 0.08})`);
+      rightGroundGradient.addColorStop(0.85, `rgba(${groundLightColor.r}, ${groundLightColor.g}, ${groundLightColor.b}, ${rightGroundIntensity * 0.02})`);
+      rightGroundGradient.addColorStop(1, `rgba(${groundLightColor.r}, ${groundLightColor.g}, ${groundLightColor.b}, 0)`);
+
+      ctx.fillStyle = rightGroundGradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.restore();
+
+      // Jetzt die SPOTLIGHTS DARÜBER zeichnen - 4 gleichmäßig verteilt!
+      drawSpotlight(canvas.width * 0.2, angleSpot1, colorSpot1, false);   // Spot 1 (20%)
+      drawSpotlight(canvas.width * 0.4, angleSpot2, colorSpot2, true);    // Spot 2 (40%) - BREITER!
+      drawSpotlight(canvas.width * 0.6, angleSpot3, colorSpot3, true);    // Spot 3 (60%) - BREITER!
+      drawSpotlight(canvas.width * 0.8, angleSpot4, colorSpot4, false);   // Spot 4 (80%)
+
+      // FOG MACHINE BURST EFFECT - Realistischer Nebelmaschinen-Ausstoß
+      const currentTime = Date.now();
+
+      // Prüfe ob neuer Burst starten soll
+      if (!fogMachineActiveRef.current && currentTime >= fogNextBurstTimeRef.current) {
+        // Starte neuen Fog Burst
+        fogMachineActiveRef.current = true;
+        fogBurstStartTimeRef.current = currentTime;
+
+        // Zufällige Burst-Dauer zwischen 10-20 Sekunden
+        fogBurstDurationRef.current = 10000 + Math.random() * 10000;
+
+        // Nächster Burst in 15-30 Sekunden nach diesem Burst endet
+        fogNextBurstTimeRef.current = currentTime + fogBurstDurationRef.current + 15000 + Math.random() * 15000;
+
+        // Neue zufällige Position für die Nebelmaschine (links oder rechts)
+        fogMachinePositionRef.current = Math.random() < 0.5 ? 0.1 + Math.random() * 0.2 : 0.7 + Math.random() * 0.2;
+
+        console.log('💨 FOG BURST STARTED! Duration:', Math.round(fogBurstDurationRef.current / 1000), 'seconds');
+      }
+
+      // Update Fog Intensity während des Bursts
+      if (fogMachineActiveRef.current) {
+        const burstElapsed = currentTime - fogBurstStartTimeRef.current;
+        const burstProgress = burstElapsed / fogBurstDurationRef.current;
+
+        if (burstProgress >= 1) {
+          // Burst beendet
+          fogMachineActiveRef.current = false;
+          fogIntensityRef.current = 0;
+          console.log('💨 Fog burst ended. Next in:', Math.round((fogNextBurstTimeRef.current - currentTime) / 1000), 'seconds');
+        } else {
+          // Berechne Intensität: Starker Anfang, dann langsames Ausbreiten
+          if (burstProgress < 0.2) {
+            // Aufbau-Phase (erste 20%)
+            fogIntensityRef.current = burstProgress * 5; // Schnell auf 1.0
+          } else if (burstProgress < 0.7) {
+            // Haupt-Phase (20-70%)
+            fogIntensityRef.current = 1.0 - (burstProgress - 0.2) * 0.6; // Langsam auf 0.7 runter
+          } else {
+            // Auslauf-Phase (70-100%)
+            fogIntensityRef.current = 0.7 * (1 - (burstProgress - 0.7) / 0.3); // Fade out
+          }
+        }
+      }
+
+      // Animiere den Nebel-Offset
+      fogOffsetRef.current += 0.5 * speedMultiplierRef.current;
+
+      // NEBEL NUR IN SPOTLIGHT-BEREICHEN SICHTBAR!
+      if (fogIntensityRef.current > 0) {
+        ctx.save();
+
+        // Speichere die aktuellen Spotlight-Positionen und Winkel - 4 Spots!
+        const spotlights = [
+          { x: canvas.width * 0.2, angle: angleSpot1, color: colorSpot1, isCenter: false },
+          { x: canvas.width * 0.4, angle: angleSpot2, color: colorSpot2, isCenter: true },
+          { x: canvas.width * 0.6, angle: angleSpot3, color: colorSpot3, isCenter: true },
+          { x: canvas.width * 0.8, angle: angleSpot4, color: colorSpot4, isCenter: false }
+        ];
+
+        // Zeichne Nebel für jeden Spotlight separat
+        spotlights.forEach((spot) => {
+          ctx.save();
+
+          // Berechne Spotlight-Kegel-Bereich
+          const spotY = -50;
+          const stageY = canvas.height * 0.7;
+          const angleRad = (spot.angle * Math.PI) / 180;
+          const beamEndX = spot.x + Math.sin(angleRad) * (stageY + 50);
+          const beamEndY = stageY;
+          const beamWidth = (spot.isCenter ? 180 : 100) * speedMultiplierRef.current;
+
+          // Erstelle Clipping-Path für diesen Spotlight
+          ctx.beginPath();
+          ctx.moveTo(spot.x - 5, spotY);
+          ctx.lineTo(spot.x + 5, spotY);
+          ctx.lineTo(beamEndX + beamWidth, beamEndY + 200);
+          ctx.lineTo(beamEndX - beamWidth, beamEndY + 200);
+          ctx.closePath();
+          ctx.clip();
+
+          // NEBEL-PARTIKEL NUR IM LICHTKEGEL
+          const fogDensity = fogIntensityRef.current;
+
+          // Mehrere Nebel-Schichten mit verschiedenen Höhen - VIEL DICHTER!
+          for (let layer = 0; layer < 5; layer++) { // Mehr Schichten!
+            const layerHeight = canvas.height * (0.2 + layer * 0.18);
+            const layerOpacity = fogDensity * 0.35 * (1 - layer * 0.15); // DOPPELT SO STARK!
+
+            // Wabernde Nebel-Wolken - MEHR WOLKEN!
+            for (let i = 0; i < 5; i++) { // 5 statt 3!
+              const offsetX = Math.sin((fogOffsetRef.current + layer * 100 + i * 50) * 0.01) * 70;
+              const offsetY = Math.sin((fogOffsetRef.current + layer * 80 + i * 30) * 0.008) * 30;
+
+              const fogX = beamEndX + offsetX;
+              const fogY = layerHeight + offsetY;
+              const fogRadius = 120 + Math.sin(fogOffsetRef.current * 0.01 + i) * 40; // GRÖßERE WOLKEN!
+
+              // Nebel-Gradient mit Spotlight-Farbe getönt
+              const fogGradient = ctx.createRadialGradient(
+                fogX, fogY, 0,
+                fogX, fogY, fogRadius
+              );
+
+              // Nebel nimmt die Farbe des Spotlights an! - INTENSIVER!
+              const tintedOpacity = layerOpacity * (0.8 + beatFlashRef.current * 0.4);
+              fogGradient.addColorStop(0, `rgba(${spot.color.r}, ${spot.color.g}, ${spot.color.b}, ${tintedOpacity * 0.5})`);
+              fogGradient.addColorStop(0.3, `rgba(220, 225, 230, ${tintedOpacity * 0.4})`);
+              fogGradient.addColorStop(0.6, `rgba(200, 210, 220, ${tintedOpacity * 0.2})`);
+              fogGradient.addColorStop(1, 'transparent');
+
+              ctx.fillStyle = fogGradient;
+              ctx.fillRect(fogX - fogRadius, fogY - fogRadius, fogRadius * 2, fogRadius * 2);
+            }
+          }
+
+          // Bodennebel im Lichtkegel - DICHTER!
+          if (fogDensity > 0.2) { // Früher sichtbar
+            const groundFogGradient = ctx.createLinearGradient(
+              beamEndX - beamWidth, canvas.height,
+              beamEndX - beamWidth, canvas.height * 0.5 // Höher hinauf!
+            );
+
+            const groundOpacity = fogDensity * 0.6; // STÄRKER!
+
+            // Bodennebel auch mit Spotlight-Farbe getönt
+            groundFogGradient.addColorStop(0, `rgba(${spot.color.r * 0.7 + 60}, ${spot.color.g * 0.7 + 65}, ${spot.color.b * 0.7 + 70}, ${groundOpacity})`);
+            groundFogGradient.addColorStop(0.5, `rgba(190, 200, 210, ${groundOpacity * 0.7})`);
+            groundFogGradient.addColorStop(1, 'transparent');
+
+            ctx.fillStyle = groundFogGradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+          }
+
+          // Volumetrische Licht-Streuung im Nebel - INTENSIVER!
+          const scatterGradient = ctx.createLinearGradient(
+            spot.x, spotY,
+            beamEndX, beamEndY + 150 // Länger!
+          );
+
+          const scatterOpacity = fogDensity * 0.25 * (1 + beatFlashRef.current * 0.7); // VIEL STÄRKER!
+          scatterGradient.addColorStop(0, `rgba(${spot.color.r}, ${spot.color.g}, ${spot.color.b}, ${scatterOpacity * 0.4})`);
+          scatterGradient.addColorStop(0.5, `rgba(${spot.color.r * 0.8 + 40}, ${spot.color.g * 0.8 + 40}, ${spot.color.b * 0.8 + 40}, ${scatterOpacity * 0.2})`);
+          scatterGradient.addColorStop(1, 'transparent');
+
+          ctx.fillStyle = scatterGradient;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          ctx.restore();
+        });
+
+        // Kleine schwebende Partikel die nur in Lichtkegeln sichtbar sind
+        if (fogIntensityRef.current > 0.5 && beatFlashRef.current > 0.3) {
+          ctx.globalAlpha = beatFlashRef.current * 0.5;
+
+          for (let i = 0; i < 15; i++) {
+            const particleX = Math.random() * canvas.width;
+            const particleY = canvas.height * (0.3 + Math.random() * 0.5);
+            const particleRadius = 2 + Math.random() * 4;
+
+            // Prüfe ob Partikel in einem Lichtkegel ist
+            let inSpotlight = false;
+            let spotlightColor = { r: 220, g: 230, b: 240 };
+
+            for (const spot of spotlights) {
+              const spotY = -50;
+              const angleRad = (spot.angle * Math.PI) / 180;
+              const beamEndX = spot.x + Math.sin(angleRad) * (canvas.height * 0.7 + 50);
+              const beamWidth = (spot.isCenter ? 180 : 100) * speedMultiplierRef.current;
+
+              // Einfache Prüfung ob Punkt im Dreieck ist
+              if (Math.abs(particleX - beamEndX) < beamWidth) {
+                inSpotlight = true;
+                spotlightColor = spot.color;
+                break;
+              }
+            }
+
+            if (inSpotlight) {
+              ctx.beginPath();
+              ctx.arc(particleX, particleY, particleRadius, 0, Math.PI * 2);
+              ctx.fillStyle = `rgba(${spotlightColor.r}, ${spotlightColor.g}, ${spotlightColor.b}, 0.6)`;
+              ctx.fill();
+            }
+          }
+
+          ctx.globalAlpha = 1;
+        }
+
+        ctx.restore();
+      }
+
+      // Leichter Ambient-Nebel auch wenn keine Maschine aktiv (für Atmosphäre)
+      if (fogIntensityRef.current < 0.1) {
+        ctx.save();
+        const ambientOpacity = 0.03 + beatFlashRef.current * 0.02;
+        const ambientGradient = ctx.createLinearGradient(
+          0, canvas.height,
+          0, canvas.height * 0.6
+        );
+
+        ambientGradient.addColorStop(0, `rgba(180, 190, 200, ${ambientOpacity})`);
+        ambientGradient.addColorStop(1, 'transparent');
+
+        ctx.fillStyle = ambientGradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.restore();
+      }
+
 
       // STROBOSKOP-EFFEKT VON UNTEN (bei starkem Beat!)
       if (beatFlashRef.current > 0.7) {
@@ -264,6 +543,26 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive })
 
         ctx.fillStyle = strobeGradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // RANDOM VOLLBILD-BLITZ (20% Chance bei starkem Beat!)
+        if (Math.random() < 0.2 && beatFlashRef.current > 0.85) {
+          // Wähle zufällige Blitz-Farbe
+          const fullFlashColors = [
+            { r: 255, g: 255, b: 255, intensity: 0.9 },  // Weißer Blitz
+            { r: 255, g: 100, b: 0, intensity: 0.7 },     // Orange Blitz
+            { r: 0, g: 200, b: 255, intensity: 0.7 },     // Cyan Blitz
+            { r: 255, g: 0, b: 100, intensity: 0.7 },     // Pink Blitz
+          ];
+
+          const flashColor = fullFlashColors[Math.floor(Math.random() * fullFlashColors.length)];
+          const flashIntensity = flashColor.intensity * beatFlashRef.current;
+
+          // VOLLBILD-BLITZ!
+          ctx.fillStyle = `rgba(${flashColor.r}, ${flashColor.g}, ${flashColor.b}, ${flashIntensity})`;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          console.log('⚡ FULL SCREEN STROBE FLASH!');
+        }
 
         // Zusätzlicher Blitz-Effekt für mehr Impact
         if (beatFlashRef.current > 0.9) {
