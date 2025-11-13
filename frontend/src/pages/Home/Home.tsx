@@ -6,13 +6,20 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { gigService, newsService } from '../../services';
+import { useConcertModeContext } from '../../context/ConcertModeContext';
+import SimpleSpotlight from '../../components/SimpleSpotlight/SimpleSpotlight';
 import type { Gig, NewsPost } from '@joch/shared';
 import styles from './Home.module.scss';
+import heroImage from '../../bilder/IMG-20241013-WA0076.jpg';
 
 const Home: React.FC = () => {
+  const { isShowActive } = useConcertModeContext();
   const [upcomingGigs, setUpcomingGigs] = useState<Gig[]>([]);
   const [latestNews, setLatestNews] = useState<NewsPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Debug logging
+  console.log('🏠 Home - isShowActive:', isShowActive);
 
   // Fetch data on mount
   useEffect(() => {
@@ -39,7 +46,11 @@ const Home: React.FC = () => {
     <div className={styles.home}>
       {/* Hero Section */}
       <section className={styles.hero}>
-        <div className={styles.heroOverlay}></div>
+        <div className={`${styles.heroOverlay} ${isShowActive ? styles.lightshowActive : ''}`}></div>
+
+        {/* Simple Spotlight Effect */}
+        <SimpleSpotlight imageUrl={heroImage} isActive={isShowActive} />
+
         <div className={styles.heroContent}>
           <h1 className={styles.heroTitle}>JOCH</h1>
           <p className={styles.heroTagline}>Ehrliche Musik. Ohne Filter.</p>

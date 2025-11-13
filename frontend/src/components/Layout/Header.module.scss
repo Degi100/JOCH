@@ -28,8 +28,10 @@
 
 .container {
   @include container;
-  @include flex-between;
+  display: flex;
+  align-items: center;
   height: 100%;
+  gap: $spacing-md;
 }
 
 // ============================================
@@ -64,6 +66,37 @@
 
   @include md {
     display: block;
+    flex: 1; // Take up remaining space, push sound toggle right
+  }
+}
+
+// ============================================
+// Concert Play Button
+// ============================================
+
+.concertPlay {
+  display: flex;
+  align-items: center;
+  z-index: 10;
+
+  @include md {
+    margin-left: $spacing-lg; // Space after navigation on desktop
+  }
+}
+
+// ============================================
+// Sound Toggle
+// ============================================
+
+.soundToggle {
+  display: flex;
+  align-items: center;
+  margin-left: $spacing-sm; // Space after concert play button
+  z-index: 10;
+
+  // On mobile, push to the right (before hamburger)
+  @include responsive(max-md) {
+    margin-left: auto;
   }
 }
 

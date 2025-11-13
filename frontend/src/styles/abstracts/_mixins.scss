@@ -7,6 +7,25 @@
 @use 'variables' as *;
 
 // ============================================
+// Accessibility - Reduced Motion
+// ============================================
+
+// Disable animations for users who prefer reduced motion
+@mixin respect-motion-preference {
+  @media (prefers-reduced-motion: reduce) {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+// Only apply animations if user allows motion
+@mixin with-motion {
+  @media (prefers-reduced-motion: no-preference) {
+    @content;
+  }
+}
+
+// ============================================
 // Media Queries (Mobile-first)
 // ============================================
 

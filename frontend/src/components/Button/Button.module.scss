@@ -1,5 +1,6 @@
 @use '../../styles/abstracts/variables' as *;
 @use '../../styles/abstracts/mixins' as *;
+@use '../../styles/abstracts/stage-animations' as *;
 
 // ============================================
 // Button Component Styles
@@ -26,6 +27,16 @@
 
 .primary {
   @include button-primary;
+
+  // Stage glow effect
+  @include stage-glow($color-red, 15px);
+
+  // Amp glow animation on hover
+  @include with-motion {
+    &:hover:not(:disabled) {
+      animation: ampGlow 2s ease-in-out infinite;
+    }
+  }
 }
 
 .secondary {

@@ -6,9 +6,16 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Navigation from './Navigation';
+import SoundToggle from '../SoundToggle/SoundToggle';
+import ConcertPlayButton from '../ConcertPlayButton/ConcertPlayButton';
 import styles from './Header.module.scss';
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  onConcertModeToggle?: () => void;
+  isConcertModeActive?: boolean;
+}
+
+const Header: React.FC<HeaderProps> = ({ onConcertModeToggle, isConcertModeActive = false }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -56,6 +63,19 @@ const Header: React.FC = () => {
         {/* Desktop Navigation */}
         <div className={styles.desktopNav}>
           <Navigation onLinkClick={closeMobileMenu} />
+        </div>
+
+        {/* Concert Play Button */}
+        <div className={styles.concertPlay}>
+          <ConcertPlayButton
+            onClick={onConcertModeToggle || (() => {})}
+            isActive={isConcertModeActive}
+          />
+        </div>
+
+        {/* Sound Toggle */}
+        <div className={styles.soundToggle}>
+          <SoundToggle />
         </div>
 
         {/* Mobile Menu Button */}

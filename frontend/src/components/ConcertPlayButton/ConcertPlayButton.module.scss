@@ -1,0 +1,74 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+@use '../../styles/abstracts/stage-animations' as *;
+
+// ============================================
+// Concert Play Button Styles
+// ============================================
+
+.playButton {
+  background: rgba($color-red, 0.2);
+  border: 2px solid $color-red;
+  padding: $spacing-xs;
+  cursor: pointer;
+  color: $color-red;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all $transition-base;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+
+  // Stage glow
+  @include stage-glow($color-red, 10px);
+
+  // Hover state
+  &:hover {
+    background: rgba($color-red, 0.3);
+    color: $color-white;
+    transform: scale(1.1);
+    border-color: $color-white;
+
+    @include with-motion {
+      animation: ampGlow 1s ease-in-out infinite;
+    }
+  }
+
+  // Active/Playing state
+  &.active {
+    background: $color-red;
+    color: $color-white;
+    border-color: $color-white;
+
+    @include with-motion {
+      animation: ampGlow 2s ease-in-out infinite, stagePulse 1s ease-in-out infinite;
+    }
+  }
+
+  // Active/Click state
+  &:active {
+    transform: scale(0.95);
+  }
+
+  // Focus state (keyboard navigation)
+  &:focus-visible {
+    outline: 2px solid $color-red;
+    outline-offset: 4px;
+  }
+
+  // SVG icon
+  svg {
+    width: 20px;
+    height: 20px;
+    display: block;
+
+    @include md {
+      width: 22px;
+      height: 22px;
+    }
+  }
+
+  // Apply motion preference
+  @include respect-motion-preference;
+}

@@ -1,0 +1,52 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+// ============================================
+// JOCH Bandpage - Sound Toggle Styles
+// ============================================
+
+.soundToggle {
+  background: none;
+  border: none;
+  padding: $spacing-xs;
+  cursor: pointer;
+  color: $color-gray-light;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color $transition-base, transform $transition-base;
+  border-radius: $border-radius-sm;
+
+  // Hover state
+  &:hover {
+    color: $color-red;
+    background: rgba($color-red, 0.1);
+    transform: scale(1.1);
+  }
+
+  // Active/Click state
+  &:active {
+    transform: scale(0.95);
+  }
+
+  // Focus state (keyboard navigation)
+  &:focus-visible {
+    outline: 2px solid $color-red;
+    outline-offset: 2px;
+  }
+
+  // SVG icon
+  svg {
+    width: 20px;
+    height: 20px;
+    display: block;
+
+    @include md {
+      width: 22px;
+      height: 22px;
+    }
+  }
+
+  // Apply motion preference
+  @include respect-motion-preference;
+}

@@ -447,7 +447,59 @@ This completes the music upload feature with full metadata support including alb
 
 ---
 
-## 🎯 Was fehlt noch (Stand 08. Nov - Ende Tag 5)
+### ✅ TAG 9 (12. Nov 2025) - Guestbook Feature & UX Fixes Complete!
+
+**Geplant:** Woche 7 Tasks (Testing, Polish)
+**Geschafft:** Guestbook Feature + ScrollToTop + Navigation Hover Fix!
+
+#### Guestbook & UX Achievements:
+- ✅ **Guestbook Feature Complete**:
+  - GuestbookEntry Model with name, email (required), message
+  - Public guestbook page with form + entries list
+  - Admin GuestbookManager with email display + delete function
+  - Email addresses hidden on public page (only visible to admins)
+  - Two-column responsive layout (form + entries)
+  - Success/error messages with icons
+  - Character counter for message textarea (max 1000 chars)
+  - Navigation link added, dashboard card added
+- ✅ **Error Handling Improvements**:
+  - Fixed ZodError detection in errorHandler (added `err.name === 'ZodError'` check)
+  - API client now extracts `error` and `details` fields correctly
+  - Frontend displays specific validation error messages
+  - Changed from 500 Internal Server Error to 422 Unprocessable Entity for validation errors
+- ✅ **JWT Authentication Fix**:
+  - GuestbookManager now passes JWT token to service calls
+  - Fixed `getAllAdmin(token)` and `delete(id, token)` signatures
+  - Admin routes properly protected with authenticate + authorize middleware
+- ✅ **ScrollToTop Component**:
+  - Automatic scroll to top on route change
+  - Uses `useLocation()` hook to detect pathname changes
+  - Smooth UX when navigating between pages
+- ✅ **Navigation Hover Fix**:
+  - Removed duplicate underlines (browser default + custom)
+  - Only red underline appears on hover (Desktop)
+  - Red underline stays on active link
+  - Fixed `text-decoration: none` on hover state
+
+**Herausforderungen gelöst:**
+1. **ZodError not caught**: Fixed by checking `err.name === 'ZodError'` in addition to `instanceof`
+2. **API Error Messages**: Frontend now reads `data.error` before `data.message`
+3. **Validation Details**: Frontend extracts and displays `details[0].message` from Zod errors
+4. **JWT Token Missing**: Added token parameter to guestbook admin service calls
+5. **Scroll Position Persistence**: Created ScrollToTop component with useLocation hook
+6. **Navigation Double Underline**: Added explicit `text-decoration: none` and red `::after` underline on hover
+
+**Zeitaufwand:** ~4-5h
+
+**TODO für morgen (13. Nov):**
+- 📧 Registrierung mit Passwort-Bestätigung
+- 📧 Gästebuch Email-Benachrichtigung an User
+- 📧 Newsletter Feature
+- 💡 Weitere Features nach Bedarf
+
+---
+
+## 🎯 Was fehlt noch (Stand 12. Nov - Ende Tag 9)
 
 ### ✅ Woche 4-6 Tasks (COMPLETE!):
 - **Public Pages**:
@@ -1261,5 +1313,5 @@ Evening:
 
 ---
 
-**Stand:** 2025-11-09
-**Status:** Weeks 1-6 COMPLETED ✅ | Music Upload System READY | Cloudinary Integration COMPLETE | Auto-Duration Detection WORKING 🚀🎵☁️
+**Stand:** 2025-11-12
+**Status:** Weeks 1-6 COMPLETED ✅ | Guestbook Feature LIVE | ScrollToTop Fixed | Navigation Hover Fixed 🚀📖

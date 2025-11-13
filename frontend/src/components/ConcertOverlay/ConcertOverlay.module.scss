@@ -1,0 +1,167 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+// ============================================
+// Concert Overlay Styles
+// ============================================
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999; // Above everything
+  pointer-events: none;
+}
+
+// ============================================
+// Blackout Phase
+// ============================================
+
+.blackout {
+  @include absolute-full;
+  background: $color-black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeInBlackout 2s ease-in-out forwards;
+}
+
+.blackoutText {
+  color: rgba($color-white, 0.3);
+  font-size: $font-size-xl;
+  font-family: $font-family-heading;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  opacity: 0;
+  animation: fadeInText 1s ease-in 0.5s forwards;
+}
+
+@keyframes fadeInBlackout {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInText {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.3;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+// ============================================
+// Countdown Phase
+// ============================================
+
+.countdown {
+  @include absolute-full;
+  background: $color-black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.countdownNumber {
+  font-size: clamp(120px, 30vw, 300px);
+  font-weight: $font-weight-bold;
+  font-family: $font-family-heading;
+  color: $color-white;
+  text-shadow:
+    0 0 40px rgba($color-red, 1),
+    0 0 80px rgba($color-orange, 0.8),
+    0 0 120px rgba($color-red, 0.6);
+  animation: countdownPop 0.8s ease-out;
+}
+
+@keyframes countdownPop {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+// Strobo flash bei jedem Countdown mit zufälligen Farben
+.stroboFlash {
+  @include absolute-full;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+// Verschiedene Strobo-Klassen mit Farben
+.stroboWhite {
+  background: $color-white;
+  animation: stroboFade 0.3s ease-out;
+}
+
+.stroboRed {
+  background: $color-red;
+  animation: stroboFade 0.3s ease-out;
+}
+
+.stroboOrange {
+  background: $color-orange;
+  animation: stroboFade 0.3s ease-out;
+}
+
+.stroboBlue {
+  background: #00d4ff;
+  animation: stroboFade 0.3s ease-out;
+}
+
+.stroboPurple {
+  background: #b030ff;
+  animation: stroboFade 0.3s ease-out;
+}
+
+// Gemeinsame Fade-Animation für alle Strobo-Effekte
+@keyframes stroboFade {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+// ============================================
+// Show Starting Phase (Fade Out)
+// ============================================
+
+.showStarting {
+  @include absolute-full;
+  pointer-events: none;
+}
+
+.fadeOut {
+  @include absolute-full;
+  background: $color-black;
+  animation: fadeOutToShow 3s ease-out forwards;
+}
+
+@keyframes fadeOutToShow {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
