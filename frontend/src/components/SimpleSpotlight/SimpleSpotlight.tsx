@@ -471,7 +471,6 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive })
             let spotlightColor = { r: 220, g: 230, b: 240 };
 
             for (const spot of spotlights) {
-              const spotY = -50;
               const angleRad = (spot.angle * Math.PI) / 180;
               const beamEndX = spot.x + Math.sin(angleRad) * (canvas.height * 0.7 + 50);
               const beamWidth = (spot.isCenter ? 180 : 100) * speedMultiplierRef.current;
