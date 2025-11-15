@@ -6,17 +6,23 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { gigService, newsService } from '../../services';
+import { galleryService } from '../../services/gallery.service';
 import { useConcertModeContext } from '../../context/ConcertModeContext';
 import SimpleSpotlight from '../../components/SimpleSpotlight/SimpleSpotlight';
-import type { Gig, NewsPost } from '@joch/shared';
+import type { Gig, NewsPost, GalleryImage } from '@joch/shared';
 import styles from './Home.module.scss';
 import heroImage from '../../bilder/IMG-20241013-WA0076.jpg';
+import jochImage from '../../bilder/JOCH.jpg';
 
 const Home: React.FC = () => {
   const { isShowActive } = useConcertModeContext();
   const [upcomingGigs, setUpcomingGigs] = useState<Gig[]>([]);
   const [latestNews, setLatestNews] = useState<NewsPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [galleryImages, setGalleryImages] = useState<string[]>([]);
+
+  // Slideshow images for concert mode - combine local and gallery images
+  const slideshowImages = [...[heroImage, jochImage], ...galleryImages];
 
   // Debug logging
   console.log('🏠 Home - isShowActive:', isShowActive);
@@ -32,6 +38,19 @@ const Home: React.FC = () => {
         // Fetch latest news (limit 3)
         const news = await newsService.getAll();
         setLatestNews(news.slice(0, 3));
+
+        // Fetch gallery images for slideshow
+        try {
+          const gallery = await galleryService.getAll();
+          if (gallery.length > 0) {
+            // Get image URLs from gallery items
+            const imageUrls = gallery.map(img => img.imageUrl).filter(url => url);
+            setGalleryImages(imageUrls);
+            console.log('📸 Loaded gallery images for slideshow:', imageUrls.length);
+          }
+        } catch (galleryError) {
+          console.log('📸 No gallery images available (this is OK):', galleryError);
+        }
       } catch (error) {
         console.error('Failed to fetch home data:', error);
       } finally {
@@ -48,8 +67,12 @@ const Home: React.FC = () => {
       <section className={styles.hero}>
         <div className={`${styles.heroOverlay} ${isShowActive ? styles.lightshowActive : ''}`}></div>
 
-        {/* Simple Spotlight Effect */}
-        <SimpleSpotlight imageUrl={heroImage} isActive={isShowActive} />
+        {/* Simple Spotlight Effect with Slideshow */}
+        <SimpleSpotlight
+          imageUrl={heroImage}
+          isActive={isShowActive}
+          slideImages={slideshowImages}
+        />
 
         <div className={styles.heroContent}>
           <h1 className={styles.heroTitle}>JOCH</h1>

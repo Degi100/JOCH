@@ -1,16 +1,17 @@
 @use '../../styles/abstracts/variables' as *;
 
-.container {
+.slideshow {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 2;
-  pointer-events: none;
+  z-index: 1; // Above the container background but below canvas
+  overflow: hidden;
+  background: #000;
 }
 
-.backgroundImage {
+.slide {
   position: absolute;
   top: 0;
   left: 0;
@@ -19,32 +20,35 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  z-index: 0;
+  opacity: 0;
+  transform: scale(1.05);
+  transition: opacity 1s ease-in-out, transform 8s ease-out;
+  will-change: opacity, transform;
+
+  &.active {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  &.transitioning {
+    transition: opacity 0.5s ease-in-out;
+  }
 }
 
-.canvas {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: block;
-  z-index: 2;
-  pointer-events: none;
-}
-
-// Beat indicator for debugging
+// Beat indicator for debugging/visual feedback
 .beatIndicator {
-  position: fixed;
+  position: fixed;  // Changed from absolute to fixed
   bottom: 20px;
   right: 20px;
-  z-index: 10000;
-  opacity: 1;
+  z-index: 10000;  // Much higher z-index
+  opacity: 1;  // Full opacity for visibility
   pointer-events: none;
   display: flex;
   align-items: center;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.8);  // Darker background
   padding: 8px 15px;
   border-radius: 20px;
-  border: 2px solid $color-red;
+  border: 2px solid $color-red;  // Add border for visibility
 }
 
 .beatDot {
@@ -60,8 +64,8 @@
 }
 
 .beatCount {
-  color: #fff;
-  font-size: 14px;
+  color: #fff;  // White for better visibility
+  font-size: 14px;  // Slightly bigger
   margin-left: 10px;
   font-family: monospace;
   font-weight: bold;

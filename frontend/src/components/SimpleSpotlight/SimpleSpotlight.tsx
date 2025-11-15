@@ -1,17 +1,32 @@
 // ============================================
 // JOCH Bandpage - Simple Spotlight Effect
 // Ein beweglicher Lichtstrahl der das Bild aufdeckt
+// Mit integrierter Slideshow-Funktionalität
 // ============================================
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './SimpleSpotlight.module.scss';
 
 interface SimpleSpotlightProps {
   imageUrl: string;
   isActive: boolean;
+  slideImages?: string[]; // Optional slideshow images
 }
 
-const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive }) => {
+// Global state for beat synchronization
+let globalBeatCount = 0;
+let globalCurrentImageIndex = 0;
+
+const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive, slideImages }) => {
+  // Slideshow state
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [beatCount, setBeatCount] = useState(0);
+  const [showBeatPulse, setShowBeatPulse] = useState(false);
+
+  // Determine which image to show
+  const activeImageUrl = slideImages && slideImages.length > 0 && isActive
+    ? slideImages[currentImageIndex]
+    : imageUrl;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const animationRef = useRef<number | null>(null);
@@ -30,23 +45,52 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive })
   const fogIntensityRef = useRef<number>(0); // 0 bis 1, kontrolliert Opazität
   const fogMachinePositionRef = useRef<number>(Math.random()); // Position der Nebelmaschine (0-1)
 
-  // Bild laden
+  // Bild laden - jetzt mit activeImageUrl statt imageUrl
   useEffect(() => {
     const img = new Image();
-    img.src = imageUrl;
+    img.src = activeImageUrl;
     img.onload = () => {
       imageRef.current = img;
-      console.log('✅ Bild geladen');
+      console.log('✅ Bild geladen:', activeImageUrl);
     };
-  }, [imageUrl]);
+  }, [activeImageUrl]);
 
-  // Beat-Event Listener
+  // Reset global state when concert mode stops
+  useEffect(() => {
+    if (!isActive) {
+      globalBeatCount = 0;
+      globalCurrentImageIndex = 0;
+      setCurrentImageIndex(0);
+      setBeatCount(0);
+    } else {
+      // Restore state when concert mode starts
+      setCurrentImageIndex(globalCurrentImageIndex);
+      setBeatCount(globalBeatCount);
+    }
+  }, [isActive]);
+
+  // Beat-Event Listener mit Slideshow-Logik
   useEffect(() => {
     if (!isActive) return;
 
     const handleBeat = (event: Event) => {
       const customEvent = event as CustomEvent;
       console.log('🎵 Spotlight received beat!', customEvent.detail);
+
+      // Increment beat count
+      globalBeatCount++;
+      setBeatCount(globalBeatCount);
+
+      // Show beat pulse
+      setShowBeatPulse(true);
+      setTimeout(() => setShowBeatPulse(false), 150);
+
+      // Change image every 4 beats if slideshow images are available
+      if (slideImages && slideImages.length > 0 && globalBeatCount % 4 === 0 && globalBeatCount > 0) {
+        globalCurrentImageIndex = (globalCurrentImageIndex + 1) % slideImages.length;
+        setCurrentImageIndex(globalCurrentImageIndex);
+        console.log(`🖼️ Slideshow: Changed to image ${globalCurrentImageIndex + 1}/${slideImages.length}`);
+      }
 
       const now = Date.now();
 
@@ -84,7 +128,7 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive })
     return () => {
       window.removeEventListener('musicBeat', handleBeat);
     };
-  }, [isActive]);
+  }, [isActive, slideImages]);
 
   // Animation
   useEffect(() => {
@@ -190,8 +234,11 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive })
     };
 
     const draw = () => {
+      // Clear the canvas first to make it transparent
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
       // Canvas mit semi-transparentem Schwarz füllen (dunkle Bühne mit mehr Durchblick)
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.65)'; // 65% Schwarz, 35% transparent - viel mehr durchsichtig!
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.65)'; // 65% Schwarz, 35% transparent
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Beat-Flash-Effekt (fade out)
@@ -589,9 +636,27 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive })
 
   return (
     <div className={styles.container}>
+      {/* Background image - now changes based on beat */}
+      <div
+        className={styles.backgroundImage}
+        style={{ backgroundImage: `url(${activeImageUrl})` }}
+      />
+
+      {/* Canvas for spotlight effects */}
       <canvas ref={canvasRef} className={styles.canvas} />
+
+      {/* Beat indicator for debugging slideshow */}
+      {slideImages && slideImages.length > 0 && isActive && (
+        <div className={styles.beatIndicator}>
+          <div className={`${styles.beatDot} ${showBeatPulse ? styles.pulse : ''}`} />
+          <span className={styles.beatCount}>{beatCount}</span>
+          <span style={{ marginLeft: '10px', color: '#ff6b35' }}>
+            Img: {currentImageIndex + 1}/{slideImages.length}
+          </span>
+        </div>
+      )}
     </div>
   );
 };
 
-export default SimpleSpotlight;
+export default React.memo(SimpleSpotlight);
