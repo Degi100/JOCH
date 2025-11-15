@@ -1,0 +1,451 @@
+@use '../../styles/abstracts/variables' as *;
+
+.stageEquipment {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 5; // Above background, below spotlight
+}
+
+// PA Speaker Stacks (Left & Right)
+.speakerStack {
+  position: absolute;
+  bottom: 10%;
+  width: 180px;
+  height: 400px;
+
+  &.left {
+    left: 2%;
+  }
+
+  &.right {
+    right: 2%;
+  }
+}
+
+// Line Array (Top Speakers)
+.lineArray {
+  position: relative;
+  width: 100%;
+  background: linear-gradient(145deg, #1a1a1a, #2d2d2d);
+  border: 2px solid #333;
+  border-radius: 8px;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.8),
+    inset 0 2px 5px rgba(255, 255, 255, 0.1);
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.arrayUnit {
+  position: relative;
+  width: 100%;
+  height: 80px;
+  margin-bottom: 8px;
+  background: #0a0a0a;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.8);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Horn Tweeter
+.horn {
+  width: 40px;
+  height: 40px;
+  background: radial-gradient(circle, #4a4a4a, #2a2a2a);
+  border-radius: 4px;
+  position: relative;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.8);
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    background: #1a1a1a;
+    border-radius: 50%;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.9);
+  }
+}
+
+// Woofer (Mid-range)
+.woofer {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  background: #0a0a0a;
+  border-radius: 50%;
+  box-shadow:
+    0 3px 10px rgba(0, 0, 0, 0.8),
+    inset 0 2px 8px rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.bassHit {
+    animation: speakerPump 0.3s ease-out;
+  }
+}
+
+.cone {
+  position: absolute;
+  width: 90%;
+  height: 90%;
+  background: radial-gradient(circle, #3a3a3a, #1a1a1a);
+  border-radius: 50%;
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.5),
+    inset 0 -2px 10px rgba(0, 0, 0, 0.8);
+}
+
+.dustcap {
+  position: absolute;
+  width: 30%;
+  height: 30%;
+  background: radial-gradient(circle, #2a2a2a, #0a0a0a);
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  z-index: 1;
+}
+
+// LED Strip on each unit
+.ledStrip {
+  position: absolute;
+  bottom: 2px;
+  left: 10px;
+  right: 10px;
+  height: 3px;
+  background: linear-gradient(90deg,
+    $color-red 0%,
+    $color-orange 50%,
+    $color-red 100%);
+  border-radius: 2px;
+  opacity: 0.3;
+  transition: opacity 0.15s ease-out;
+
+  &.pulse {
+    opacity: 1;
+    box-shadow:
+      0 0 10px $color-red,
+      0 0 20px $color-orange;
+    animation: ledPulse 0.15s ease-out;
+  }
+}
+
+// Subwoofer
+.subwoofer {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  background: linear-gradient(145deg, #1a1a1a, #2d2d2d);
+  border: 2px solid #333;
+  border-radius: 8px;
+  box-shadow:
+    0 15px 40px rgba(0, 0, 0, 0.9),
+    inset 0 2px 5px rgba(255, 255, 255, 0.1);
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.subwooferCone {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  background: #0a0a0a;
+  border-radius: 50%;
+  box-shadow:
+    0 5px 15px rgba(0, 0, 0, 0.9),
+    inset 0 3px 10px rgba(0, 0, 0, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.bassHit {
+    animation: subwooferPump 0.3s ease-out;
+  }
+}
+
+.subCone {
+  position: absolute;
+  width: 90%;
+  height: 90%;
+  background: radial-gradient(circle, #4a4a4a, #1a1a1a);
+  border-radius: 50%;
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.6),
+    inset 0 -3px 15px rgba(0, 0, 0, 0.9);
+}
+
+.subDustcap {
+  position: absolute;
+  width: 35%;
+  height: 35%;
+  background: radial-gradient(circle, #3a3a3a, #0a0a0a);
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.9);
+  z-index: 1;
+}
+
+// Port Holes
+.portHoles {
+  position: absolute;
+  bottom: 15px;
+  left: 15px;
+  right: 15px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.port {
+  width: 35px;
+  height: 25px;
+  background: #000;
+  border-radius: 50%;
+  box-shadow: inset 0 3px 10px rgba(0, 0, 0, 1);
+}
+
+// LED Bar at bottom
+.ledBar {
+  position: absolute;
+  bottom: 5px;
+  left: 15px;
+  right: 15px;
+  height: 4px;
+  background: linear-gradient(90deg,
+    $color-red 0%,
+    $color-orange 30%,
+    $color-red 60%,
+    $color-orange 100%);
+  border-radius: 2px;
+  opacity: 0.3;
+  transition: opacity 0.15s ease-out;
+
+  &.pulse {
+    opacity: 1;
+    box-shadow:
+      0 0 15px $color-red,
+      0 0 30px $color-orange;
+  }
+}
+
+// Speaker Stand/Cable
+.speakerStand {
+  position: relative;
+  width: 100%;
+  height: 20px;
+}
+
+.cable {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 100%;
+  background: linear-gradient(180deg, #2a2a2a, #1a1a1a);
+  border-radius: 4px;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: -20px;
+    right: -20px;
+    height: 20px;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20"><path d="M0,10 Q25,0 50,10 T100,10" stroke="%23333" stroke-width="2" fill="none"/></svg>');
+    background-size: 100px 20px;
+    background-repeat: repeat-x;
+  }
+}
+
+// Lighting Rig (Top Truss)
+.lightingRig {
+  position: fixed;
+  top: 80px;  // Below header (header is typically 60-70px)
+  left: 10%;
+  right: 10%;
+  height: 100px;
+  pointer-events: none;
+  z-index: 5;  // Below header, above background
+}
+
+.truss {
+  position: relative;
+  width: 100%;
+  height: 30px;
+  background: linear-gradient(180deg, #3a3a3a, #2a2a2a);
+  border: 2px solid #444;
+  border-radius: 4px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.8);
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    background: repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 20px,
+      #444 20px,
+      #444 22px
+    );
+  }
+}
+
+// Light Fixtures on Truss (simplified - beams are on canvas now)
+.lightFixture {
+  position: absolute;
+  bottom: -40px;
+  width: 40px;
+  height: 40px;
+  z-index: 1;
+}
+
+.fixtureBody {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #3a3a3a, #1a1a1a);
+  border-radius: 50% 50% 10px 10px;
+  box-shadow:
+    0 3px 15px rgba(0, 0, 0, 0.8),
+    inset 0 -2px 5px rgba(255, 255, 255, 0.1);
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.2), transparent);
+    border-radius: 50%;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 10px;
+    background: #2a2a2a;
+    border-radius: 2px;
+  }
+}
+
+// Canvas for beams
+.beamCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 8; // Above speakers, below UI elements
+}
+
+// Monitor Wedges
+.monitors {
+  position: absolute;
+  bottom: 8%;
+  left: 25%;
+  right: 25%;
+  height: 60px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.monitorWedge {
+  position: relative;
+  width: 100px;
+  height: 60px;
+  background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+  clip-path: polygon(0 30%, 100% 0, 100% 100%, 0 100%);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.8);
+
+  &.leftMonitor {
+    transform: scaleX(-1);
+  }
+}
+
+.monitorSpeaker {
+  position: absolute;
+  bottom: 10px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background: radial-gradient(circle, #3a3a3a, #1a1a1a);
+  border-radius: 50%;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.9);
+
+  &.pulse {
+    animation: monitorPulse 0.15s ease-out;
+  }
+}
+
+// Animations
+@keyframes speakerPump {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes subwooferPump {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+@keyframes ledPulse {
+  0% { transform: scaleY(1); }
+  50% { transform: scaleY(1.5); }
+  100% { transform: scaleY(1); }
+}
+
+
+@keyframes monitorPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .speakerStack {
+    width: 120px;
+    height: 300px;
+
+    &.left { left: 1%; }
+    &.right { right: 1%; }
+  }
+
+  .monitors {
+    display: none; // Hide monitors on mobile
+  }
+
+  .lightingRig {
+    left: 5%;
+    right: 5%;
+  }
+}

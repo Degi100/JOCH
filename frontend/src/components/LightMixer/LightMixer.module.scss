@@ -1,0 +1,443 @@
+@use '../../styles/abstracts/variables' as *;
+
+// Toggle Button (floating)
+.toggleButton {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 10001;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+  border: 2px solid $color-red;
+  border-radius: 50%;
+  font-size: 28px;
+  cursor: pointer;
+  box-shadow:
+    0 4px 15px rgba(0, 0, 0, 0.8),
+    inset 0 2px 5px rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow:
+      0 6px 20px rgba(230, 57, 70, 0.4),
+      inset 0 2px 5px rgba(255, 255, 255, 0.1);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+// Mixer Panel
+.mixer {
+  position: fixed;
+  bottom: 100px;
+  left: 20px;
+  width: 450px;
+  max-height: 80vh;
+  background: linear-gradient(145deg, #1a1a1a, #0a0a0a);
+  border: 3px solid #333;
+  border-radius: $border-radius-lg;
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.9),
+    inset 0 2px 10px rgba(255, 255, 255, 0.05);
+  z-index: 10000;
+  opacity: 0;
+  transform: translateY(20px);
+  pointer-events: none;
+  transition: all 0.3s ease;
+  overflow: hidden;
+
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+  }
+}
+
+.mixerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: linear-gradient(180deg, #2a2a2a, #1a1a1a);
+  border-bottom: 2px solid #444;
+}
+
+.mixerTitle {
+  margin: 0;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-red;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-family: monospace;
+}
+
+.closeButton {
+  background: transparent;
+  border: none;
+  color: #666;
+  font-size: $font-size-xl;
+  cursor: pointer;
+  padding: 5px 10px;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: $color-red;
+  }
+}
+
+.mixerContent {
+  padding: 20px;
+  max-height: calc(80vh - 70px);
+  overflow-y: auto;
+
+  // Custom scrollbar
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #0a0a0a;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 4px;
+
+    &:hover {
+      background: #444;
+    }
+  }
+}
+
+// Sections
+.section {
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #222;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.sectionTitle {
+  margin: 0 0 15px 0;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-orange;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-family: monospace;
+}
+
+// Auto Mode Button
+.autoModeButton {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+  border: 2px solid #333;
+  border-radius: $border-radius;
+  color: #888;
+  font-size: $font-size-md;
+  font-weight: $font-weight-bold;
+  font-family: monospace;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #444;
+    background: linear-gradient(145deg, #333, #222);
+  }
+
+  &.active {
+    background: linear-gradient(145deg, darken($color-red, 20%), darken($color-red, 30%));
+    border-color: $color-red;
+    color: #fff;
+
+    .led {
+      background: $color-red;
+      box-shadow:
+        0 0 10px $color-red,
+        0 0 20px rgba($color-red, 0.5);
+    }
+  }
+}
+
+// Mode Buttons Grid
+.modeGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.modeButton {
+  padding: 10px 5px;
+  background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+  border: 2px solid #333;
+  border-radius: $border-radius-sm;
+  color: #666;
+  font-size: 10px;
+  font-weight: $font-weight-semibold;
+  font-family: monospace;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s ease;
+
+  &:hover:not(.disabled) {
+    border-color: #444;
+    background: linear-gradient(145deg, #333, #222);
+    color: #888;
+  }
+
+  &.active {
+    background: linear-gradient(145deg, darken($color-orange, 10%), darken($color-orange, 20%));
+    border-color: $color-orange;
+    color: #fff;
+
+    .led {
+      background: $color-orange;
+      box-shadow:
+        0 0 8px $color-orange,
+        0 0 15px rgba($color-orange, 0.5);
+    }
+  }
+
+  &.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+// LED Indicator
+.led {
+  width: 8px;
+  height: 8px;
+  background: #333;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+// Fader Controls
+.faderGroup {
+  margin-bottom: 15px;
+}
+
+.faderLabel {
+  display: block;
+  margin-bottom: 8px;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: #888;
+  font-family: monospace;
+  letter-spacing: 1px;
+}
+
+.fader {
+  width: 100%;
+  height: 40px;
+  -webkit-appearance: none;
+  background: linear-gradient(180deg, #1a1a1a, #0a0a0a);
+  border: 2px solid #333;
+  border-radius: $border-radius;
+  outline: none;
+  cursor: pointer;
+
+  // Thumb (slider handle)
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 36px;
+    background: linear-gradient(145deg, #4a4a4a, #2a2a2a);
+    border: 2px solid #666;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    &:hover {
+      background: linear-gradient(145deg, #5a5a5a, #3a3a3a);
+      border-color: #777;
+    }
+  }
+
+  &::-moz-range-thumb {
+    width: 20px;
+    height: 36px;
+    background: linear-gradient(145deg, #4a4a4a, #2a2a2a);
+    border: 2px solid #666;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    &:hover {
+      background: linear-gradient(145deg, #5a5a5a, #3a3a3a);
+      border-color: #777;
+    }
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+
+    &::-webkit-slider-thumb {
+      cursor: not-allowed;
+    }
+
+    &::-moz-range-thumb {
+      cursor: not-allowed;
+    }
+  }
+}
+
+.masterFader {
+  &::-webkit-slider-thumb {
+    background: linear-gradient(145deg, darken($color-red, 10%), darken($color-red, 20%));
+    border-color: $color-red;
+  }
+
+  &::-moz-range-thumb {
+    background: linear-gradient(145deg, darken($color-red, 10%), darken($color-red, 20%));
+    border-color: $color-red;
+  }
+}
+
+// Color Picker
+.colorGroup {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.colorLabel {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: #888;
+  font-family: monospace;
+  letter-spacing: 1px;
+}
+
+.colorPicker {
+  width: 60px;
+  height: 40px;
+  padding: 2px;
+  background: #1a1a1a;
+  border: 2px solid #333;
+  border-radius: $border-radius-sm;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+
+  &:hover:not(:disabled) {
+    border-color: #444;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+// Effect Buttons
+.effectButtons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.effectButton {
+  padding: 15px;
+  background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+  border: 2px solid #333;
+  border-radius: $border-radius;
+  color: #666;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  font-family: monospace;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+
+  &:hover {
+    border-color: #444;
+    background: linear-gradient(145deg, #333, #222);
+    color: #888;
+  }
+
+  &.active {
+    background: linear-gradient(145deg, darken($color-orange, 10%), darken($color-orange, 20%));
+    border-color: $color-orange;
+    color: #fff;
+
+    .led {
+      background: $color-orange;
+      box-shadow:
+        0 0 10px $color-orange,
+        0 0 20px rgba($color-orange, 0.5);
+      animation: ledPulse 0.5s infinite;
+    }
+  }
+}
+
+// Keyboard Shortcuts Info
+.shortcuts {
+  margin-top: 20px;
+  padding: 10px;
+  background: #0a0a0a;
+  border: 1px solid #222;
+  border-radius: $border-radius-sm;
+  text-align: center;
+
+  small {
+    color: #555;
+    font-family: monospace;
+    font-size: 11px;
+  }
+}
+
+// LED Pulse Animation
+@keyframes ledPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+// Responsive (Mobile)
+@media (max-width: 768px) {
+  .mixer {
+    left: 10px;
+    right: 10px;
+    width: auto;
+    max-height: 70vh;
+  }
+
+  .toggleButton {
+    bottom: 15px;
+    left: 15px;
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+  }
+
+  .modeGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .modeButton {
+    font-size: 9px;
+    padding: 8px 4px;
+  }
+}

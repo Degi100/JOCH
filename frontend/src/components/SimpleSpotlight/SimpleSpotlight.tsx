@@ -37,6 +37,26 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive, s
   const speedMultiplierRef = useRef<number>(1); // Geschwindigkeitsmultiplikator
   const fogOffsetRef = useRef<number>(0); // Für animierten Nebel
 
+  // Spotlight modes for dynamic show (only 2 or all 4, never single)
+  // WICHTIG: Niemals 0+1 (beide links zu nah) oder 2+3 (beide rechts zu nah)!
+  const spotlightModes = [
+    { name: 'DUAL_OUTER', activeSpots: [0, 3], intensity: 0.4 },      // Äußere links + äußere rechts
+    { name: 'DUAL_INNER', activeSpots: [1, 2], intensity: 0.4 },      // Innere links + innere rechts
+    { name: 'DIAGONAL_1', activeSpots: [0, 2], intensity: 0.4 },      // Links außen + rechts innen
+    { name: 'DIAGONAL_2', activeSpots: [1, 3], intensity: 0.4 },      // Links innen + rechts außen
+    { name: 'CHASE', activeSpots: [0], intensity: 0.4 },              // Chase Mode (wird dynamisch geändert)
+    { name: 'BOUNCE', activeSpots: [0, 3], intensity: 0.4 },          // Ping-Pong outer ↔ inner (dynamisch)
+    { name: 'ALTERNATE', activeSpots: [0, 3], intensity: 0.4 },       // Toggle outer ↔ inner (dynamisch)
+    { name: 'RANDOM', activeSpots: [0], intensity: 0.4 },             // Random lights (dynamisch)
+    { name: 'ALL', activeSpots: [0, 1, 2, 3], intensity: 0.35 },      // Alle 4 (sehr dezent)
+    { name: 'BLACKOUT', activeSpots: [], intensity: 0 },              // Alle aus (drama)
+  ];
+  const currentSpotModeIndexRef = useRef(0);
+  const activeSpotlightsRef = useRef<number[]>([0, 1, 2, 3]); // Welche Spots sind aktiv
+  const chasePositionRef = useRef(0); // Für Chase Mode: welcher Spot ist gerade aktiv (0-3)
+  const bounceDirectionRef = useRef(1); // Für Bounce: 1 = vorwärts, -1 = rückwärts
+  const alternateStateRef = useRef(false); // Für Alternate: false = outer, true = inner
+
   // Fog machine state
   const fogMachineActiveRef = useRef<boolean>(false);
   const fogBurstStartTimeRef = useRef<number>(0);
@@ -44,6 +64,15 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive, s
   const fogNextBurstTimeRef = useRef<number>(Date.now() + 5000); // Erster Burst nach 5 Sekunden
   const fogIntensityRef = useRef<number>(0); // 0 bis 1, kontrolliert Opazität
   const fogMachinePositionRef = useRef<number>(Math.random()); // Position der Nebelmaschine (0-1)
+
+  // Dark Beat state
+  const darkBeatActiveRef = useRef<boolean>(false);
+  const darkBeatEndTimeRef = useRef<number>(0);
+
+  // Auto mode control
+  const autoModeRef = useRef(true);
+  const manualIntensityRef = useRef(0.4);
+  const manualColorRef = useRef('#e63946');
 
   // Bild laden - jetzt mit activeImageUrl statt imageUrl
   useEffect(() => {
@@ -118,9 +147,68 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive, s
       beatFlashRef.current = 1;
       lastBeatTimeRef.current = now;
 
-      // Random color change on beat (70% chance)
-      if (Math.random() > 0.3) {
+      // Every 16 beats, switch spotlight mode (nur in Auto Mode!)
+      if (autoModeRef.current && globalBeatCount % 16 === 0 && globalBeatCount > 0) {
+        const randomModeIndex = Math.floor(Math.random() * spotlightModes.length);
+        currentSpotModeIndexRef.current = randomModeIndex;
+        const newMode = spotlightModes[randomModeIndex];
+        activeSpotlightsRef.current = newMode.activeSpots;
+        console.log('💡 Spotlight Mode changed to:', newMode.name, 'Active spots:', newMode.activeSpots);
+      }
+
+      // Color change every 16 beats (nur in Auto Mode!)
+      if (autoModeRef.current && globalBeatCount % 16 === 0 && globalBeatCount > 0) {
         colorChangeRef.current++;
+        console.log('🎨 Spotlights: Color changed');
+      }
+
+      // DYNAMIC MODES: CHASE, BOUNCE, ALTERNATE, RANDOM
+      const currentMode = spotlightModes[currentSpotModeIndexRef.current];
+
+      if (currentMode.name === 'CHASE') {
+        // CHASE MODE: Bei jedem Beat den nächsten Spot aktivieren (0 → 1 → 2 → 3 → 0 ...)
+        chasePositionRef.current = (chasePositionRef.current + 1) % 4;
+
+        // Nur der aktuelle Chase-Spot ist aktiv
+        activeSpotlightsRef.current = [chasePositionRef.current];
+
+        console.log('🏃 CHASE: Spot', chasePositionRef.current, 'active');
+      }
+      else if (currentMode.name === 'BOUNCE') {
+        // BOUNCE MODE: Ping-Pong zwischen outer (0+3) und inner (1+2)
+        // Pattern: outer → inner → outer → inner (hin und her)
+        const pattern = [[0, 3], [1, 2]]; // outer, inner
+        chasePositionRef.current = (chasePositionRef.current + 1) % pattern.length;
+        const activeSpots = pattern[chasePositionRef.current];
+
+        activeSpotlightsRef.current = activeSpots;
+
+        console.log('🏓 BOUNCE: Spots', activeSpots.join('+'), 'active');
+      }
+      else if (currentMode.name === 'ALTERNATE') {
+        // ALTERNATE MODE: Toggle zwischen outer (0+3) und inner (1+2) bei jedem Beat
+        alternateStateRef.current = !alternateStateRef.current;
+        const activeSpots = alternateStateRef.current ? [1, 2] : [0, 3]; // inner : outer
+
+        activeSpotlightsRef.current = activeSpots;
+
+        console.log('🔄 ALTERNATE: Spots', activeSpots.join('+'), 'active');
+      }
+      else if (currentMode.name === 'RANDOM') {
+        // RANDOM MODE: Zufällig 1-2 Spots aktivieren (Chaos!)
+        const numSpots = Math.random() > 0.5 ? 2 : 1;
+        const availableSpots = [0, 1, 2, 3];
+        const randomSpots: number[] = [];
+
+        for (let i = 0; i < numSpots; i++) {
+          const randomIndex = Math.floor(Math.random() * availableSpots.length);
+          randomSpots.push(availableSpots[randomIndex]);
+          availableSpots.splice(randomIndex, 1);
+        }
+
+        activeSpotlightsRef.current = randomSpots;
+
+        console.log('🎲 RANDOM: Spots', randomSpots.join('+'), 'active');
       }
     };
 
@@ -129,6 +217,59 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive, s
       window.removeEventListener('musicBeat', handleBeat);
     };
   }, [isActive, slideImages]);
+
+  // Listen to Light Control events from Mixer
+  useEffect(() => {
+    if (!isActive) return;
+
+    const handleLightControl = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const { type, data } = customEvent.detail;
+
+      console.log('🎛️ SimpleSpotlight: Light Control received', type, data);
+
+      switch (type) {
+        case 'spotMode':
+          // Manual mode control for main spots
+          currentSpotModeIndexRef.current = data.mode;
+          const mode = spotlightModes[data.mode];
+          activeSpotlightsRef.current = mode.activeSpots;
+          manualIntensityRef.current = data.intensity;
+          manualColorRef.current = data.color;
+          break;
+
+        case 'autoMode':
+          autoModeRef.current = data.enabled;
+          console.log('🎛️ Auto Mode:', data.enabled ? 'ENABLED' : 'DISABLED');
+          break;
+
+        case 'fog':
+          // Manual fog trigger
+          if (data.trigger) {
+            fogMachineActiveRef.current = true;
+            fogBurstStartTimeRef.current = Date.now();
+            console.log('🌫️ FOG TRIGGERED MANUALLY!');
+          }
+          break;
+
+        case 'darkBeat':
+          // Dark Beat: Complete blackout for dramatic effect
+          darkBeatActiveRef.current = true;
+          darkBeatEndTimeRef.current = Date.now() + (data.duration || 2000);
+          console.log('🌑 DARK-BEAT activated for', data.duration || 2000, 'ms');
+          break;
+
+        case 'master':
+          // Master controls can be handled here if needed
+          break;
+      }
+    };
+
+    window.addEventListener('lightControl', handleLightControl);
+    return () => {
+      window.removeEventListener('lightControl', handleLightControl);
+    };
+  }, [isActive]);
 
   // Animation
   useEffect(() => {
@@ -207,7 +348,12 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive, s
       }
 
       // Füge Lichteffekt mit aktueller Farbe hinzu (Beat-verstärkt!)
-      const intensity = 0.4 + (beatFlashRef.current * 0.4);
+      // Intensity from current mode or manual control
+      const currentSpotMode = spotlightModes[currentSpotModeIndexRef.current];
+      const modeIntensity = currentSpotMode.intensity;
+      // Use manual intensity if in manual mode, otherwise use mode intensity
+      const effectiveIntensity = autoModeRef.current ? modeIntensity : manualIntensityRef.current;
+      const intensity = effectiveIntensity * (0.6 + beatFlashRef.current * 0.4); // Base 0.6, flash boost 0.4
       const gradient = ctx.createLinearGradient(spotX, spotY, beamEndX, beamEndY);
       gradient.addColorStop(0, `rgba(${color.r}, ${color.g}, ${color.b}, ${intensity})`);
       gradient.addColorStop(0.3, `rgba(${color.r}, ${color.g}, ${color.b}, ${intensity * 0.5})`);
@@ -218,10 +364,10 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive, s
 
       ctx.restore();
 
-      // Zeichne Umgebungslicht-Effekt
+      // Zeichne Umgebungslicht-Effekt (dezenter basierend auf Mode)
       ctx.save();
-      const ambientIntensity = 0.1 + (beatFlashRef.current * 0.2);
-      const ambientRadius = 200 + (beatFlashRef.current * 100);
+      const ambientIntensity = effectiveIntensity * (0.08 + beatFlashRef.current * 0.15); // Dezenter!
+      const ambientRadius = 180 + (beatFlashRef.current * 80); // Kleiner Radius
       const ambientGradient = ctx.createRadialGradient(
         beamEndX, beamEndY, 0,
         beamEndX, beamEndY, ambientRadius
@@ -236,6 +382,19 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive, s
     const draw = () => {
       // Clear the canvas first to make it transparent
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Check for Dark Beat (blackout effect)
+      if (darkBeatActiveRef.current && Date.now() < darkBeatEndTimeRef.current) {
+        // Dark Beat is active - render complete darkness
+        ctx.fillStyle = 'rgba(0, 0, 0, 1)'; // 100% black for blackout
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        animationRef.current = requestAnimationFrame(draw);
+        return;
+      } else if (darkBeatActiveRef.current) {
+        // Dark Beat has ended
+        darkBeatActiveRef.current = false;
+        console.log('🌟 DARK-BEAT ended, spotlights back on');
+      }
 
       // Canvas mit semi-transparentem Schwarz füllen (dunkle Bühne mit mehr Durchblick)
       ctx.fillStyle = 'rgba(0, 0, 0, 0.65)'; // 65% Schwarz, 35% transparent
@@ -296,11 +455,27 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive, s
         directionSpot4 = 1;
       }
 
-      // Farben für die vier Spotlights (verschiedene Farben!)
-      const colorSpot1 = spotlightColors[colorChangeRef.current % spotlightColors.length];
-      const colorSpot2 = spotlightColors[(colorChangeRef.current + 2) % spotlightColors.length];
-      const colorSpot3 = spotlightColors[(colorChangeRef.current + 4) % spotlightColors.length];
-      const colorSpot4 = spotlightColors[(colorChangeRef.current + 6) % spotlightColors.length];
+      // Farben für die vier Spotlights (in Manual Mode alle gleich, in Auto Mode verschieden!)
+      let colorSpot1, colorSpot2, colorSpot3, colorSpot4;
+
+      if (autoModeRef.current) {
+        // Auto Mode: Verschiedene Farben aus Palette
+        colorSpot1 = spotlightColors[colorChangeRef.current % spotlightColors.length];
+        colorSpot2 = spotlightColors[(colorChangeRef.current + 2) % spotlightColors.length];
+        colorSpot3 = spotlightColors[(colorChangeRef.current + 4) % spotlightColors.length];
+        colorSpot4 = spotlightColors[(colorChangeRef.current + 6) % spotlightColors.length];
+      } else {
+        // Manual Mode: Alle Spots haben die gewählte Farbe
+        const hexColor = manualColorRef.current;
+        const r = parseInt(hexColor.slice(1, 3), 16);
+        const g = parseInt(hexColor.slice(3, 5), 16);
+        const b = parseInt(hexColor.slice(5, 7), 16);
+        const manualColor = { r, g, b };
+        colorSpot1 = manualColor;
+        colorSpot2 = manualColor;
+        colorSpot3 = manualColor;
+        colorSpot4 = manualColor;
+      }
 
       // GRUND-BELEUCHTUNG ZUERST ZEICHNEN (unter den Spotlights!)
       // Beide Grundlichter haben die GLEICHE FARBE wie die äußeren Spots
@@ -346,11 +521,15 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive, s
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.restore();
 
-      // Jetzt die SPOTLIGHTS DARÜBER zeichnen - 4 gleichmäßig verteilt!
-      drawSpotlight(canvas.width * 0.2, angleSpot1, colorSpot1, false);   // Spot 1 (20%)
-      drawSpotlight(canvas.width * 0.4, angleSpot2, colorSpot2, true);    // Spot 2 (40%) - BREITER!
-      drawSpotlight(canvas.width * 0.6, angleSpot3, colorSpot3, true);    // Spot 3 (60%) - BREITER!
-      drawSpotlight(canvas.width * 0.8, angleSpot4, colorSpot4, false);   // Spot 4 (80%)
+      // Get current spotlight mode
+      const currentSpotMode = spotlightModes[currentSpotModeIndexRef.current];
+      const activeSpots = activeSpotlightsRef.current;
+
+      // Jetzt die SPOTLIGHTS DARÜBER zeichnen - NUR die aktiven!
+      if (activeSpots.includes(0)) drawSpotlight(canvas.width * 0.2, angleSpot1, colorSpot1, false);   // Spot 1 (20%)
+      if (activeSpots.includes(1)) drawSpotlight(canvas.width * 0.4, angleSpot2, colorSpot2, true);    // Spot 2 (40%) - BREITER!
+      if (activeSpots.includes(2)) drawSpotlight(canvas.width * 0.6, angleSpot3, colorSpot3, true);    // Spot 3 (60%) - BREITER!
+      if (activeSpots.includes(3)) drawSpotlight(canvas.width * 0.8, angleSpot4, colorSpot4, false);   // Spot 4 (80%)
 
       // FOG MACHINE BURST EFFECT - Realistischer Nebelmaschinen-Ausstoß
       const currentTime = Date.now();

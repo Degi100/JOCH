@@ -9,6 +9,8 @@ import { gigService, newsService } from '../../services';
 import { galleryService } from '../../services/gallery.service';
 import { useConcertModeContext } from '../../context/ConcertModeContext';
 import SimpleSpotlight from '../../components/SimpleSpotlight/SimpleSpotlight';
+import StageEquipment from '../../components/StageEquipment/StageEquipment';
+import LightMixer from '../../components/LightMixer/LightMixer';
 import type { Gig, NewsPost, GalleryImage } from '@joch/shared';
 import styles from './Home.module.scss';
 import heroImage from '../../bilder/IMG-20241013-WA0076.jpg';
@@ -67,12 +69,18 @@ const Home: React.FC = () => {
       <section className={styles.hero}>
         <div className={`${styles.heroOverlay} ${isShowActive ? styles.lightshowActive : ''}`}></div>
 
+        {/* Stage Equipment (PA Speakers, Moving Heads, etc.) */}
+        <StageEquipment isActive={isShowActive} />
+
         {/* Simple Spotlight Effect with Slideshow */}
         <SimpleSpotlight
           imageUrl={heroImage}
           isActive={isShowActive}
           slideImages={slideshowImages}
         />
+
+        {/* Light Mixer Control Panel */}
+        <LightMixer isActive={isShowActive} />
 
         <div className={styles.heroContent}>
           <h1 className={styles.heroTitle}>JOCH</h1>
