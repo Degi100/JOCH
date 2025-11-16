@@ -72,7 +72,7 @@ const App: React.FC = () => {
     loadConcertSongs();
   }, []);
 
-  // Listen for events from pop-out window (lightControl from mixer)
+  // Listen for events from pop-out window (lightControl + ledControl from mixer)
   useEffect(() => {
     const handleBroadcastMessage = (event: MessageEvent) => {
       const { type, detail } = event.data;
@@ -81,6 +81,11 @@ const App: React.FC = () => {
       if (type === 'lightControl') {
         console.log('🎛️ Main: Received lightControl from popout, re-dispatching locally:', detail);
         window.dispatchEvent(new CustomEvent('lightControl', { detail }));
+      }
+      // Re-dispatch ledControl events from popout window in main window
+      else if (type === 'ledControl') {
+        console.log('📺 Main: Received ledControl from popout, re-dispatching locally:', detail);
+        window.dispatchEvent(new CustomEvent('ledControl', { detail }));
       }
     };
 

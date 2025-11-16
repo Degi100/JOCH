@@ -48,14 +48,18 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive, s
     { name: 'BOUNCE', activeSpots: [0, 3], intensity: 0.4 },          // Ping-Pong outer ↔ inner (dynamisch)
     { name: 'ALTERNATE', activeSpots: [0, 3], intensity: 0.4 },       // Toggle outer ↔ inner (dynamisch)
     { name: 'RANDOM', activeSpots: [0], intensity: 0.4 },             // Random lights (dynamisch)
+    { name: 'FOLLOW_TEXT', activeSpots: [0, 1, 2, 3], intensity: 0.5 }, // Alle Beams folgen dem Text! 🎯
     { name: 'ALL', activeSpots: [0, 1, 2, 3], intensity: 0.35 },      // Alle 4 (sehr dezent)
     { name: 'BLACKOUT', activeSpots: [], intensity: 0 },              // Alle aus (drama)
   ];
   const currentSpotModeIndexRef = useRef(0);
   const activeSpotlightsRef = useRef<number[]>([0, 1, 2, 3]); // Welche Spots sind aktiv
   const chasePositionRef = useRef(0); // Für Chase Mode: welcher Spot ist gerade aktiv (0-3)
-  const bounceDirectionRef = useRef(1); // Für Bounce: 1 = vorwärts, -1 = rückwärts
   const alternateStateRef = useRef(false); // Für Alternate: false = outer, true = inner
+
+  // Text Position State (from LED Screen)
+  const textPositionXRef = useRef<number>(50); // 0-100% horizontal
+  const textPositionYRef = useRef<number>(50); // 0-100% vertical
 
   // Fog machine state
   const fogMachineActiveRef = useRef<boolean>(false);
@@ -355,6 +359,28 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive, s
     };
   }, [isActive]);
 
+  // Listen to LED Screen position updates for FOLLOW_TEXT mode
+  useEffect(() => {
+    if (!isActive) return;
+
+    const handleLEDControl = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const { positionX, positionY } = customEvent.detail;
+
+      if (positionX !== undefined) {
+        textPositionXRef.current = positionX;
+      }
+      if (positionY !== undefined) {
+        textPositionYRef.current = positionY;
+      }
+    };
+
+    window.addEventListener('ledControl', handleLEDControl);
+    return () => {
+      window.removeEventListener('ledControl', handleLEDControl);
+    };
+  }, [isActive]);
+
   // Listen to Lightshow Reset event (when song changes)
   useEffect(() => {
     const handleReset = () => {
@@ -394,7 +420,7 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive, s
 
     const handleMovingHeadModeChange = (event: Event) => {
       const customEvent = event as CustomEvent;
-      const { mode, activeBeams } = customEvent.detail;
+      const { mode } = customEvent.detail;
       movingHeadModeRef.current = mode;
 
       console.log('🔗 COORDINATION: Moving Heads changed to', mode, '- Spots adapting...');
@@ -437,7 +463,7 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive, s
 
     const handleMovingHeadColorChange = (event: Event) => {
       const customEvent = event as CustomEvent;
-      const { colorIndex, color } = customEvent.detail;
+      const { colorIndex } = customEvent.detail;
 
       if (useSharedColorPaletteRef.current) {
         // Use SAME color palette as Moving Heads (synchronized colors!)
@@ -832,11 +858,30 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive, s
       const currentSpotMode = spotlightModes[currentSpotModeIndexRef.current];
       const activeSpots = activeSpotlightsRef.current;
 
+      // FOLLOW_TEXT Mode: Alle Beams zielen auf den Text! 🎯
+      let spotX1 = canvas.width * 0.2;
+      let spotX2 = canvas.width * 0.4;
+      let spotX3 = canvas.width * 0.6;
+      let spotX4 = canvas.width * 0.8;
+
+      if (currentSpotMode.name === 'FOLLOW_TEXT') {
+        // Konvertiere Text-Position (0-100%) zu Canvas-Koordinaten
+        const textX = (textPositionXRef.current / 100) * canvas.width;
+
+        // Alle Beams zielen auf die Text-Position
+        // Aber behalten ihre ursprüngliche X-Position (nur Winkel ändert sich)
+        // Der Winkel wird automatisch durch die X-Position in drawSpotlight berechnet
+        spotX1 = textX;
+        spotX2 = textX;
+        spotX3 = textX;
+        spotX4 = textX;
+      }
+
       // Jetzt die SPOTLIGHTS DARÜBER zeichnen - NUR die aktiven!
-      if (activeSpots.includes(0)) drawSpotlight(canvas.width * 0.2, angleSpot1, colorSpot1, false);   // Spot 1 (20%)
-      if (activeSpots.includes(1)) drawSpotlight(canvas.width * 0.4, angleSpot2, colorSpot2, true);    // Spot 2 (40%) - BREITER!
-      if (activeSpots.includes(2)) drawSpotlight(canvas.width * 0.6, angleSpot3, colorSpot3, true);    // Spot 3 (60%) - BREITER!
-      if (activeSpots.includes(3)) drawSpotlight(canvas.width * 0.8, angleSpot4, colorSpot4, false);   // Spot 4 (80%)
+      if (activeSpots.includes(0)) drawSpotlight(spotX1, angleSpot1, colorSpot1, false);   // Spot 1
+      if (activeSpots.includes(1)) drawSpotlight(spotX2, angleSpot2, colorSpot2, true);    // Spot 2 - BREITER!
+      if (activeSpots.includes(2)) drawSpotlight(spotX3, angleSpot3, colorSpot3, true);    // Spot 3 - BREITER!
+      if (activeSpots.includes(3)) drawSpotlight(spotX4, angleSpot4, colorSpot4, false);   // Spot 4
 
       // FOG MACHINE BURST EFFECT - Realistischer Nebelmaschinen-Ausstoß
       const currentTime = Date.now();

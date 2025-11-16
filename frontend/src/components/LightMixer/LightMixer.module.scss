@@ -664,6 +664,65 @@
   }
 }
 
+// Text Input
+.textInput {
+  width: 100%;
+  padding: 10px;
+  background: linear-gradient(180deg, #1a1a1a, #0a0a0a);
+  border: 2px solid #444;
+  border-radius: $border-radius;
+  color: #fff;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  font-family: monospace;
+  text-align: center;
+  letter-spacing: 2px;
+  outline: none;
+  transition: border-color 0.2s ease;
+
+  &:focus {
+    border-color: $color-orange;
+    box-shadow: 0 0 10px rgba($color-orange, 0.3);
+  }
+
+  &::placeholder {
+    color: #555;
+  }
+}
+
+// Font Style Grid
+.fontStyleGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.fontStyleButton {
+  padding: 10px 6px;
+  background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+  border: 2px solid #333;
+  border-radius: $border-radius-sm;
+  color: #666;
+  font-size: 9px;
+  font-weight: $font-weight-bold;
+  font-family: monospace;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    border-color: #444;
+    background: linear-gradient(145deg, #333, #222);
+    color: #888;
+  }
+
+  &.active {
+    background: linear-gradient(145deg, darken($color-orange, 10%), darken($color-orange, 20%));
+    border-color: $color-orange;
+    color: #fff;
+  }
+}
+
 // LED Pulse Animation
 @keyframes ledPulse {
   0%, 100% { opacity: 1; }

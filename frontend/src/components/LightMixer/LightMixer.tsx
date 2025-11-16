@@ -53,6 +53,19 @@ const LightMixer: React.FC<LightMixerProps> = ({ isActive, isPopout = false }) =
   // Auto Mode Intensity (0.0 = CHILL, 1.0 = EXTREM)
   const [autoIntensity, setAutoIntensity] = useState(0.0); // DEFAULT: CHILL!
 
+  // LED Screen Controls
+  const [ledEffect, setLedEffect] = useState<'static' | 'pulse' | 'strobe' | 'rainbow' | 'wave' | 'beat-sync' | 'off'>('static');
+  const [ledColor, setLedColor] = useState('#ff6b35'); // Orange default
+  const [ledIntensity, setLedIntensity] = useState(0.8);
+
+  // Logo Beam Text & Position
+  const [logoText, setLogoText] = useState('JOCH');
+  const [logoPositionX, setLogoPositionX] = useState(50); // 0-100 (%)
+  const [logoPositionY, setLogoPositionY] = useState(50); // 0-100 (%)
+  const [logoFontFamily, setLogoFontFamily] = useState<'impact' | 'arial-black' | 'bebas' | 'oswald' | 'roboto'>('impact');
+  const [logoSize, setLogoSize] = useState(15); // 5-30 (vw)
+  const [logoAutoRepeats, setLogoAutoRepeats] = useState(4); // 2-6: Random position repeats in auto mode
+
   // Mode definitions (matching StageEquipment lightingModes array indices!)
   // WICHTIG: Index-Order muss EXAKT mit StageEquipment übereinstimmen!
   const movingHeadModes = [
@@ -71,18 +84,20 @@ const LightMixer: React.FC<LightMixerProps> = ({ isActive, isPopout = false }) =
     'BOUNCE',         // 12
     'ALTERNATE',      // 13
     'RANDOM',         // 14
-    'SPIN_360',       // 15
-    'SPIN_WAVE',      // 16
-    'MIRROR_SYNC',    // 17
-    'CIRCLE_IN_OUT',  // 18
-    'X_CROSS',        // 19
-    'FAN_OUT'         // 20
+    'FOLLOW_TEXT',    // 15 - Alle Moving Heads folgen dem LED Screen Text! 🎯
+    'SPIN_360',       // 16
+    'SPIN_WAVE',      // 17
+    'MIRROR_SYNC',    // 18
+    'CIRCLE_IN_OUT',  // 19
+    'X_CROSS',        // 20
+    'FAN_OUT',        // 21
+    'ALL'             // 22 - Alle 12 Moving Heads!
   ];
 
   const spotModes = [
     'DUAL_OUTER', 'DUAL_INNER',
     'DIAGONAL_1', 'DIAGONAL_2', 'CHASE', 'BOUNCE',
-    'ALTERNATE', 'RANDOM', 'ALL', 'BLACKOUT'
+    'ALTERNATE', 'RANDOM', 'FOLLOW_TEXT', 'ALL', 'BLACKOUT'
   ];
 
   // Dispatch control events
@@ -148,6 +163,32 @@ const LightMixer: React.FC<LightMixerProps> = ({ isActive, isPopout = false }) =
     }
   }, [autoMode, autoIntensity, isActive]);
 
+  // LED Screen control dispatch
+  useEffect(() => {
+    if (isActive) {
+      const detail = {
+        effect: ledEffect,
+        color: ledColor,
+        intensity: ledIntensity,
+        text: logoText,
+        positionX: logoPositionX,
+        positionY: logoPositionY,
+        fontFamily: logoFontFamily,
+        size: logoSize,
+        autoRepeats: logoAutoRepeats
+      };
+
+      // Dispatch locally
+      window.dispatchEvent(new CustomEvent('ledControl', { detail }));
+
+      // Broadcast to pop-out windows
+      broadcastChannel.postMessage({
+        type: 'ledControl',
+        detail
+      });
+    }
+  }, [ledEffect, ledColor, ledIntensity, logoText, logoPositionX, logoPositionY, logoFontFamily, logoSize, logoAutoRepeats, isActive]);
+
   // Sync ALL state changes to pop-out windows (ONLY if this is NOT the pop-out window!)
   useEffect(() => {
     if (!isPopout) {
@@ -163,7 +204,16 @@ const LightMixer: React.FC<LightMixerProps> = ({ isActive, isPopout = false }) =
         spotColor,
         masterIntensity,
         strobeActive,
-        strobeTriggerMode
+        strobeTriggerMode,
+        ledEffect,
+        ledColor,
+        ledIntensity,
+        logoText,
+        logoPositionX,
+        logoPositionY,
+        logoFontFamily,
+        logoSize,
+        logoAutoRepeats
       });
     }
   }, [
@@ -179,6 +229,15 @@ const LightMixer: React.FC<LightMixerProps> = ({ isActive, isPopout = false }) =
     masterIntensity,
     strobeActive,
     strobeTriggerMode,
+    ledEffect,
+    ledColor,
+    ledIntensity,
+    logoText,
+    logoPositionX,
+    logoPositionY,
+    logoFontFamily,
+    logoSize,
+    logoAutoRepeats,
     isPopout
   ]);
 
@@ -231,7 +290,14 @@ const LightMixer: React.FC<LightMixerProps> = ({ isActive, isPopout = false }) =
           spotColor,
           masterIntensity,
           strobeActive,
-          strobeTriggerMode
+          strobeTriggerMode,
+          ledEffect,
+          ledColor,
+          ledIntensity,
+          logoText,
+          logoPositionX,
+          logoPositionY,
+          logoFontFamily
         });
       }, 500);
 
@@ -281,6 +347,15 @@ const LightMixer: React.FC<LightMixerProps> = ({ isActive, isPopout = false }) =
       if (state.masterIntensity !== undefined) setMasterIntensity(state.masterIntensity);
       if (state.strobeActive !== undefined) setStrobeActive(state.strobeActive);
       if (state.strobeTriggerMode !== undefined) setStrobeTriggerMode(state.strobeTriggerMode);
+      if (state.ledEffect !== undefined) setLedEffect(state.ledEffect);
+      if (state.ledColor !== undefined) setLedColor(state.ledColor);
+      if (state.ledIntensity !== undefined) setLedIntensity(state.ledIntensity);
+      if (state.logoText !== undefined) setLogoText(state.logoText);
+      if (state.logoPositionX !== undefined) setLogoPositionX(state.logoPositionX);
+      if (state.logoPositionY !== undefined) setLogoPositionY(state.logoPositionY);
+      if (state.logoFontFamily !== undefined) setLogoFontFamily(state.logoFontFamily);
+      if (state.logoSize !== undefined) setLogoSize(state.logoSize);
+      if (state.logoAutoRepeats !== undefined) setLogoAutoRepeats(state.logoAutoRepeats);
     };
 
     window.addEventListener('lightMixerStateSync', handleStateSync as EventListener);
@@ -746,6 +821,182 @@ const LightMixer: React.FC<LightMixerProps> = ({ isActive, isPopout = false }) =
               >
                 🎲 RANDOM COLOR
               </button>
+            </div>
+          </div>
+
+          {/* Logo Beam Controls */}
+          <div className={styles.section}>
+            <h4 className={styles.sectionTitle}>LOGO BEAM</h4>
+
+            {/* Text Input */}
+            <div className={styles.faderGroup}>
+              <label className={styles.faderLabel}>TEXT</label>
+              <input
+                type="text"
+                value={logoText}
+                onChange={(e) => setLogoText(e.target.value.toUpperCase())}
+                className={styles.textInput}
+                placeholder="JOCH"
+                maxLength={20}
+              />
+            </div>
+
+            {/* Font Style Buttons */}
+            <label className={styles.colorLabel} style={{ marginBottom: '8px' }}>FONT STYLE</label>
+            <div className={styles.fontStyleGrid}>
+              {[
+                { name: 'IMPACT', value: 'impact' },
+                { name: 'ARIAL BLACK', value: 'arial-black' },
+                { name: 'BEBAS', value: 'bebas' },
+                { name: 'OSWALD', value: 'oswald' },
+                { name: 'ROBOTO', value: 'roboto' }
+              ].map((font) => (
+                <button
+                  key={font.value}
+                  className={`${styles.fontStyleButton} ${logoFontFamily === font.value ? styles.active : ''}`}
+                  onClick={() => setLogoFontFamily(font.value as any)}
+                  title={font.name}
+                >
+                  {font.name}
+                </button>
+              ))}
+            </div>
+
+            {/* Position Sliders */}
+            <div className={styles.dualFaderGroup}>
+              <div className={styles.faderGroup}>
+                <label className={styles.faderLabel}>
+                  POSITION X: {logoPositionX}%
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="1"
+                  value={logoPositionX}
+                  onChange={(e) => setLogoPositionX(parseFloat(e.target.value))}
+                  className={styles.fader}
+                />
+              </div>
+
+              <div className={styles.faderGroup}>
+                <label className={styles.faderLabel}>
+                  POSITION Y: {logoPositionY}%
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="1"
+                  value={logoPositionY}
+                  onChange={(e) => setLogoPositionY(parseFloat(e.target.value))}
+                  className={styles.fader}
+                />
+              </div>
+            </div>
+
+            {/* Size & Auto Repeats */}
+            <div className={styles.dualFaderGroup}>
+              <div className={styles.faderGroup}>
+                <label className={styles.faderLabel}>
+                  SIZE: {logoSize}vw
+                </label>
+                <input
+                  type="range"
+                  min="5"
+                  max="30"
+                  step="1"
+                  value={logoSize}
+                  onChange={(e) => setLogoSize(parseFloat(e.target.value))}
+                  className={styles.fader}
+                />
+              </div>
+
+              <div className={styles.faderGroup}>
+                <label className={styles.faderLabel}>
+                  AUTO REPEATS: {logoAutoRepeats}x
+                </label>
+                <input
+                  type="range"
+                  min="2"
+                  max="6"
+                  step="1"
+                  value={logoAutoRepeats}
+                  onChange={(e) => setLogoAutoRepeats(parseInt(e.target.value))}
+                  className={styles.fader}
+                />
+              </div>
+            </div>
+
+            {/* Effect Buttons */}
+            <label className={styles.colorLabel} style={{ marginBottom: '8px' }}>EFFECT</label>
+            <div className={styles.modeGrid}>
+              {['static', 'pulse', 'strobe', 'rainbow', 'wave', 'beat-sync', 'off'].map((effect) => (
+                <button
+                  key={effect}
+                  className={`${styles.modeButton} ${ledEffect === effect ? styles.active : ''}`}
+                  onClick={() => setLedEffect(effect as any)}
+                  title={effect.toUpperCase()}
+                >
+                  <div className={styles.led} />
+                  {effect.toUpperCase()}
+                </button>
+              ))}
+            </div>
+
+            {/* Color Picker */}
+            <div className={styles.colorGroup}>
+              <label className={styles.colorLabel}>COLOR</label>
+              <input
+                type="color"
+                value={ledColor}
+                onChange={(e) => setLedColor(e.target.value)}
+                className={styles.colorPicker}
+                disabled={ledEffect === 'rainbow' || ledEffect === 'wave' || ledEffect === 'off'}
+              />
+            </div>
+
+            {/* Color Presets */}
+            <div className={styles.colorPresets}>
+              <label className={styles.colorLabel} style={{ marginBottom: '8px' }}>PRESETS</label>
+              <div className={styles.colorPresetsGrid}>
+                {[
+                  { name: 'Orange', color: '#ff6b35' },
+                  { name: 'Red', color: '#e63946' },
+                  { name: 'Cyan', color: '#06ffa5' },
+                  { name: 'Purple', color: '#a855f7' },
+                  { name: 'Yellow', color: '#ffd60a' },
+                  { name: 'Blue', color: '#06b6d4' },
+                  { name: 'Pink', color: '#ec4899' },
+                  { name: 'White', color: '#ffffff' },
+                ].map((preset) => (
+                  <button
+                    key={preset.name}
+                    className={`${styles.colorPresetButton} ${ledColor === preset.color ? styles.active : ''}`}
+                    style={{ backgroundColor: preset.color }}
+                    onClick={() => setLedColor(preset.color)}
+                    disabled={ledEffect === 'rainbow' || ledEffect === 'wave' || ledEffect === 'off'}
+                    title={preset.name}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Intensity Fader */}
+            <div className={styles.faderGroup}>
+              <label className={styles.faderLabel}>
+                INTENSITY: {Math.round(ledIntensity * 100)}%
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={ledIntensity}
+                onChange={(e) => setLedIntensity(parseFloat(e.target.value))}
+                className={styles.fader}
+                disabled={ledEffect === 'off'}
+              />
             </div>
           </div>
 

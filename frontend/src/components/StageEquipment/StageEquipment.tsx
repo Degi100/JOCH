@@ -36,6 +36,10 @@ const StageEquipment: React.FC<StageEquipmentProps> = ({ isActive }) => {
   const beatIntervalRef = useRef<number>(500); // Standard: 120 BPM = 500ms
   const lastBeatTimeRef = useRef<number>(0);
 
+  // Text Position State (from LED Screen) - for FOLLOW_TEXT mode
+  const textPositionXRef = useRef<number>(50); // 0-100% horizontal
+  const textPositionYRef = useRef<number>(50); // 0-100% vertical
+
   // Strobe state - ENHANCED! (same as SimpleSpotlight)
   const strobeActiveRef = useRef<boolean>(false);
   const strobeStateRef = useRef<boolean>(false); // true = ON, false = OFF
@@ -83,6 +87,7 @@ const StageEquipment: React.FC<StageEquipmentProps> = ({ isActive }) => {
     { name: 'BOUNCE', activeBeams: [0, 3], intensity: 0.6 },                // Ping-Pong
     { name: 'ALTERNATE', activeBeams: [0, 3], intensity: 0.55 },            // Toggle
     { name: 'RANDOM', activeBeams: [0], intensity: 0.65 },                  // Random
+    { name: 'FOLLOW_TEXT', activeBeams: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], intensity: 0.7 }, // Follow LED Screen Text! 🎯
 
     // ADVANCED ROTATION MODES
     { name: 'SPIN_360', activeBeams: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], intensity: 0.7 }, // 360° Sync Rotation!
@@ -100,7 +105,6 @@ const StageEquipment: React.FC<StageEquipmentProps> = ({ isActive }) => {
   // Chase Order: Links (unten→oben: MH8→7→6→5) → Top (links→rechts: MH1→2→3→4) → Rechts (oben→unten: MH9→10→11→12)
   const chaseOrderRef = useRef([7, 6, 5, 4, 0, 1, 2, 3, 8, 9, 10, 11]); // Indices: 7,6,5,4=Left(bottom-up), 0,1,2,3=Top(L-R), 8,9,10,11=Right(top-down)
   const chaseTrailRef = useRef<number[]>([]); // Für CHASE_TRAIL: Beams die bereits aktiviert wurden
-  const bounceDirectionRef = useRef(1); // Für Bounce: 1 = vorwärts, -1 = rückwärts
   const alternateStateRef = useRef(false); // Für Alternate: false = outer, true = inner
   const spinRotationRef = useRef(0); // Für SPIN_360: aktuelle Rotation in Grad (0-360)
   const waveOffsetRef = useRef(0); // Für SPIN_WAVE: Wellenversatz
@@ -491,7 +495,41 @@ const StageEquipment: React.FC<StageEquipmentProps> = ({ isActive }) => {
       const angleVariation = 30 + (autoIntensityRef.current * 60); // 30-90 degrees
 
       // ADVANCED ROTATION MODES: Special angle calculations
-      if (currentMode.name === 'SPIN_360') {
+      if (currentMode.name === 'FOLLOW_TEXT') {
+        // FOLLOW_TEXT: Alle Moving Heads zielen auf die Text-Position! 🎯
+        beamPositionsRef.current.forEach((beam) => {
+          if (beam.isActive) {
+            // Calculate angle needed to point at text position
+            // Text position is 0-100% of screen, beam position is also 0-100% (beam.x or beam.y)
+            const textX = textPositionXRef.current; // 0-100%
+            const textY = textPositionYRef.current; // 0-100%
+
+            let targetAngle = 0;
+
+            if (beam.trussPosition === 'top') {
+              // Top truss: beams point down and left/right
+              // beam.x is horizontal position (0-100%), textX is target horizontal position
+              const horizontalDiff = textX - (beam.x * 100); // Difference in %
+              // Convert to angle: -90° = far left, 0° = center, +90° = far right
+              targetAngle = horizontalDiff * 0.9; // Scale factor for realistic angles
+            } else if (beam.trussPosition === 'left') {
+              // Left truss: beams point right and up/down
+              // beam.y is vertical position, textY is target vertical position
+              const verticalDiff = textY - (beam.y * 100); // Difference in %
+              // Left side points right (positive angles), adjust based on vertical position
+              targetAngle = 45 + (verticalDiff * 0.5); // Base angle + vertical adjustment
+            } else if (beam.trussPosition === 'right') {
+              // Right truss: beams point left and up/down
+              const verticalDiff = textY - (beam.y * 100);
+              // Right side points left (negative angles), adjust based on vertical position
+              targetAngle = -45 - (verticalDiff * 0.5); // Base angle + vertical adjustment
+            }
+
+            // Clamp angles to realistic range (-90 to +90 degrees)
+            beam.targetAngle = Math.max(-90, Math.min(90, targetAngle));
+          }
+        });
+      } else if (currentMode.name === 'SPIN_360') {
         // SPIN_360: Alle Beams drehen sich synchron
         beamPositionsRef.current.forEach((beam) => {
           if (beam.isActive) {
@@ -682,6 +720,30 @@ const StageEquipment: React.FC<StageEquipmentProps> = ({ isActive }) => {
     };
   }, [isActive]);
 
+  // Listen to LED Screen position updates for FOLLOW_TEXT mode
+  useEffect(() => {
+    if (!isActive) return;
+
+    const handleLEDControl = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const { positionX, positionY } = customEvent.detail;
+
+      if (positionX !== undefined) {
+        textPositionXRef.current = positionX;
+        console.log('🎯 Moving Heads: Text X position updated to', positionX.toFixed(0), '%');
+      }
+      if (positionY !== undefined) {
+        textPositionYRef.current = positionY;
+        console.log('🎯 Moving Heads: Text Y position updated to', positionY.toFixed(0), '%');
+      }
+    };
+
+    window.addEventListener('ledControl', handleLEDControl);
+    return () => {
+      window.removeEventListener('ledControl', handleLEDControl);
+    };
+  }, [isActive]);
+
   // Listen to Lightshow Reset event (when song changes)
   useEffect(() => {
     const handleReset = () => {
@@ -849,6 +911,9 @@ const StageEquipment: React.FC<StageEquipmentProps> = ({ isActive }) => {
         case 'ALTERNATE':
           modeSpeedMultiplier = 0.9; // Gemäßigt
           break;
+        case 'FOLLOW_TEXT':
+          modeSpeedMultiplier = 1.8; // Sehr schnell & reaktiv für Text-Tracking! 🎯
+          break;
         case 'SPIN_360':
           modeSpeedMultiplier = 1.5; // Schnell & flüssig für Rotation
           break;
@@ -883,7 +948,7 @@ const StageEquipment: React.FC<StageEquipmentProps> = ({ isActive }) => {
       const beamAngleSpeed = baseAngleSpeed * Math.min(totalBeamSpeedMultiplier, 3.0); // Cap at 3x for smoother movement (war 5x)
 
       // Draw each moving head beam (only if active in current mode)
-      beamPositionsRef.current.forEach((beam, index) => {
+      beamPositionsRef.current.forEach((beam) => {
         // Skip inactive beams
         if (!beam.isActive) return;
 

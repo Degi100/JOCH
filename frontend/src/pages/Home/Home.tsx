@@ -11,7 +11,8 @@ import { useConcertModeContext } from '../../context/ConcertModeContext';
 import SimpleSpotlight from '../../components/SimpleSpotlight/SimpleSpotlight';
 import StageEquipment from '../../components/StageEquipment/StageEquipment';
 import LightMixer from '../../components/LightMixer/LightMixer';
-import type { Gig, NewsPost, GalleryImage } from '@joch/shared';
+import LEDScreen from '../../components/LEDScreen/LEDScreen';
+import type { Gig, NewsPost } from '@joch/shared';
 import styles from './Home.module.scss';
 import heroImage from '../../bilder/IMG-20241013-WA0076.jpg';
 import jochImage from '../../bilder/JOCH.jpg';
@@ -71,6 +72,9 @@ const Home: React.FC = () => {
 
         {/* Stage Equipment (PA Speakers, Moving Heads, etc.) */}
         <StageEquipment isActive={isShowActive} />
+
+        {/* LED Screen with JOCH Logo */}
+        <LEDScreen isActive={isShowActive} />
 
         {/* Simple Spotlight Effect with Slideshow */}
         <SimpleSpotlight
