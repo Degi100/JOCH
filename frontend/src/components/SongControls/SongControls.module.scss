@@ -1,0 +1,164 @@
+@use '../../styles/abstracts/variables' as *;
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.controlsContainer {
+  background: linear-gradient(145deg, #1a1a1a, #0a0a0a);
+  border: 3px solid $color-red;
+  border-radius: $border-radius-lg;
+  padding: 40px;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.9),
+    inset 0 2px 10px rgba(255, 255, 255, 0.05);
+  text-align: center;
+  max-width: 500px;
+  width: 90%;
+  animation: slideUp 0.4s ease;
+}
+
+.header {
+  margin-bottom: 30px;
+}
+
+.title {
+  margin: 0 0 10px 0;
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-red;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.songInfo {
+  margin: 0;
+  font-size: $font-size-md;
+  color: #888;
+  font-family: monospace;
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.replayButton,
+.nextButton {
+  padding: 20px 30px;
+  border: 2px solid #333;
+  border-radius: $border-radius;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  font-family: monospace;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.replayButton {
+  background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+  color: $color-orange;
+
+  &:hover {
+    background: linear-gradient(145deg, darken($color-orange, 10%), darken($color-orange, 20%));
+    border-color: $color-orange;
+    color: #fff;
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.nextButton {
+  background: linear-gradient(145deg, darken($color-red, 20%), darken($color-red, 30%));
+  border-color: $color-red;
+  color: #fff;
+
+  &:hover {
+    background: linear-gradient(145deg, darken($color-red, 10%), darken($color-red, 20%));
+    border-color: lighten($color-red, 10%);
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.icon {
+  font-size: $font-size-xxl;
+}
+
+.label {
+  font-size: $font-size-sm;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .controlsContainer {
+    padding: 30px 20px;
+  }
+
+  .buttons {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .title {
+    font-size: $font-size-xl;
+  }
+
+  .songInfo {
+    font-size: $font-size-sm;
+  }
+
+  .replayButton,
+  .nextButton {
+    padding: 15px 20px;
+    font-size: $font-size-md;
+  }
+
+  .icon {
+    font-size: $font-size-xl;
+  }
+}

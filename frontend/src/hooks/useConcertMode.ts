@@ -11,18 +11,19 @@ export type ConcertModeState = 'idle' | 'blackout' | 'countdown' | 'show-startin
 interface UseConcertModeProps {
   musicUrl?: string;
   onBeat?: () => void;
+  onSongEnded?: () => void;
 }
 
 /**
  * useConcertMode Hook
  * Manages the concert entrance sequence with music playback
  */
-export const useConcertMode = ({ musicUrl, onBeat }: UseConcertModeProps = {}) => {
+export const useConcertMode = ({ musicUrl, onBeat, onSongEnded }: UseConcertModeProps = {}) => {
   const [concertMode, setConcertMode] = useState<ConcertModeState>('idle');
   const [countdown, setCountdown] = useState<number>(3);
 
   // Music player with beat detection
-  const { play, stop } = useMusicPlayer({ audioUrl: musicUrl, onBeat });
+  const { play, stop } = useMusicPlayer({ audioUrl: musicUrl, onBeat, onEnded: onSongEnded });
 
   // Start Concert Mode Sequence
   const startConcertMode = useCallback(() => {

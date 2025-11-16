@@ -69,10 +69,28 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive, s
   const darkBeatActiveRef = useRef<boolean>(false);
   const darkBeatEndTimeRef = useRef<number>(0);
 
+  // Strobe state - ENHANCED!
+  const strobeActiveRef = useRef<boolean>(false);
+  const strobeStateRef = useRef<boolean>(false); // true = ON, false = OFF
+  const strobeColorIndexRef = useRef<number>(0);
+  const strobeTimerRef = useRef<number>(0);
+  const strobeTriggerModeRef = useRef<'continuous' | 'beat-2' | 'beat-4' | 'beat-8' | 'beat-16'>('continuous');
+  const strobeAllowedRef = useRef<boolean>(true); // Beat-based trigger control
+
   // Auto mode control
   const autoModeRef = useRef(true);
+  const autoIntensityRef = useRef(0.0); // 0.0 = CHILL (DEFAULT!), 1.0 = aggressiv
   const manualIntensityRef = useRef(0.4);
   const manualColorRef = useRef('#e63946');
+
+  // Warm-up phase - Spots "lauschen" erst, dann starten sie
+  const warmupBeatsRef = useRef(8); // Erste 8 Beats: Spots bleiben dunkel
+  const isWarmupPhaseRef = useRef(true); // Sind wir noch in der Aufwärmphase?
+
+  // COORDINATION STATE - Kommunikation mit Moving Heads
+  const movingHeadModeRef = useRef<string>('BLACKOUT'); // Aktueller Moving Head Mode
+  const movingHeadColorIndexRef = useRef<number>(0); // Aktueller Moving Head Color Index
+  const useSharedColorPaletteRef = useRef(true); // Nutze gleiche Farbpalette wie Moving Heads
 
   // Bild laden - jetzt mit activeImageUrl statt imageUrl
   useEffect(() => {
@@ -91,10 +109,12 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive, s
       globalCurrentImageIndex = 0;
       setCurrentImageIndex(0);
       setBeatCount(0);
+      isWarmupPhaseRef.current = true; // Reset warm-up phase
     } else {
       // Restore state when concert mode starts
       setCurrentImageIndex(globalCurrentImageIndex);
       setBeatCount(globalBeatCount);
+      isWarmupPhaseRef.current = true; // Reset warm-up when concert starts
     }
   }, [isActive]);
 
@@ -147,19 +167,36 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive, s
       beatFlashRef.current = 1;
       lastBeatTimeRef.current = now;
 
-      // Every 16 beats, switch spotlight mode (nur in Auto Mode!)
-      if (autoModeRef.current && globalBeatCount % 16 === 0 && globalBeatCount > 0) {
+      // Warm-up Phase Check: Erste 8 Beats "lauschen" (Spots bleiben dunkel)
+      if (globalBeatCount <= warmupBeatsRef.current) {
+        isWarmupPhaseRef.current = true;
+        // Spots bleiben komplett dunkel - keine Mode Changes, keine Aktivität
+        activeSpotlightsRef.current = []; // Alle Spots aus
+        console.log(`🎧 WARM-UP: Beat ${globalBeatCount}/${warmupBeatsRef.current} - Spots lauschen...`);
+        return; // Keine weiteren Aktionen während Warm-up
+      } else if (isWarmupPhaseRef.current) {
+        // Warm-up Phase vorbei - Spots starten jetzt!
+        isWarmupPhaseRef.current = false;
+        console.log('🚀 WARM-UP COMPLETE! Spots starten jetzt!');
+      }
+
+      // Spotlight Mode wechsel - Intervall abhängig von Auto Intensity!
+      // 0.0 = alle 24 Beats, 0.5 = alle 16 Beats, 1.0 = alle 8 Beats
+      const spotModeChangeInterval = Math.max(8, Math.round(24 - (autoIntensityRef.current * 16))); // 8-24 Beats
+      if (autoModeRef.current && globalBeatCount % spotModeChangeInterval === 0 && globalBeatCount > 0) {
         const randomModeIndex = Math.floor(Math.random() * spotlightModes.length);
         currentSpotModeIndexRef.current = randomModeIndex;
         const newMode = spotlightModes[randomModeIndex];
         activeSpotlightsRef.current = newMode.activeSpots;
-        console.log('💡 Spotlight Mode changed to:', newMode.name, 'Active spots:', newMode.activeSpots);
+        console.log('💡 Spotlight Mode changed to:', newMode.name, 'Active spots:', newMode.activeSpots, 'Interval:', spotModeChangeInterval);
       }
 
-      // Color change every 16 beats (nur in Auto Mode!)
-      if (autoModeRef.current && globalBeatCount % 16 === 0 && globalBeatCount > 0) {
+      // Color change - Intervall abhängig von Auto Intensity!
+      // 0.0 = alle 24 Beats, 0.5 = alle 16 Beats, 1.0 = alle 8 Beats
+      const spotColorChangeInterval = Math.max(8, Math.round(24 - (autoIntensityRef.current * 16))); // 8-24 Beats
+      if (autoModeRef.current && globalBeatCount % spotColorChangeInterval === 0 && globalBeatCount > 0) {
         colorChangeRef.current++;
-        console.log('🎨 Spotlights: Color changed');
+        console.log('🎨 Spotlights: Color changed, Interval:', spotColorChangeInterval);
       }
 
       // DYNAMIC MODES: CHASE, BOUNCE, ALTERNATE, RANDOM
@@ -210,6 +247,34 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive, s
 
         console.log('🎲 RANDOM: Spots', randomSpots.join('+'), 'active');
       }
+
+      // ======================================================
+      // STROBE TRIGGER LOGIC - Beat-based activation
+      // ======================================================
+      if (strobeActiveRef.current && strobeTriggerModeRef.current !== 'continuous') {
+        const triggerMode = strobeTriggerModeRef.current;
+        let shouldTrigger = false;
+
+        switch (triggerMode) {
+          case 'beat-2':
+            shouldTrigger = (globalBeatCount % 2 === 0);
+            break;
+          case 'beat-4':
+            shouldTrigger = (globalBeatCount % 4 === 0);
+            break;
+          case 'beat-8':
+            shouldTrigger = (globalBeatCount % 8 === 0);
+            break;
+          case 'beat-16':
+            shouldTrigger = (globalBeatCount % 16 === 0);
+            break;
+        }
+
+        if (shouldTrigger) {
+          strobeAllowedRef.current = true; // Enable strobe for short duration
+          console.log(`⚡ STROBE TRIGGER: Beat ${globalBeatCount} (${triggerMode})`);
+        }
+      }
     };
 
     window.addEventListener('musicBeat', handleBeat);
@@ -240,7 +305,10 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive, s
 
         case 'autoMode':
           autoModeRef.current = data.enabled;
-          console.log('🎛️ Auto Mode:', data.enabled ? 'ENABLED' : 'DISABLED');
+          if (data.intensity !== undefined) {
+            autoIntensityRef.current = data.intensity;
+          }
+          console.log('🎛️ Auto Mode:', data.enabled ? 'ENABLED' : 'DISABLED', 'Intensity:', data.intensity);
           break;
 
         case 'fog':
@@ -260,7 +328,23 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive, s
           break;
 
         case 'master':
-          // Master controls can be handled here if needed
+          // Master controls - handle strobe
+          if (data.strobe !== undefined) {
+            strobeActiveRef.current = data.strobe;
+            if (data.strobe) {
+              strobeStateRef.current = true; // Start with ON
+              strobeColorIndexRef.current = 0;
+              strobeTimerRef.current = 0;
+              strobeAllowedRef.current = true; // Reset allowed flag
+              console.log('⚡ STROBE ACTIVATED!');
+            } else {
+              console.log('⚡ STROBE DEACTIVATED');
+            }
+          }
+          if (data.strobeTriggerMode !== undefined) {
+            strobeTriggerModeRef.current = data.strobeTriggerMode;
+            console.log('⚡ STROBE TRIGGER MODE:', data.strobeTriggerMode);
+          }
           break;
       }
     };
@@ -268,6 +352,108 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive, s
     window.addEventListener('lightControl', handleLightControl);
     return () => {
       window.removeEventListener('lightControl', handleLightControl);
+    };
+  }, [isActive]);
+
+  // Listen to Lightshow Reset event (when song changes)
+  useEffect(() => {
+    const handleReset = () => {
+      console.log('🔄 Spotlights: Resetting state for new song');
+      // Reset warm-up phase
+      isWarmupPhaseRef.current = true;
+      // Reset beat counters
+      setBeatCount(0);
+      globalBeatCount = 0; // Reset global beat count
+      lastBeatTimeRef.current = 0;
+      beatIntervalRef.current = 500;
+      speedMultiplierRef.current = 1;
+      // Reset strobe
+      strobeActiveRef.current = false;
+      strobeStateRef.current = false;
+      strobeAllowedRef.current = true;
+      // Reset dark beat
+      darkBeatActiveRef.current = false;
+      // Reset beat flash
+      beatFlashRef.current = 0;
+      // Reset fog
+      fogIntensityRef.current = 0;
+      fogNextBurstTimeRef.current = Date.now() + 5000;
+      // Reset to first mode
+      currentSpotModeIndexRef.current = 0;
+    };
+
+    window.addEventListener('lightshowReset', handleReset);
+    return () => {
+      window.removeEventListener('lightshowReset', handleReset);
+    };
+  }, []);
+
+  // COORDINATION: Listen to Moving Head changes for intelligent lighting
+  useEffect(() => {
+    if (!isActive || !autoModeRef.current) return;
+
+    const handleMovingHeadModeChange = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const { mode, activeBeams } = customEvent.detail;
+      movingHeadModeRef.current = mode;
+
+      console.log('🔗 COORDINATION: Moving Heads changed to', mode, '- Spots adapting...');
+
+      // INTELLIGENT COORDINATION LOGIC
+      // If Moving Heads are BLACKOUT, Spots should take over (never both dark!)
+      if (mode === 'BLACKOUT') {
+        // Moving Heads aus → Spots übernehmen (volle Power!)
+        const takeoverModes = [4, 5, 6, 7, 8]; // CHASE, BOUNCE, ALTERNATE, RANDOM, ALL
+        const randomIndex = Math.floor(Math.random() * takeoverModes.length);
+        currentSpotModeIndexRef.current = takeoverModes[randomIndex];
+        const newMode = spotlightModes[takeoverModes[randomIndex]];
+        activeSpotlightsRef.current = newMode.activeSpots;
+        console.log('  💡 Spots TAKEOVER:', newMode.name);
+      }
+      // If Moving Heads are ALL (full power), Spots should be more subtle
+      else if (mode === 'ALL') {
+        // Moving Heads volle Power → Spots zurückhaltend
+        const subtleModes = [0, 1, 2, 3]; // DUAL_OUTER, DUAL_INNER, DIAGONAL_1, DIAGONAL_2
+        const randomIndex = Math.floor(Math.random() * subtleModes.length);
+        currentSpotModeIndexRef.current = subtleModes[randomIndex];
+        const newMode = spotlightModes[subtleModes[randomIndex]];
+        activeSpotlightsRef.current = newMode.activeSpots;
+        console.log('  ✨ Spots SUBTLE:', newMode.name);
+      }
+      // Complementary patterns: If Moving Heads use outer beams, Spots use inner (and vice versa)
+      else if (mode === 'DUAL_OUTER') {
+        // Moving Heads außen → Spots innen (komplementär!)
+        currentSpotModeIndexRef.current = 1; // DUAL_INNER
+        activeSpotlightsRef.current = spotlightModes[1].activeSpots;
+        console.log('  🔄 Spots COMPLEMENT: DUAL_INNER');
+      }
+      else if (mode === 'DUAL_INNER') {
+        // Moving Heads innen → Spots außen (komplementär!)
+        currentSpotModeIndexRef.current = 0; // DUAL_OUTER
+        activeSpotlightsRef.current = spotlightModes[0].activeSpots;
+        console.log('  🔄 Spots COMPLEMENT: DUAL_OUTER');
+      }
+    };
+
+    const handleMovingHeadColorChange = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const { colorIndex, color } = customEvent.detail;
+
+      if (useSharedColorPaletteRef.current) {
+        // Use SAME color palette as Moving Heads (synchronized colors!)
+        movingHeadColorIndexRef.current = colorIndex;
+        // Offset by +3 for variety but still harmonious
+        colorChangeRef.current = (colorIndex + 3) % 9;
+        console.log('🎨 COORDINATION: Spots synced to Moving Head color palette (offset +3)');
+      }
+    };
+
+    window.addEventListener('movingHeadModeChange', handleMovingHeadModeChange);
+    window.addEventListener('movingHeadColorChange', handleMovingHeadColorChange);
+
+    return () => {
+      window.removeEventListener('movingHeadModeChange', handleMovingHeadModeChange);
+      window.removeEventListener('movingHeadColorChange', handleMovingHeadColorChange);
     };
   }, [isActive]);
 
@@ -299,17 +485,18 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive, s
     let directionSpot3 = 1;
     let directionSpot4 = -1;
 
-    // Spotlight-Farben für zufällige Auswahl - JETZT RICHTIG KRASS!
+    // SYNCHRONIZED COLOR PALETTE - GLEICH WIE MOVING HEADS!
+    // Diese Palette wird mit Moving Heads geteilt für harmonische Farbgebung
     const spotlightColors = [
-      { r: 255, g: 255, b: 200 }, // Warmweiß (Standard)
-      { r: 255, g: 50, b: 0 },    // Knalliges Rot
-      { r: 255, g: 150, b: 0 },   // Orange
-      { r: 0, g: 100, b: 255 },   // Tiefes Blau
-      { r: 180, g: 0, b: 255 },   // Lila
-      { r: 0, g: 255, b: 100 },   // Grün
-      { r: 255, g: 0, b: 150 },   // Pink
-      { r: 0, g: 255, b: 255 },   // Cyan
-      { r: 255, g: 255, b: 0 },   // Gelb
+      { r: 255, g: 107, b: 53 },  // #ff6b35 - Orange (Moving Heads Color 1)
+      { r: 230, g: 57, b: 70 },   // #e63946 - Red (Moving Heads Color 2)
+      { r: 6, g: 255, b: 165 },   // #06ffa5 - Cyan/Turquoise (Moving Heads Color 3)
+      { r: 168, g: 85, b: 247 },  // #a855f7 - Purple/Violet (Moving Heads Color 4)
+      { r: 255, g: 214, b: 10 },  // #ffd60a - Yellow/Gold (Moving Heads Color 5)
+      { r: 6, g: 182, b: 212 },   // #06b6d4 - Blue (Moving Heads Color 6)
+      { r: 236, g: 72, b: 153 },  // #ec4899 - Pink/Magenta (Moving Heads Color 7)
+      { r: 255, g: 255, b: 200 }, // Warmweiß (Zusatz für Variation)
+      { r: 0, g: 255, b: 100 },   // Grün (Zusatz für Variation)
     ];
 
     // Funktion zum Zeichnen eines einzelnen Spotlights
@@ -396,8 +583,80 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive, s
         console.log('🌟 DARK-BEAT ended, spotlights back on');
       }
 
+      // ======================================================
+      // STROBE EFFECT - ENHANCED WITH BPM SYNC & INTENSITY!
+      // ======================================================
+      if (strobeActiveRef.current) {
+        // Check if strobe is allowed (for beat-based triggers)
+        const isContinuous = strobeTriggerModeRef.current === 'continuous';
+        const canStrobe = isContinuous || strobeAllowedRef.current;
+
+        if (!canStrobe) {
+          // Strobe is not allowed right now (waiting for beat trigger)
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          animationRef.current = requestAnimationFrame(draw);
+          return;
+        }
+
+        // Calculate strobe speed based on BPM and Auto Intensity
+        // CHILL = 4 Hz (slow), MITTEL = 8 Hz, EXTREM = 16 Hz (crazy fast!)
+        const baseStrobeFrequency = 4 + (autoIntensityRef.current * 12); // 4-16 Hz
+        const strobeInterval = 1000 / (baseStrobeFrequency * 2); // /2 because we have ON and OFF states
+
+        strobeTimerRef.current += 16.67; // Approx 60fps frame time
+
+        if (strobeTimerRef.current >= strobeInterval) {
+          strobeTimerRef.current = 0;
+          strobeStateRef.current = !strobeStateRef.current; // Toggle ON/OFF
+
+          // Change color on every ON state
+          if (strobeStateRef.current) {
+            strobeColorIndexRef.current = (strobeColorIndexRef.current + 1) % 8;
+          }
+
+          // For beat-based triggers: Disable after one complete cycle (ON->OFF->ON)
+          if (!isContinuous && !strobeStateRef.current) {
+            // After a full flash (ON->OFF), disable until next beat
+            const strobeDuration = 500; // Duration of one strobe burst in ms
+            if (strobeTimerRef.current >= strobeDuration) {
+              strobeAllowedRef.current = false;
+            }
+          }
+        }
+
+        if (strobeStateRef.current) {
+          // STROBE ON - Render bright flash
+          const strobeColors = [
+            { r: 255, g: 255, b: 255 }, // White
+            { r: 255, g: 107, b: 53 },  // Orange
+            { r: 230, g: 57, b: 70 },   // Red
+            { r: 6, g: 255, b: 165 },   // Cyan
+            { r: 168, g: 85, b: 247 },  // Purple
+            { r: 255, g: 214, b: 10 },  // Yellow
+            { r: 6, g: 182, b: 212 },   // Blue
+            { r: 236, g: 72, b: 153 },  // Pink
+          ];
+          const strobeColor = strobeColors[strobeColorIndexRef.current];
+
+          // Full screen flash with color
+          const intensity = 0.6 + (autoIntensityRef.current * 0.4); // 0.6-1.0
+          ctx.fillStyle = `rgba(${strobeColor.r}, ${strobeColor.g}, ${strobeColor.b}, ${intensity})`;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          animationRef.current = requestAnimationFrame(draw);
+          return; // Skip normal rendering
+        } else {
+          // STROBE OFF - Complete darkness
+          ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          animationRef.current = requestAnimationFrame(draw);
+          return; // Skip normal rendering
+        }
+      }
+
       // Canvas mit semi-transparentem Schwarz füllen (dunkle Bühne mit mehr Durchblick)
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.65)'; // 65% Schwarz, 35% transparent
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.9)'; // 80% Schwarz, 20% transparent (dunkler!)
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Beat-Flash-Effekt (fade out)
@@ -405,13 +664,61 @@ const SimpleSpotlight: React.FC<SimpleSpotlightProps> = ({ imageUrl, isActive, s
         beatFlashRef.current = Math.max(0, beatFlashRef.current - 0.05);
       }
 
-      // Tempo-angepasste Bewegung
-      const baseSpeed = 0.5;
-      const currentSpeed = baseSpeed * speedMultiplierRef.current;
+      // ======================================================
+      // COMPREHENSIVE SPEED OPTIMIZATION (Option A)
+      // ======================================================
 
-      // Unterschiedliche Bewegungsradien für die Spots
-      const maxAngleOuter = 45 + (speedMultiplierRef.current - 1) * 20; // Größerer Radius für außen (45-65°)
-      const maxAngleCenter = 35 + (speedMultiplierRef.current - 1) * 15; // Sanfter für Mitte (35-50°)
+      // 1. BPM-based speed multiplier (already calculated in beat handler: 0.5x - 2.0x)
+      const bpmSpeedMultiplier = speedMultiplierRef.current;
+
+      // 2. Auto Intensity speed boost (CHILL = 0.3x, MITTEL = 0.8x, EXTREM = 1.5x) - VIEL LANGSAMER!
+      const intensitySpeedMultiplier = 0.3 + (autoIntensityRef.current * 1.2); // 0.3 - 1.5x
+
+      // 3. Mode-specific speed multiplier - ALLES LANGSAMER & KOORDINIERTER!
+      const currentMode = spotlightModes[currentSpotModeIndexRef.current];
+      let modeSpeedMultiplier = 1.0;
+      switch (currentMode.name) {
+        case 'CHASE':
+        case 'RANDOM':
+          modeSpeedMultiplier = 1.2; // Schnell, aber kontrolliert
+          break;
+        case 'BOUNCE':
+        case 'ALTERNATE':
+          modeSpeedMultiplier = 0.8; // Gemäßigt
+          break;
+        case 'DUAL_OUTER':
+        case 'DUAL_INNER':
+        case 'DIAGONAL_1':
+        case 'DIAGONAL_2':
+          modeSpeedMultiplier = 0.6; // Langsam & smooth
+          break;
+        case 'ALL':
+          modeSpeedMultiplier = 0.4; // Sehr langsam & majestätisch
+          break;
+        case 'BLACKOUT':
+          modeSpeedMultiplier = 0.0; // No movement
+          break;
+      }
+
+      // 4. Burst speed boost (every 4th beat = SUDDEN FAST MOVEMENT!) - NUR BEI HOHER INTENSITY!
+      const isBurstBeat = (beatCount % 4 === 0) && beatCount > 0;
+      const burstSpeedMultiplier = (isBurstBeat && autoIntensityRef.current > 0.6) ? 2.0 : 1.0; // 2x speed on burst beats (nur bei Intensity > 0.6!)
+
+      // COMBINE ALL MULTIPLIERS for maximum dynamics!
+      const baseSpeed = 0.25; // VIEL LANGSAMER! (war 0.5)
+      const totalSpeedMultiplier = bpmSpeedMultiplier * intensitySpeedMultiplier * modeSpeedMultiplier * burstSpeedMultiplier;
+      const currentSpeed = baseSpeed * totalSpeedMultiplier;
+
+      if (isBurstBeat && beatFlashRef.current > 0.8) {
+        console.log(`⚡ BURST SPEED! Total multiplier: ${totalSpeedMultiplier.toFixed(2)}x (BPM: ${bpmSpeedMultiplier.toFixed(2)}x, Intensity: ${intensitySpeedMultiplier.toFixed(2)}x, Mode: ${modeSpeedMultiplier}x, Burst: ${burstSpeedMultiplier}x)`);
+      }
+
+      // Unterschiedliche Bewegungsradien für die Spots - auch dynamisch basierend auf Intensity!
+      const baseMaxAngleOuter = 35; // Kleiner Radius für ruhigere Bewegung (war 45)
+      const baseMaxAngleCenter = 25; // Kleiner Radius für ruhigere Bewegung (war 35)
+      const angleIntensityBoost = autoIntensityRef.current * 20; // 0-20° extra bei hoher Intensity (war 30)
+      const maxAngleOuter = baseMaxAngleOuter + (speedMultiplierRef.current - 1) * 15 + angleIntensityBoost; // 35-70° (war 45-95°)
+      const maxAngleCenter = baseMaxAngleCenter + (speedMultiplierRef.current - 1) * 10 + angleIntensityBoost; // 25-55° (war 35-80°)
 
       // Update alle vier Winkel - Spots 2&3 bewegen sich sanfter!
       angleSpot1 += currentSpeed * directionSpot1;

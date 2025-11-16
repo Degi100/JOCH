@@ -1,0 +1,27 @@
+@use '../../styles/abstracts/variables' as *;
+
+.popoutContainer {
+  width: 100vw;
+  height: 100vh;
+  background: #0a0a0a;
+  overflow: hidden;
+
+  // Force the mixer to be visible and fullscreen
+  :global(.toggleButton) {
+    display: none !important;
+  }
+
+  :global(.mixer) {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    top: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-height: 100vh !important;
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    pointer-events: all !important;
+    border-radius: 0 !important;
+  }
+}

@@ -8,9 +8,10 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 interface UseMusicPlayerProps {
   audioUrl?: string;
   onBeat?: () => void;
+  onEnded?: () => void;
 }
 
-export const useMusicPlayer = ({ audioUrl, onBeat }: UseMusicPlayerProps = {}) => {
+export const useMusicPlayer = ({ audioUrl, onBeat, onEnded }: UseMusicPlayerProps = {}) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -58,6 +59,7 @@ export const useMusicPlayer = ({ audioUrl, onBeat }: UseMusicPlayerProps = {}) =
       console.log('⏹️ Audio ended');
       setIsPlaying(false);
       setCurrentTime(0);
+      onEnded?.(); // Notify parent component
     });
 
     // Error handling
