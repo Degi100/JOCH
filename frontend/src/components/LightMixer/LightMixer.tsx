@@ -17,15 +17,26 @@ const LightMixer: React.FC<LightMixerProps> = ({ isActive, isPopout = false }) =
   const [isPoppedOut, setIsPoppedOut] = useState(false);
   const [broadcastChannel] = useState(() => new BroadcastChannel('concert-mode-events'));
 
-  // Moving Heads Controls
+  // Moving Heads Controls (jetzt 12 Moving Heads!)
   const [movingHeadMode, setMovingHeadMode] = useState(0);
   const [movingHeadIntensity, setMovingHeadIntensity] = useState(0.7);
   const [movingHeadColors, setMovingHeadColors] = useState<string[]>([
-    '#ff6b35', // Moving Head 1 - Orange
-    '#e63946', // Moving Head 2 - Red
-    '#06ffa5', // Moving Head 3 - Cyan
-    '#a855f7', // Moving Head 4 - Purple
+    '#ff6b35', // MH 1 (Top) - Orange
+    '#e63946', // MH 2 (Top) - Red
+    '#06ffa5', // MH 3 (Top) - Cyan
+    '#a855f7', // MH 4 (Top) - Purple
+    '#ffd60a', // MH 5 (Left) - Yellow
+    '#06b6d4', // MH 6 (Left) - Blue
+    '#ec4899', // MH 7 (Left) - Pink
+    '#ffffff', // MH 8 (Left) - White
+    '#ff6b35', // MH 9 (Right) - Orange
+    '#e63946', // MH 10 (Right) - Red
+    '#06ffa5', // MH 11 (Right) - Cyan
+    '#a855f7', // MH 12 (Right) - Purple
   ]);
+
+  // BPM Speed Control (0.3x - 2.5x)
+  const [bpmSpeedMultiplier, setBpmSpeedMultiplier] = useState(1.0);
 
   // Main Spots Controls
   const [spotMode, setSpotMode] = useState(0);
@@ -42,12 +53,30 @@ const LightMixer: React.FC<LightMixerProps> = ({ isActive, isPopout = false }) =
   // Auto Mode Intensity (0.0 = CHILL, 1.0 = EXTREM)
   const [autoIntensity, setAutoIntensity] = useState(0.0); // DEFAULT: CHILL!
 
-  // Mode definitions (matching the components)
-  // WICHTIG: Nur sinnvolle Kombinationen (niemals 0+1 oder 2+3 zu nah beieinander)
+  // Mode definitions (matching StageEquipment lightingModes array indices!)
+  // WICHTIG: Index-Order muss EXAKT mit StageEquipment übereinstimmen!
   const movingHeadModes = [
-    'BLACKOUT', 'DUAL_OUTER', 'DUAL_INNER',
-    'DIAGONAL_1', 'DIAGONAL_2', 'CHASE', 'BOUNCE',
-    'ALTERNATE', 'RANDOM', 'ALL'
+    'BLACKOUT',       // 0
+    'TOP_OUTER',      // 1
+    'TOP_INNER',      // 2
+    'TOP_ALL',        // 3
+    'SIDES_ONLY',     // 4
+    'LEFT_ONLY',      // 5
+    'RIGHT_ONLY',     // 6
+    'WALLS',          // 7
+    'CENTER_FOCUS',   // 8
+    'DIAGONAL_CROSS', // 9
+    'CHASE',          // 10 - Links→Top→Rechts (ein Beam)
+    'CHASE_TRAIL',    // 11 - Links→Top→Rechts (Trail - alle bleiben an!)
+    'BOUNCE',         // 12
+    'ALTERNATE',      // 13
+    'RANDOM',         // 14
+    'SPIN_360',       // 15
+    'SPIN_WAVE',      // 16
+    'MIRROR_SYNC',    // 17
+    'CIRCLE_IN_OUT',  // 18
+    'X_CROSS',        // 19
+    'FAN_OUT'         // 20
   ];
 
   const spotModes = [
@@ -87,10 +116,11 @@ const LightMixer: React.FC<LightMixerProps> = ({ isActive, isPopout = false }) =
       dispatchControl('movingHeadMode', {
         mode: movingHeadMode,
         intensity: movingHeadIntensity,
-        colors: movingHeadColors
+        colors: movingHeadColors,
+        bpmSpeedMultiplier: bpmSpeedMultiplier
       });
     }
-  }, [movingHeadMode, movingHeadIntensity, movingHeadColors, autoMode, isActive]);
+  }, [movingHeadMode, movingHeadIntensity, movingHeadColors, bpmSpeedMultiplier, autoMode, isActive]);
 
   useEffect(() => {
     if (!autoMode && isActive) {
@@ -127,6 +157,7 @@ const LightMixer: React.FC<LightMixerProps> = ({ isActive, isPopout = false }) =
         movingHeadMode,
         movingHeadIntensity,
         movingHeadColors,
+        bpmSpeedMultiplier,
         spotMode,
         spotIntensity,
         spotColor,
@@ -141,6 +172,7 @@ const LightMixer: React.FC<LightMixerProps> = ({ isActive, isPopout = false }) =
     movingHeadMode,
     movingHeadIntensity,
     movingHeadColors,
+    bpmSpeedMultiplier,
     spotMode,
     spotIntensity,
     spotColor,
@@ -172,11 +204,12 @@ const LightMixer: React.FC<LightMixerProps> = ({ isActive, isPopout = false }) =
     const baseUrl = window.location.origin;
     const popoutUrl = `${baseUrl}/light-mixer-popout`;
 
-    // Create new window with specific dimensions for dual monitor
+    // Create new window with VERY LARGE dimensions - Professional Light Console!
+    // Extra breit für 3-Spalten Layout (LEFT | TOP | RIGHT)
     const popoutWindow = window.open(
       popoutUrl,
       'LightMixer',
-      'width=500,height=900,left=100,top=100,menubar=no,toolbar=no,location=no,status=no'
+      'width=1600,height=1000,left=50,top=50,menubar=no,toolbar=no,location=no,status=no'
     );
 
     if (popoutWindow) {
@@ -192,6 +225,7 @@ const LightMixer: React.FC<LightMixerProps> = ({ isActive, isPopout = false }) =
           movingHeadMode,
           movingHeadIntensity,
           movingHeadColors,
+          bpmSpeedMultiplier,
           spotMode,
           spotIntensity,
           spotColor,
@@ -240,6 +274,7 @@ const LightMixer: React.FC<LightMixerProps> = ({ isActive, isPopout = false }) =
       if (state.movingHeadMode !== undefined) setMovingHeadMode(state.movingHeadMode);
       if (state.movingHeadIntensity !== undefined) setMovingHeadIntensity(state.movingHeadIntensity);
       if (state.movingHeadColors !== undefined) setMovingHeadColors(state.movingHeadColors);
+      if (state.bpmSpeedMultiplier !== undefined) setBpmSpeedMultiplier(state.bpmSpeedMultiplier);
       if (state.spotMode !== undefined) setSpotMode(state.spotMode);
       if (state.spotIntensity !== undefined) setSpotIntensity(state.spotIntensity);
       if (state.spotColor !== undefined) setSpotColor(state.spotColor);
@@ -348,8 +383,10 @@ const LightMixer: React.FC<LightMixerProps> = ({ isActive, isPopout = false }) =
         </div>
 
         <div className={styles.mixerContent}>
-          {/* Auto Mode Toggle */}
-          <div className={styles.section}>
+          {/* LEFT COLUMN */}
+          <div className={styles.leftColumn}>
+            {/* Auto Mode Toggle */}
+            <div className={styles.section}>
             <button
               className={`${styles.autoModeButton} ${autoMode ? styles.active : ''}`}
               onClick={() => setAutoMode(!autoMode)}
@@ -385,19 +422,19 @@ const LightMixer: React.FC<LightMixerProps> = ({ isActive, isPopout = false }) =
             )}
           </div>
 
-          {/* Moving Heads Section */}
+          {/* Moving Heads Section - ERWEITERT! */}
           <div className={styles.section}>
-            <h4 className={styles.sectionTitle}>MOVING HEADS</h4>
+            <h4 className={styles.sectionTitle}>MOVING HEADS (12x)</h4>
 
-            {/* Mode Buttons */}
-            <div className={styles.modeGrid}>
+            {/* Mode Buttons - JETZT 17 MODI! */}
+            <div className={styles.modeGridLarge}>
               {movingHeadModes.map((mode, index) => (
                 <button
                   key={mode}
                   className={`${styles.modeButton} ${movingHeadMode === index ? styles.active : ''} ${autoMode ? styles.disabled : ''}`}
                   onClick={() => !autoMode && setMovingHeadMode(index)}
                   disabled={autoMode}
-                  title={`Key: ${index + 1}`}
+                  title={`Mode: ${mode}`}
                 >
                   <div className={styles.led} />
                   {mode}
@@ -405,84 +442,224 @@ const LightMixer: React.FC<LightMixerProps> = ({ isActive, isPopout = false }) =
               ))}
             </div>
 
-            {/* Intensity Fader */}
-            <div className={styles.faderGroup}>
-              <label className={styles.faderLabel}>
-                INTENSITY: {Math.round(movingHeadIntensity * 100)}%
-              </label>
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={movingHeadIntensity}
-                onChange={(e) => setMovingHeadIntensity(parseFloat(e.target.value))}
-                className={styles.fader}
-                disabled={autoMode}
-              />
+            {/* Intensity + BPM Speed Controls */}
+            <div className={styles.dualFaderGroup}>
+              <div className={styles.faderGroup}>
+                <label className={styles.faderLabel}>
+                  INTENSITY: {Math.round(movingHeadIntensity * 100)}%
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={movingHeadIntensity}
+                  onChange={(e) => setMovingHeadIntensity(parseFloat(e.target.value))}
+                  className={styles.fader}
+                  disabled={autoMode}
+                />
+              </div>
+
+              <div className={styles.faderGroup}>
+                <label className={styles.faderLabel}>
+                  BPM SPEED: {bpmSpeedMultiplier.toFixed(1)}x
+                  <span style={{ float: 'right', color: '#ff6b35', fontSize: '11px' }}>
+                    {bpmSpeedMultiplier < 0.6 ? 'SLOW' : bpmSpeedMultiplier < 1.2 ? 'NORMAL' : bpmSpeedMultiplier < 1.8 ? 'FAST' : 'EXTREME'}
+                  </span>
+                </label>
+                <input
+                  type="range"
+                  min="0.3"
+                  max="2.5"
+                  step="0.1"
+                  value={bpmSpeedMultiplier}
+                  onChange={(e) => setBpmSpeedMultiplier(parseFloat(e.target.value))}
+                  className={styles.fader}
+                  disabled={autoMode}
+                />
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '5px', fontSize: '11px', color: '#555' }}>
+                  <span>0.3x</span>
+                  <span>1.0x</span>
+                  <span>2.5x</span>
+                </div>
+              </div>
             </div>
 
-            {/* Individual Color Selection for 4 Moving Heads */}
+            {/* Individual Color Selection für ALLE 12 Moving Heads */}
             <div className={styles.movingHeadColorsSection}>
-              <label className={styles.colorLabel} style={{ marginBottom: '10px' }}>INDIVIDUAL COLORS</label>
+              <label className={styles.colorLabel} style={{ marginBottom: '10px', display: 'block' }}>
+                INDIVIDUAL COLORS (12 BEAMS)
+              </label>
 
-              {/* Grid: 4 Moving Heads x 8 Colors */}
-              {[0, 1, 2, 3].map((mhIndex) => (
-                <div key={`mh-${mhIndex}`} className={styles.movingHeadColorRow}>
-                  <label className={styles.movingHeadRowLabel}>MH {mhIndex + 1}</label>
-                  <div className={styles.movingHeadColorButtons}>
-                    {[
-                      { name: 'Orange', color: '#ff6b35' },
-                      { name: 'Red', color: '#e63946' },
-                      { name: 'Cyan', color: '#06ffa5' },
-                      { name: 'Purple', color: '#a855f7' },
-                      { name: 'Yellow', color: '#ffd60a' },
-                      { name: 'Blue', color: '#06b6d4' },
-                      { name: 'Pink', color: '#ec4899' },
-                      { name: 'White', color: '#ffffff' },
-                    ].map((preset) => (
-                      <button
-                        key={`mh${mhIndex}-${preset.name}`}
-                        className={`${styles.colorPresetButton} ${styles.small} ${movingHeadColors[mhIndex] === preset.color ? styles.active : ''}`}
-                        style={{ backgroundColor: preset.color }}
-                        onClick={() => {
-                          if (!autoMode) {
-                            const newColors = [...movingHeadColors];
-                            newColors[mhIndex] = preset.color;
-                            setMovingHeadColors(newColors);
-                          }
-                        }}
-                        disabled={autoMode}
-                        title={preset.name}
-                      />
-                    ))}
-                  </div>
+              {/* Grid: 12 Moving Heads x 8 Colors - ANORDNUNG: LEFT | TOP | RIGHT */}
+              <div className={styles.movingHeadGrid}>
+                {/* Left Truss (MH 5-8) */}
+                <div className={styles.movingHeadGroup}>
+                  <label className={styles.groupLabel}>LEFT TRUSS</label>
+                  {[4, 5, 6, 7].map((mhIndex) => (
+                    <div key={`mh-${mhIndex}`} className={styles.movingHeadColorRow}>
+                      <label className={styles.movingHeadRowLabel}>MH {mhIndex + 1}</label>
+                      <div className={styles.movingHeadColorButtons}>
+                        {[
+                          { name: 'Orange', color: '#ff6b35' },
+                          { name: 'Red', color: '#e63946' },
+                          { name: 'Cyan', color: '#06ffa5' },
+                          { name: 'Purple', color: '#a855f7' },
+                          { name: 'Yellow', color: '#ffd60a' },
+                          { name: 'Blue', color: '#06b6d4' },
+                          { name: 'Pink', color: '#ec4899' },
+                          { name: 'White', color: '#ffffff' },
+                        ].map((preset) => (
+                          <button
+                            key={`mh${mhIndex}-${preset.name}`}
+                            className={`${styles.colorPresetButton} ${styles.small} ${movingHeadColors[mhIndex] === preset.color ? styles.active : ''}`}
+                            style={{ backgroundColor: preset.color }}
+                            onClick={() => {
+                              if (!autoMode) {
+                                const newColors = [...movingHeadColors];
+                                newColors[mhIndex] = preset.color;
+                                setMovingHeadColors(newColors);
+                              }
+                            }}
+                            disabled={autoMode}
+                            title={preset.name}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
 
-              {/* Random Button for All Moving Heads */}
-              <button
-                className={`${styles.randomColorButton} ${autoMode ? styles.disabled : ''}`}
-                onClick={() => {
-                  if (!autoMode) {
-                    // Random color for each Moving Head
-                    const colorPresets = ['#ff6b35', '#e63946', '#06ffa5', '#a855f7', '#ffd60a', '#06b6d4', '#ec4899', '#ffffff'];
-                    const randomColors = [0, 1, 2, 3].map(() =>
-                      colorPresets[Math.floor(Math.random() * colorPresets.length)]
-                    );
-                    setMovingHeadColors(randomColors);
-                  }
-                }}
-                disabled={autoMode}
-                style={{ marginTop: '10px' }}
-              >
-                🎲 RANDOM COLORS (ALL MH)
-              </button>
+                {/* Top Truss (MH 1-4) */}
+                <div className={styles.movingHeadGroup}>
+                  <label className={styles.groupLabel}>TOP TRUSS</label>
+                  {[0, 1, 2, 3].map((mhIndex) => (
+                    <div key={`mh-${mhIndex}`} className={styles.movingHeadColorRow}>
+                      <label className={styles.movingHeadRowLabel}>MH {mhIndex + 1}</label>
+                      <div className={styles.movingHeadColorButtons}>
+                        {[
+                          { name: 'Orange', color: '#ff6b35' },
+                          { name: 'Red', color: '#e63946' },
+                          { name: 'Cyan', color: '#06ffa5' },
+                          { name: 'Purple', color: '#a855f7' },
+                          { name: 'Yellow', color: '#ffd60a' },
+                          { name: 'Blue', color: '#06b6d4' },
+                          { name: 'Pink', color: '#ec4899' },
+                          { name: 'White', color: '#ffffff' },
+                        ].map((preset) => (
+                          <button
+                            key={`mh${mhIndex}-${preset.name}`}
+                            className={`${styles.colorPresetButton} ${styles.small} ${movingHeadColors[mhIndex] === preset.color ? styles.active : ''}`}
+                            style={{ backgroundColor: preset.color }}
+                            onClick={() => {
+                              if (!autoMode) {
+                                const newColors = [...movingHeadColors];
+                                newColors[mhIndex] = preset.color;
+                                setMovingHeadColors(newColors);
+                              }
+                            }}
+                            disabled={autoMode}
+                            title={preset.name}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Right Truss (MH 9-12) */}
+                <div className={styles.movingHeadGroup}>
+                  <label className={styles.groupLabel}>RIGHT TRUSS</label>
+                  {[8, 9, 10, 11].map((mhIndex) => (
+                    <div key={`mh-${mhIndex}`} className={styles.movingHeadColorRow}>
+                      <label className={styles.movingHeadRowLabel}>MH {mhIndex + 1}</label>
+                      <div className={styles.movingHeadColorButtons}>
+                        {[
+                          { name: 'Orange', color: '#ff6b35' },
+                          { name: 'Red', color: '#e63946' },
+                          { name: 'Cyan', color: '#06ffa5' },
+                          { name: 'Purple', color: '#a855f7' },
+                          { name: 'Yellow', color: '#ffd60a' },
+                          { name: 'Blue', color: '#06b6d4' },
+                          { name: 'Pink', color: '#ec4899' },
+                          { name: 'White', color: '#ffffff' },
+                        ].map((preset) => (
+                          <button
+                            key={`mh${mhIndex}-${preset.name}`}
+                            className={`${styles.colorPresetButton} ${styles.small} ${movingHeadColors[mhIndex] === preset.color ? styles.active : ''}`}
+                            style={{ backgroundColor: preset.color }}
+                            onClick={() => {
+                              if (!autoMode) {
+                                const newColors = [...movingHeadColors];
+                                newColors[mhIndex] = preset.color;
+                                setMovingHeadColors(newColors);
+                              }
+                            }}
+                            disabled={autoMode}
+                            title={preset.name}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Quick Action Buttons */}
+              <div className={styles.quickActions}>
+                <button
+                  className={`${styles.randomColorButton} ${autoMode ? styles.disabled : ''}`}
+                  onClick={() => {
+                    if (!autoMode) {
+                      // Random color for each Moving Head
+                      const colorPresets = ['#ff6b35', '#e63946', '#06ffa5', '#a855f7', '#ffd60a', '#06b6d4', '#ec4899', '#ffffff'];
+                      const randomColors = Array(12).fill(0).map(() =>
+                        colorPresets[Math.floor(Math.random() * colorPresets.length)]
+                      );
+                      setMovingHeadColors(randomColors);
+                    }
+                  }}
+                  disabled={autoMode}
+                >
+                  🎲 RANDOM ALL
+                </button>
+
+                <button
+                  className={`${styles.randomColorButton} ${autoMode ? styles.disabled : ''}`}
+                  onClick={() => {
+                    if (!autoMode) {
+                      // Rainbow pattern
+                      const rainbow = ['#ff6b35', '#e63946', '#ffd60a', '#06ffa5', '#06b6d4', '#a855f7', '#ec4899', '#ffffff'];
+                      const newColors = Array(12).fill(0).map((_, i) => rainbow[i % rainbow.length]);
+                      setMovingHeadColors(newColors);
+                    }
+                  }}
+                  disabled={autoMode}
+                >
+                  🌈 RAINBOW
+                </button>
+
+                <button
+                  className={`${styles.randomColorButton} ${autoMode ? styles.disabled : ''}`}
+                  onClick={() => {
+                    if (!autoMode) {
+                      // All same color - Red
+                      setMovingHeadColors(Array(12).fill('#e63946'));
+                    }
+                  }}
+                  disabled={autoMode}
+                >
+                  🔴 ALL RED
+                </button>
+              </div>
             </div>
           </div>
+          </div>
 
-          {/* Main Spots Section */}
-          <div className={styles.section}>
+          {/* RIGHT COLUMN */}
+          <div className={styles.rightColumn}>
+            {/* Main Spots Section */}
+            <div className={styles.section}>
             <h4 className={styles.sectionTitle}>MAIN SPOTS</h4>
 
             {/* Mode Buttons */}
@@ -665,11 +842,12 @@ const LightMixer: React.FC<LightMixerProps> = ({ isActive, isPopout = false }) =
             )}
           </div>
 
-          {/* Keyboard Shortcuts Info */}
-          <div className={styles.shortcuts}>
-            <small>
-              1-0: Moving Heads | Q-D: Spots | Space: Strobe | G: Fog | B: Dark-Beat | M: Auto/Manual
-            </small>
+            {/* Keyboard Shortcuts Info */}
+            <div className={styles.shortcuts}>
+              <small>
+                Moving Heads: 21 Modi | Spots: Q-D | Space: Strobe | G: Fog | B: Dark-Beat | M: Auto/Manual
+              </small>
+            </div>
           </div>
         </div>
       </div>

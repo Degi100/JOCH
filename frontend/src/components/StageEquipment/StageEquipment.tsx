@@ -28,7 +28,7 @@ const StageEquipment: React.FC<StageEquipmentProps> = ({ isActive }) => {
   // Canvas refs for moving head beams
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | null>(null);
-  const beamPositionsRef = useRef<Array<{x: number, y: number, angle: number, targetAngle: number, color: string, isActive: boolean, endX?: number}>>([]);
+  const beamPositionsRef = useRef<Array<{x: number, y: number, angle: number, targetAngle: number, color: string, isActive: boolean, endX?: number, trussPosition: 'top' | 'left' | 'right'}>>([]);
   const beatFlashRef = useRef<number>(0);
   const darkBeatActiveRef = useRef<boolean>(false);
   const darkBeatEndTimeRef = useRef<number>(0);
@@ -57,35 +57,80 @@ const StageEquipment: React.FC<StageEquipmentProps> = ({ isActive }) => {
   const colorPaletteRef = useRef(colorPalette);
   const currentColorIndexRef = useRef(0);
 
-  // Lighting modes for dynamic show (nur 2 oder alle 4, niemals einzeln!)
-  // WICHTIG: Niemals 0+1 (beide links zu nah) oder 2+3 (beide rechts zu nah)!
+  // Lighting modes for dynamic show - NOW WITH 12 MOVING HEADS!
+  // Indices: 0-3 = Top, 4-7 = Left, 8-11 = Right
   const lightingModes = [
-    { name: 'BLACKOUT', activeBeams: [], intensity: 0 },                    // Alle aus (drama)
-    { name: 'DUAL_OUTER', activeBeams: [0, 3], intensity: 0.5 },            // Äußere links + äußere rechts
-    { name: 'DUAL_INNER', activeBeams: [1, 2], intensity: 0.5 },            // Innere links + innere rechts
-    { name: 'DIAGONAL_1', activeBeams: [0, 2], intensity: 0.55 },           // Links außen + rechts innen
-    { name: 'DIAGONAL_2', activeBeams: [1, 3], intensity: 0.55 },           // Links innen + rechts außen
-    { name: 'CHASE', activeBeams: [0], intensity: 0.65 },                   // Chase Mode (wird dynamisch geändert)
-    { name: 'BOUNCE', activeBeams: [0, 3], intensity: 0.6 },                // Ping-Pong outer ↔ inner (dynamisch)
-    { name: 'ALTERNATE', activeBeams: [0, 3], intensity: 0.55 },            // Toggle outer ↔ inner (dynamisch)
-    { name: 'RANDOM', activeBeams: [0], intensity: 0.65 },                  // Random lights (dynamisch)
-    { name: 'ALL', activeBeams: [0, 1, 2, 3], intensity: 0.7 },             // Alle 4 (INTENSE!)
+    { name: 'BLACKOUT', activeBeams: [], intensity: 0 },
+
+    // TOP TRUSS ONLY MODES
+    { name: 'TOP_OUTER', activeBeams: [0, 3], intensity: 0.5 },            // Top außen
+    { name: 'TOP_INNER', activeBeams: [1, 2], intensity: 0.5 },            // Top innen
+    { name: 'TOP_ALL', activeBeams: [0, 1, 2, 3], intensity: 0.6 },        // Top alle
+
+    // SIDE TRUSS ONLY MODES
+    { name: 'SIDES_ONLY', activeBeams: [4, 5, 6, 7, 8, 9, 10, 11], intensity: 0.6 },  // Nur Seiten
+    { name: 'LEFT_ONLY', activeBeams: [4, 5, 6, 7], intensity: 0.5 },      // Nur links
+    { name: 'RIGHT_ONLY', activeBeams: [8, 9, 10, 11], intensity: 0.5 },   // Nur rechts
+
+    // COMBINED MODES
+    { name: 'WALLS', activeBeams: [0, 3, 4, 7, 8, 11], intensity: 0.65 },  // Äußere Wand
+    { name: 'CENTER_FOCUS', activeBeams: [1, 2, 5, 6, 9, 10], intensity: 0.6 }, // Zentrum
+    { name: 'DIAGONAL_CROSS', activeBeams: [0, 2, 4, 6, 8, 10], intensity: 0.65 }, // Diagonales Kreuz
+
+    // DYNAMIC MODES
+    { name: 'CHASE', activeBeams: [0], intensity: 0.65 },                   // Chase Links→Top→Rechts (ein Beam)
+    { name: 'CHASE_TRAIL', activeBeams: [0], intensity: 0.65 },             // Chase mit Trail (alle bleiben an)
+    { name: 'BOUNCE', activeBeams: [0, 3], intensity: 0.6 },                // Ping-Pong
+    { name: 'ALTERNATE', activeBeams: [0, 3], intensity: 0.55 },            // Toggle
+    { name: 'RANDOM', activeBeams: [0], intensity: 0.65 },                  // Random
+
+    // ADVANCED ROTATION MODES
+    { name: 'SPIN_360', activeBeams: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], intensity: 0.7 }, // 360° Sync Rotation!
+    { name: 'SPIN_WAVE', activeBeams: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], intensity: 0.75 }, // Wellenförmige Rotation!
+    { name: 'MIRROR_SYNC', activeBeams: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], intensity: 0.7 }, // Links/Rechts Spiegelung
+    { name: 'CIRCLE_IN_OUT', activeBeams: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], intensity: 0.7 }, // Kreisbewegung rein/raus
+    { name: 'X_CROSS', activeBeams: [0, 3, 4, 7, 8, 11], intensity: 0.65 }, // X-förmiges Kreuz in Mitte
+    { name: 'FAN_OUT', activeBeams: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], intensity: 0.7 }, // Fächereffekt
+
+    // FULL POWER
+    { name: 'ALL', activeBeams: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], intensity: 0.8 }, // Alle 12!
   ];
   const currentModeIndexRef = useRef(0);
-  const chasePositionRef = useRef(0); // Für Chase Mode: welcher Beam ist gerade aktiv (0-3)
+  const chasePositionRef = useRef(0); // Für Chase Mode: welcher Beam ist gerade aktiv (0-11)
+  // Chase Order: Links (unten→oben: MH8→7→6→5) → Top (links→rechts: MH1→2→3→4) → Rechts (oben→unten: MH9→10→11→12)
+  const chaseOrderRef = useRef([7, 6, 5, 4, 0, 1, 2, 3, 8, 9, 10, 11]); // Indices: 7,6,5,4=Left(bottom-up), 0,1,2,3=Top(L-R), 8,9,10,11=Right(top-down)
+  const chaseTrailRef = useRef<number[]>([]); // Für CHASE_TRAIL: Beams die bereits aktiviert wurden
   const bounceDirectionRef = useRef(1); // Für Bounce: 1 = vorwärts, -1 = rückwärts
   const alternateStateRef = useRef(false); // Für Alternate: false = outer, true = inner
+  const spinRotationRef = useRef(0); // Für SPIN_360: aktuelle Rotation in Grad (0-360)
+  const waveOffsetRef = useRef(0); // Für SPIN_WAVE: Wellenversatz
+  const circleDirectionRef = useRef(1); // Für CIRCLE_IN_OUT: 1 = nach außen, -1 = nach innen
+  const circleRadiusRef = useRef(0); // Für CIRCLE_IN_OUT: Aktueller Radius
+  const fanSpreadRef = useRef(0); // Für FAN_OUT: Fächerwinkel (0-90°)
 
-  // Initialize beam positions for 4 moving heads (matching fixture positions on truss)
+  // Initialize beam positions for 12 moving heads (4 top, 4 left, 4 right)
   useEffect(() => {
     // All moving heads start with the same color (synchronized)
     const initialColor = colorPaletteRef.current[0];
     const initialMode = lightingModes[0];
     const positions = [
-      { x: 0.15, y: 0, angle: 45, targetAngle: 45, color: initialColor, isActive: initialMode.activeBeams.includes(0) },  // Left 1
-      { x: 0.35, y: 0, angle: 30, targetAngle: 30, color: initialColor, isActive: initialMode.activeBeams.includes(1) },  // Left 2
-      { x: 0.65, y: 0, angle: -30, targetAngle: -30, color: initialColor, isActive: initialMode.activeBeams.includes(2) }, // Right 1
-      { x: 0.85, y: 0, angle: -45, targetAngle: -45, color: initialColor, isActive: initialMode.activeBeams.includes(3) }  // Right 2
+      // Top Truss - 4 Moving Heads (Index 0-3)
+      { x: 0.15, y: 0, angle: 45, targetAngle: 45, color: initialColor, isActive: initialMode.activeBeams.includes(0), trussPosition: 'top' as const },
+      { x: 0.35, y: 0, angle: 30, targetAngle: 30, color: initialColor, isActive: initialMode.activeBeams.includes(1), trussPosition: 'top' as const },
+      { x: 0.65, y: 0, angle: -30, targetAngle: -30, color: initialColor, isActive: initialMode.activeBeams.includes(2), trussPosition: 'top' as const },
+      { x: 0.85, y: 0, angle: -45, targetAngle: -45, color: initialColor, isActive: initialMode.activeBeams.includes(3), trussPosition: 'top' as const },
+
+      // Left Vertical Truss - 4 Moving Heads (Index 4-7)
+      { x: 0.05, y: 0.15, angle: 60, targetAngle: 60, color: initialColor, isActive: initialMode.activeBeams.includes(4), trussPosition: 'left' as const },
+      { x: 0.05, y: 0.35, angle: 50, targetAngle: 50, color: initialColor, isActive: initialMode.activeBeams.includes(5), trussPosition: 'left' as const },
+      { x: 0.05, y: 0.55, angle: 40, targetAngle: 40, color: initialColor, isActive: initialMode.activeBeams.includes(6), trussPosition: 'left' as const },
+      { x: 0.05, y: 0.75, angle: 30, targetAngle: 30, color: initialColor, isActive: initialMode.activeBeams.includes(7), trussPosition: 'left' as const },
+
+      // Right Vertical Truss - 4 Moving Heads (Index 8-11)
+      { x: 0.95, y: 0.15, angle: -60, targetAngle: -60, color: initialColor, isActive: initialMode.activeBeams.includes(8), trussPosition: 'right' as const },
+      { x: 0.95, y: 0.35, angle: -50, targetAngle: -50, color: initialColor, isActive: initialMode.activeBeams.includes(9), trussPosition: 'right' as const },
+      { x: 0.95, y: 0.55, angle: -40, targetAngle: -40, color: initialColor, isActive: initialMode.activeBeams.includes(10), trussPosition: 'right' as const },
+      { x: 0.95, y: 0.75, angle: -30, targetAngle: -30, color: initialColor, isActive: initialMode.activeBeams.includes(11), trussPosition: 'right' as const }
     ];
     beamPositionsRef.current = positions;
   }, []);
@@ -232,20 +277,68 @@ const StageEquipment: React.FC<StageEquipmentProps> = ({ isActive }) => {
       const currentMode = lightingModes[currentModeIndexRef.current];
 
       if (currentMode.name === 'CHASE') {
-        // CHASE MODE: Bei jedem Beat den nächsten Beam aktivieren (0 → 1 → 2 → 3 → 0 ...)
-        chasePositionRef.current = (chasePositionRef.current + 1) % 4;
+        // CHASE MODE: Links→Top→Rechts (nur ein Beam aktiv)
+        chasePositionRef.current = (chasePositionRef.current + 1) % 12;
+        const currentBeamIndex = chaseOrderRef.current[chasePositionRef.current];
 
         // Nur der aktuelle Chase-Beam ist aktiv
         beamPositionsRef.current.forEach((beam, index) => {
-          beam.isActive = index === chasePositionRef.current;
+          beam.isActive = index === currentBeamIndex;
         });
 
-        console.log('🏃 CHASE: Beam', chasePositionRef.current, 'active');
+        console.log('🏃 CHASE: Position', chasePositionRef.current, '→ Beam', currentBeamIndex + 1, 'active');
+      }
+      else if (currentMode.name === 'CHASE_TRAIL') {
+        // CHASE_TRAIL MODE: Links→Top→Rechts (alle bleiben an - Trail-Effekt!)
+        // WICHTIG: Beam ERST holen, DANN Position erhöhen (sonst wird erster Beam übersprungen!)
+        const currentBeamIndex = chaseOrderRef.current[chasePositionRef.current];
+        chasePositionRef.current = (chasePositionRef.current + 1) % 12;
+
+        // Füge aktuellen Beam zum Trail hinzu (nur wenn noch nicht alle 12 aktiv sind)
+        if (!chaseTrailRef.current.includes(currentBeamIndex)) {
+          chaseTrailRef.current.push(currentBeamIndex);
+        }
+
+        // Wenn alle 12 Beams erreicht sind, stoppe den Chase (bleiben alle an!)
+        // KEIN AUTO-RESET - Beams bleiben dauerhaft an bis Mode-Wechsel!
+        if (chaseTrailRef.current.length >= 12) {
+          // Setze Position auf 11, damit sie nicht weiter hochzählt
+          chasePositionRef.current = 11;
+        }
+
+        // WICHTIG: Setze ALLE Beams im Trail auf Center-Focus!
+        // (Muss jedes Mal gemacht werden, nicht nur beim Hinzufügen!)
+        beamPositionsRef.current.forEach((beam, index) => {
+          if (chaseTrailRef.current.includes(index)) {
+            beam.isActive = true;
+
+            // Set angle to point toward center based on truss position
+            if (beam.trussPosition === 'left') {
+              beam.angle = 45;        // Point right toward center
+              beam.targetAngle = 45;
+            } else if (beam.trussPosition === 'top') {
+              beam.angle = 0;         // Point straight down to center
+              beam.targetAngle = 0;
+            } else if (beam.trussPosition === 'right') {
+              beam.angle = -45;       // Point left toward center
+              beam.targetAngle = -45;
+            }
+          } else {
+            beam.isActive = false;
+          }
+        });
+
+        console.log('🏃✨ CHASE_TRAIL: Position', chasePositionRef.current, '→ Beam', currentBeamIndex + 1, 'added (Trail:', chaseTrailRef.current.length, 'beams)');
       }
       else if (currentMode.name === 'BOUNCE') {
-        // BOUNCE MODE: Ping-Pong zwischen outer (0+3) und inner (1+2)
-        // Pattern: outer → inner → outer → inner (hin und her)
-        const pattern = [[0, 3], [1, 2]]; // outer, inner
+        // BOUNCE MODE: Ping-Pong zwischen verschiedenen Gruppen
+        // Pattern: Top Outer → Top Inner → Left → Right (zyklisch)
+        const pattern = [
+          [0, 3],              // Top Outer
+          [1, 2],              // Top Inner
+          [4, 5, 6, 7],        // Left Side
+          [8, 9, 10, 11]       // Right Side
+        ];
         chasePositionRef.current = (chasePositionRef.current + 1) % pattern.length;
         const activeBeams = pattern[chasePositionRef.current];
 
@@ -253,23 +346,25 @@ const StageEquipment: React.FC<StageEquipmentProps> = ({ isActive }) => {
           beam.isActive = activeBeams.includes(index);
         });
 
-        console.log('🏓 BOUNCE: Beams', activeBeams.join('+'), 'active');
+        console.log('🏓 BOUNCE: Group', chasePositionRef.current, 'Beams', activeBeams.join('+'), 'active');
       }
       else if (currentMode.name === 'ALTERNATE') {
-        // ALTERNATE MODE: Toggle zwischen outer (0+3) und inner (1+2) bei jedem Beat
+        // ALTERNATE MODE: Toggle zwischen Top und Sides
         alternateStateRef.current = !alternateStateRef.current;
-        const activeBeams = alternateStateRef.current ? [1, 2] : [0, 3]; // inner : outer
+        const activeBeams = alternateStateRef.current
+          ? [0, 1, 2, 3]                      // Top Truss
+          : [4, 5, 6, 7, 8, 9, 10, 11];       // Side Trusses
 
         beamPositionsRef.current.forEach((beam, index) => {
           beam.isActive = activeBeams.includes(index);
         });
 
-        console.log('🔄 ALTERNATE: Beams', activeBeams.join('+'), 'active');
+        console.log('🔄 ALTERNATE:', alternateStateRef.current ? 'TOP' : 'SIDES', 'active');
       }
       else if (currentMode.name === 'RANDOM') {
-        // RANDOM MODE: Zufällig 1-2 Beams aktivieren (Chaos!)
-        const numBeams = Math.random() > 0.5 ? 2 : 1;
-        const availableBeams = [0, 1, 2, 3];
+        // RANDOM MODE: Zufällig 3-6 Beams aktivieren aus allen 12
+        const numBeams = Math.floor(Math.random() * 4) + 3; // 3-6 Beams
+        const availableBeams = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
         const randomBeams: number[] = [];
 
         for (let i = 0; i < numBeams; i++) {
@@ -282,7 +377,85 @@ const StageEquipment: React.FC<StageEquipmentProps> = ({ isActive }) => {
           beam.isActive = randomBeams.includes(index);
         });
 
-        console.log('🎲 RANDOM: Beams', randomBeams.join('+'), 'active');
+        console.log('🎲 RANDOM:', numBeams, 'Beams', randomBeams.join('+'), 'active');
+      }
+      else if (currentMode.name === 'SPIN_360') {
+        // SPIN_360 MODE: Alle Moving Heads drehen sich synchron um 360 Grad
+        const rotationSpeed = 30 + (autoIntensityRef.current * 60); // 30-90 degrees per beat
+        spinRotationRef.current = (spinRotationRef.current + rotationSpeed) % 360;
+
+        beamPositionsRef.current.forEach((beam) => {
+          beam.isActive = true;
+        });
+
+        console.log('🌀 SPIN_360: Rotation', Math.round(spinRotationRef.current), '°');
+      }
+      else if (currentMode.name === 'SPIN_WAVE') {
+        // SPIN_WAVE MODE: Wellenförmige Rotation - jeder Beam hat versetzten Offset!
+        const rotationSpeed = 30 + (autoIntensityRef.current * 60);
+        waveOffsetRef.current = (waveOffsetRef.current + rotationSpeed) % 360;
+
+        beamPositionsRef.current.forEach((beam) => {
+          beam.isActive = true;
+        });
+
+        console.log('🌊 SPIN_WAVE: Offset', Math.round(waveOffsetRef.current), '°');
+      }
+      else if (currentMode.name === 'MIRROR_SYNC') {
+        // MIRROR_SYNC MODE: Links und Rechts spiegeln sich
+        const rotationSpeed = 30 + (autoIntensityRef.current * 60);
+        spinRotationRef.current = (spinRotationRef.current + rotationSpeed) % 360;
+
+        beamPositionsRef.current.forEach((beam) => {
+          beam.isActive = true;
+        });
+
+        console.log('🪞 MIRROR_SYNC: Rotation', Math.round(spinRotationRef.current), '°');
+      }
+      else if (currentMode.name === 'CIRCLE_IN_OUT') {
+        // CIRCLE_IN_OUT MODE: Kreisbewegung nach innen/außen
+        const maxRadius = 90; // Max 90° vom Zentrum
+        const radiusChange = 10 + (autoIntensityRef.current * 20); // 10-30° per beat
+
+        circleRadiusRef.current += circleDirectionRef.current * radiusChange;
+
+        // Umkehren wenn Grenze erreicht
+        if (circleRadiusRef.current >= maxRadius) {
+          circleRadiusRef.current = maxRadius;
+          circleDirectionRef.current = -1; // Nach innen
+        } else if (circleRadiusRef.current <= 0) {
+          circleRadiusRef.current = 0;
+          circleDirectionRef.current = 1; // Nach außen
+        }
+
+        beamPositionsRef.current.forEach((beam) => {
+          beam.isActive = true;
+        });
+
+        console.log('⭕ CIRCLE_IN_OUT: Radius', Math.round(circleRadiusRef.current), '°', circleDirectionRef.current > 0 ? 'OUT' : 'IN');
+      }
+      else if (currentMode.name === 'X_CROSS') {
+        // X_CROSS MODE: Nur äußere Beams bilden X in der Mitte
+        const rotationSpeed = 20 + (autoIntensityRef.current * 40); // Langsamer
+        spinRotationRef.current = (spinRotationRef.current + rotationSpeed) % 360;
+
+        beamPositionsRef.current.forEach((beam, index) => {
+          // Nur äußere beams: 0, 3, 4, 7, 8, 11
+          beam.isActive = currentMode.activeBeams.includes(index);
+        });
+
+        console.log('❌ X_CROSS: Rotation', Math.round(spinRotationRef.current), '°');
+      }
+      else if (currentMode.name === 'FAN_OUT') {
+        // FAN_OUT MODE: Fächereffekt - öffnet und schließt sich
+        const spreadChange = 5 + (autoIntensityRef.current * 15); // 5-20° per beat
+        fanSpreadRef.current = (fanSpreadRef.current + spreadChange) % 180; // 0-180° spread
+
+        beamPositionsRef.current.forEach((beam) => {
+          beam.isActive = true;
+        });
+
+        console.log('🌟 FAN_OUT: Spread', Math.round(fanSpreadRef.current), '°');
       }
 
       // ======================================================
@@ -316,12 +489,111 @@ const StageEquipment: React.FC<StageEquipmentProps> = ({ isActive }) => {
       // Beam angles: JEDEN Beat bewegen - Bewegungsstärke abhängig von Auto Intensity!
       // 0.0 = ±30 degrees, 0.5 = ±60 degrees, 1.0 = ±90 degrees
       const angleVariation = 30 + (autoIntensityRef.current * 60); // 30-90 degrees
-      beamPositionsRef.current.forEach((beam, index) => {
-        if (beam.isActive) {
-          const baseAngle = index < 2 ? 30 : -30; // Left beams positive, right negative
-          beam.targetAngle = baseAngle + (Math.random() - 0.5) * angleVariation;
-        }
-      });
+
+      // ADVANCED ROTATION MODES: Special angle calculations
+      if (currentMode.name === 'SPIN_360') {
+        // SPIN_360: Alle Beams drehen sich synchron
+        beamPositionsRef.current.forEach((beam) => {
+          if (beam.isActive) {
+            let angle = spinRotationRef.current;
+            if (angle > 180) angle = angle - 360;
+            beam.targetAngle = angle;
+          }
+        });
+      } else if (currentMode.name === 'SPIN_WAVE') {
+        // SPIN_WAVE: Wellenförmiger Offset - jeder Beam ist 30° versetzt
+        beamPositionsRef.current.forEach((beam, index) => {
+          if (beam.isActive) {
+            const waveOffset = index * 30; // 30° Versatz pro Beam
+            let angle = (waveOffsetRef.current + waveOffset) % 360;
+            if (angle > 180) angle = angle - 360;
+            beam.targetAngle = angle;
+          }
+        });
+      } else if (currentMode.name === 'MIRROR_SYNC') {
+        // MIRROR_SYNC: Links und Rechts spiegeln sich
+        beamPositionsRef.current.forEach((beam, index) => {
+          if (beam.isActive) {
+            let angle = spinRotationRef.current;
+            if (angle > 180) angle = angle - 360;
+
+            // Rechte Seite (Index 2,3,8-11) = invertiert
+            if (index >= 2 && index <= 3) {
+              beam.targetAngle = -angle; // Top right
+            } else if (index >= 8 && index <= 11) {
+              beam.targetAngle = -angle; // Right truss
+            } else {
+              beam.targetAngle = angle; // Left side normal
+            }
+          }
+        });
+      } else if (currentMode.name === 'CIRCLE_IN_OUT') {
+        // CIRCLE_IN_OUT: Kreisbewegung basierend auf Radius
+        beamPositionsRef.current.forEach((beam, index) => {
+          if (beam.isActive) {
+            // Jeder Beam hat festen Winkel, aber variabler Radius (Abstand vom Zentrum)
+            const baseAngles = [45, 30, -30, -45, 60, 50, 40, 30, -60, -50, -40, -30];
+            const baseAngle = baseAngles[index];
+
+            // Radius beeinflusst den Winkel (größerer Radius = extremerer Winkel)
+            const radiusFactor = circleRadiusRef.current / 90; // 0.0 - 1.0
+            beam.targetAngle = baseAngle * (0.5 + radiusFactor * 0.5); // 50%-100% vom baseAngle
+          }
+        });
+      } else if (currentMode.name === 'X_CROSS') {
+        // X_CROSS: Beams treffen sich in der Mitte als X
+        beamPositionsRef.current.forEach((beam, index) => {
+          if (beam.isActive) {
+            // Top outer (0,3), Left outer (4,7), Right outer (8,11) zeigen zur Mitte
+            if (index === 0 || index === 4) {
+              beam.targetAngle = 20; // Links → Mitte
+            } else if (index === 3 || index === 11) {
+              beam.targetAngle = -20; // Rechts → Mitte
+            } else if (index === 7) {
+              beam.targetAngle = 10; // Links unten → Mitte
+            } else if (index === 8) {
+              beam.targetAngle = -10; // Rechts oben → Mitte
+            }
+          }
+        });
+      } else if (currentMode.name === 'FAN_OUT') {
+        // FAN_OUT: Fächereffekt - Beams spreizen sich gleichmäßig
+        beamPositionsRef.current.forEach((beam, index) => {
+          if (beam.isActive) {
+            // Verteile Beams gleichmäßig über den Spread-Bereich
+            const totalBeams = 12;
+            const spreadPerBeam = fanSpreadRef.current / totalBeams;
+            const startAngle = -fanSpreadRef.current / 2; // Start bei -90°
+
+            beam.targetAngle = startAngle + (index * spreadPerBeam);
+          }
+        });
+      } else if (currentMode.name !== 'CHASE' && currentMode.name !== 'CHASE_TRAIL') {
+        // Normal mode: Random variation based on base angle
+        // SKIP für CHASE/CHASE_TRAIL - die haben ihre eigene Winkel-Logik oben!
+        beamPositionsRef.current.forEach((beam, index) => {
+          if (beam.isActive) {
+            let baseAngle = 0;
+
+            // Top Truss (0-3): Left positive, Right negative
+            if (index <= 1) {
+              baseAngle = 35; // Top left beams
+            } else if (index <= 3) {
+              baseAngle = -35; // Top right beams
+            }
+            // Left Truss (4-7): Point right
+            else if (index <= 7) {
+              baseAngle = 50; // Left side points to center-right
+            }
+            // Right Truss (8-11): Point left
+            else {
+              baseAngle = -50; // Right side points to center-left
+            }
+
+            beam.targetAngle = baseAngle + (Math.random() - 0.5) * angleVariation;
+          }
+        });
+      }
     };
 
     window.addEventListener('musicBeat', handleBeat);
@@ -345,6 +617,11 @@ const StageEquipment: React.FC<StageEquipmentProps> = ({ isActive }) => {
           // Manual mode control for moving heads
           currentModeIndexRef.current = data.mode;
           const mode = lightingModes[data.mode];
+
+          // Reset CHASE_TRAIL when switching modes
+          chaseTrailRef.current = [];
+          chasePositionRef.current = 0;
+
           beamPositionsRef.current.forEach((beam, index) => {
             beam.isActive = mode.activeBeams.includes(index);
             // Use individual color for each beam if colors array is provided
@@ -428,6 +705,13 @@ const StageEquipment: React.FC<StageEquipmentProps> = ({ isActive }) => {
       beatFlashRef.current = 0;
       // Reset to first mode
       currentModeIndexRef.current = 0;
+      // Reset spin rotation
+      spinRotationRef.current = 0;
+      // Reset new advanced mode refs
+      waveOffsetRef.current = 0;
+      circleDirectionRef.current = 1;
+      circleRadiusRef.current = 0;
+      fanSpreadRef.current = 0;
       // CRITICAL: Deactivate all beams immediately
       beamPositionsRef.current.forEach(beam => {
         beam.isActive = false;
@@ -536,6 +820,13 @@ const StageEquipment: React.FC<StageEquipmentProps> = ({ isActive }) => {
       // Use manual intensity if in manual mode, otherwise use mode intensity
       const effectiveIntensity = autoModeRef.current ? currentMode.intensity : manualIntensityRef.current;
 
+      // SPECIAL: Disable strobe for CHASE_TRAIL - beams should stay solid!
+      if (strobeActiveRef.current && currentMode.name === 'CHASE_TRAIL') {
+        // Temporarily disable strobe for this mode
+        strobeActiveRef.current = false;
+        // Will be re-enabled when mode changes
+      }
+
       // ======================================================
       // COMPREHENSIVE SPEED OPTIMIZATION FOR MOVING HEADS (Option A)
       // ======================================================
@@ -550,12 +841,27 @@ const StageEquipment: React.FC<StageEquipmentProps> = ({ isActive }) => {
       let modeSpeedMultiplier = 1.0;
       switch (currentMode.name) {
         case 'CHASE':
+        case 'CHASE_TRAIL':
         case 'RANDOM':
           modeSpeedMultiplier = 1.3; // Schnell, aber kontrolliert
           break;
         case 'BOUNCE':
         case 'ALTERNATE':
           modeSpeedMultiplier = 0.9; // Gemäßigt
+          break;
+        case 'SPIN_360':
+          modeSpeedMultiplier = 1.5; // Schnell & flüssig für Rotation
+          break;
+        case 'SPIN_WAVE':
+        case 'MIRROR_SYNC':
+          modeSpeedMultiplier = 1.5; // Schnell & flüssig für dynamische Sync-Effekte
+          break;
+        case 'CIRCLE_IN_OUT':
+        case 'FAN_OUT':
+          modeSpeedMultiplier = 1.2; // Moderat dynamisch für Radius/Spread-Animationen
+          break;
+        case 'X_CROSS':
+          modeSpeedMultiplier = 0.8; // Langsamer für Präzision beim Kreuz-Pattern
           break;
         case 'DUAL_OUTER':
         case 'DUAL_INNER':
@@ -582,20 +888,41 @@ const StageEquipment: React.FC<StageEquipmentProps> = ({ isActive }) => {
         if (!beam.isActive) return;
 
         // ENHANCED smooth angle transition with SPEED MULTIPLIERS!
-        const angleDiff = beam.targetAngle - beam.angle;
-        beam.angle += angleDiff * beamAngleSpeed;
+        // EXCEPTION: CHASE_TRAIL keeps beams static (no movement)
+        if (currentMode.name !== 'CHASE_TRAIL') {
+          const angleDiff = beam.targetAngle - beam.angle;
+          beam.angle += angleDiff * beamAngleSpeed;
+        }
 
-        // Calculate beam start position (relative to canvas)
-        // lightingRig position changes based on viewport width:
-        // Desktop (>768px): left: 10%, right: 10% → width = 80%, starts at 10%
-        // Mobile (<=768px): left: 5%, right: 5% → width = 90%, starts at 5%
-        const isMobile = canvas.width <= 768;
-        const rigLeft = canvas.width * (isMobile ? 0.05 : 0.1);
-        const rigWidth = canvas.width * (isMobile ? 0.9 : 0.8);
-        const startX = rigLeft + (rigWidth * beam.x);
+        // Calculate beam start position based on truss position
+        let startX = 0;
+        let startY = 0;
 
-        // Y position - pixel-perfect alignment with moving head lens center
-        const startY = 128;
+        if (beam.trussPosition === 'top') {
+          // Top Truss - horizontal across top
+          const isMobile = canvas.width <= 768;
+          const rigLeft = canvas.width * (isMobile ? 0.05 : 0.1);
+          const rigWidth = canvas.width * (isMobile ? 0.9 : 0.8);
+          startX = rigLeft + (rigWidth * beam.x);
+          startY = 128; // Fixed Y at top (matching .lightingRig top: 80px + truss height ~50px)
+        } else if (beam.trussPosition === 'left') {
+          // Left Vertical Truss
+          // CSS: left: 1%, top: 10%, width: 50px
+          // Fixture positions: left: 50% of 50px container = 1% + 25px
+          startX = canvas.width * 0.01 + 25; // Center of 50px wide truss
+          // CSS: top: 10%, height: 85% (bottom: 5%)
+          // beam.y is relative position within the truss (0.15, 0.35, 0.55, 0.75)
+          const trussTop = canvas.height * 0.10;
+          const trussHeight = canvas.height * 0.85; // 10% top to 95% bottom
+          startY = trussTop + (trussHeight * beam.y);
+        } else if (beam.trussPosition === 'right') {
+          // Right Vertical Truss
+          // CSS: right: 1%, top: 10%, width: 50px
+          startX = canvas.width * 0.99 - 25; // Center of 50px wide truss (right side)
+          const trussTop = canvas.height * 0.10;
+          const trussHeight = canvas.height * 0.85;
+          startY = trussTop + (trussHeight * beam.y);
+        }
 
         // Calculate beam end position - jetzt BIS ZUM BODEN (100% height!)
         const beamLength = canvas.height * 1.1; // Länger, damit er wirklich bis zur Crowd reicht
@@ -678,12 +1005,15 @@ const StageEquipment: React.FC<StageEquipmentProps> = ({ isActive }) => {
         }}
       />
 
-      {/* Left PA Speaker Stack */}
-      <div className={`${styles.speakerStack} ${styles.left}`}>
-        {/* Line Array Top */}
-        <div className={styles.lineArray}>
-          {[...Array(3)].map((_, i) => (
-            <div key={`left-array-${i}`} className={styles.arrayUnit}>
+      {/* Left Hanging PA (Line Array) */}
+      <div className={`${styles.hangingPA} ${styles.left}`}>
+        {/* Rigging Cable */}
+        <div className={styles.riggingCable} />
+
+        {/* Line Array (4 boxes hängend) */}
+        <div className={styles.lineArrayHanging}>
+          {[...Array(4)].map((_, i) => (
+            <div key={`left-hanging-${i}`} className={styles.arrayBox}>
               <div className={styles.horn} />
               <div className={`${styles.woofer} ${bassHit ? styles.bassHit : ''}`}>
                 <div className={styles.cone} />
@@ -692,33 +1022,18 @@ const StageEquipment: React.FC<StageEquipmentProps> = ({ isActive }) => {
               <div className={`${styles.ledStrip} ${beatPulse ? styles.pulse : ''}`} />
             </div>
           ))}
-        </div>
-
-        {/* Subwoofer */}
-        <div className={styles.subwoofer}>
-          <div className={`${styles.subwooferCone} ${bassHit ? styles.bassHit : ''}`}>
-            <div className={styles.subCone} />
-            <div className={styles.subDustcap} />
-          </div>
-          <div className={styles.portHoles}>
-            <div className={styles.port} />
-            <div className={styles.port} />
-          </div>
-          <div className={`${styles.ledBar} ${beatPulse ? styles.pulse : ''}`} />
-        </div>
-
-        {/* Speaker Stand/Cable */}
-        <div className={styles.speakerStand}>
-          <div className={styles.cable} />
         </div>
       </div>
 
-      {/* Right PA Speaker Stack */}
-      <div className={`${styles.speakerStack} ${styles.right}`}>
-        {/* Line Array Top */}
-        <div className={styles.lineArray}>
-          {[...Array(3)].map((_, i) => (
-            <div key={`right-array-${i}`} className={styles.arrayUnit}>
+      {/* Right Hanging PA (Line Array) */}
+      <div className={`${styles.hangingPA} ${styles.right}`}>
+        {/* Rigging Cable */}
+        <div className={styles.riggingCable} />
+
+        {/* Line Array (4 boxes hängend) */}
+        <div className={styles.lineArrayHanging}>
+          {[...Array(4)].map((_, i) => (
+            <div key={`right-hanging-${i}`} className={styles.arrayBox}>
               <div className={styles.horn} />
               <div className={`${styles.woofer} ${bassHit ? styles.bassHit : ''}`}>
                 <div className={styles.cone} />
@@ -727,36 +1042,18 @@ const StageEquipment: React.FC<StageEquipmentProps> = ({ isActive }) => {
               <div className={`${styles.ledStrip} ${beatPulse ? styles.pulse : ''}`} />
             </div>
           ))}
-        </div>
-
-        {/* Subwoofer */}
-        <div className={styles.subwoofer}>
-          <div className={`${styles.subwooferCone} ${bassHit ? styles.bassHit : ''}`}>
-            <div className={styles.subCone} />
-            <div className={styles.subDustcap} />
-          </div>
-          <div className={styles.portHoles}>
-            <div className={styles.port} />
-            <div className={styles.port} />
-          </div>
-          <div className={`${styles.ledBar} ${beatPulse ? styles.pulse : ''}`} />
-        </div>
-
-        {/* Speaker Stand/Cable */}
-        <div className={styles.speakerStand}>
-          <div className={styles.cable} />
         </div>
       </div>
 
       {/* Top Truss (Moving heads are now rendered on canvas) */}
       <div className={styles.lightingRig}>
         <div className={styles.truss}>
-          {/* Physical fixtures for moving heads */}
+          {/* Physical fixtures for top moving heads */}
           {[...Array(4)].map((_, i) => {
             const positions = [0.15, 0.35, 0.65, 0.85];
             return (
               <div
-                key={`fixture-${i}`}
+                key={`fixture-top-${i}`}
                 className={styles.lightFixture}
                 style={{
                   left: `${positions[i] * 100}%`,
@@ -768,6 +1065,50 @@ const StageEquipment: React.FC<StageEquipmentProps> = ({ isActive }) => {
             );
           })}
         </div>
+      </div>
+
+      {/* Left Vertical Truss */}
+      <div className={styles.verticalTrussLeft}>
+        <div className={styles.verticalTrussBar} />
+        {/* Physical fixtures for left moving heads */}
+        {[...Array(4)].map((_, i) => {
+          const positions = [0.15, 0.35, 0.55, 0.75]; // Vertical positions - weiter oben
+          return (
+            <div
+              key={`fixture-left-${i}`}
+              className={styles.lightFixture}
+              style={{
+                top: `${positions[i] * 100}%`,
+                left: '50%',
+                transform: 'translate(-50%, -50%)'
+              }}
+            >
+              <div className={styles.fixtureBody} />
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Right Vertical Truss */}
+      <div className={styles.verticalTrussRight}>
+        <div className={styles.verticalTrussBar} />
+        {/* Physical fixtures for right moving heads */}
+        {[...Array(4)].map((_, i) => {
+          const positions = [0.15, 0.35, 0.55, 0.75]; // Vertical positions - weiter oben
+          return (
+            <div
+              key={`fixture-right-${i}`}
+              className={styles.lightFixture}
+              style={{
+                top: `${positions[i] * 100}%`,
+                left: '50%',
+                transform: 'translate(-50%, -50%)'
+              }}
+            >
+              <div className={styles.fixtureBody} />
+            </div>
+          );
+        })}
       </div>
 
       {/* Stage Monitor Wedges */}

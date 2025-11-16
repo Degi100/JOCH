@@ -30,13 +30,15 @@
   }
 }
 
-// Mixer Panel
+// Mixer Panel - MAXIMALE GRÖSSE! ALLES ohne Scrollen sichtbar!
 .mixer {
   position: fixed;
-  bottom: 100px;
-  left: 20px;
-  width: 450px;
-  max-height: 80vh;
+  bottom: 10px;
+  left: 10px;
+  right: 10px; // Nutzt die volle Breite!
+  width: auto; // Auto-width für full screen
+  max-width: calc(100vw - 20px); // Maximale Breite
+  height: calc(100vh - 20px); // Maximale Höhe - fast fullscreen!
   background: linear-gradient(145deg, #1a1a1a, #0a0a0a);
   border: 3px solid #333;
   border-radius: $border-radius-lg;
@@ -48,7 +50,7 @@
   transform: translateY(20px);
   pointer-events: none;
   transition: all 0.3s ease;
-  overflow: hidden;
+  overflow: hidden; // KEIN Scrollen!
 
   &.visible {
     opacity: 1;
@@ -61,7 +63,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 20px;
+  padding: 10px 15px; // KOMPAKTER!
   background: linear-gradient(180deg, #2a2a2a, #1a1a1a);
   border-bottom: 2px solid #444;
 }
@@ -74,11 +76,11 @@
 
 .mixerTitle {
   margin: 0;
-  font-size: $font-size-lg;
+  font-size: $font-size-md; // KLEINER!
   font-weight: $font-weight-bold;
   color: $color-red;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
   font-family: monospace;
 }
 
@@ -112,13 +114,18 @@
 }
 
 .mixerContent {
-  padding: 20px;
-  max-height: calc(80vh - 70px);
-  overflow-y: auto;
+  padding: 10px; // KOMPAKTER!
+  height: calc(100% - 60px); // Volle Höhe minus Header (weniger Padding)
+  overflow-y: auto; // Fallback: Scrollen wenn wirklich nötig
+  overflow-x: hidden;
+  display: grid;
+  grid-template-columns: 1fr 1fr; // 2 Spalten Layout!
+  gap: 10px; // KOMPAKTER!
+  align-items: start;
 
-  // Custom scrollbar
+  // Custom scrollbar (falls benötigt)
   &::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
   }
 
   &::-webkit-scrollbar-track {
@@ -127,7 +134,7 @@
 
   &::-webkit-scrollbar-thumb {
     background: #333;
-    border-radius: 4px;
+    border-radius: 3px;
 
     &:hover {
       background: #444;
@@ -135,43 +142,56 @@
   }
 }
 
-// Sections
+// Columns
+.leftColumn,
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; // KOMPAKTER!
+}
+
+// Sections - KOMPAKT!
 .section {
-  margin-bottom: 25px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #222;
+  margin-bottom: 0; // Kein extra Margin in Grid Layout
+  padding: 12px; // KOMPAKTER!
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid #222;
+  border-radius: $border-radius;
 
   &:last-child {
-    border-bottom: none;
+    border-bottom: 1px solid #222;
   }
 }
 
 .sectionTitle {
-  margin: 0 0 15px 0;
-  font-size: $font-size-md;
-  font-weight: $font-weight-semibold;
+  margin: 0 0 10px 0; // KOMPAKTER!
+  font-size: $font-size-lg; // Etwas kleiner für mehr Platz
+  font-weight: $font-weight-bold;
   color: $color-orange;
   text-transform: uppercase;
   letter-spacing: 1.5px;
   font-family: monospace;
+  text-align: center; // ZENTRIERT!
+  padding-bottom: 8px; // KOMPAKTER!
+  border-bottom: 2px solid #333;
 }
 
 // Auto Mode Button
 .autoModeButton {
   width: 100%;
-  padding: 15px;
+  padding: 10px; // KOMPAKTER!
   background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
   border: 2px solid #333;
   border-radius: $border-radius;
   color: #888;
-  font-size: $font-size-md;
+  font-size: $font-size-sm; // KLEINER!
   font-weight: $font-weight-bold;
   font-family: monospace;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   transition: all 0.2s ease;
 
   &:hover {
@@ -197,25 +217,34 @@
 .modeGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  margin-bottom: 15px;
+  gap: 6px; // KOMPAKTER!
+  margin-bottom: 10px; // KOMPAKTER!
+}
+
+// Mode Grid Large - für 17 Modi! KOMPAKT!
+.modeGridLarge {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); // 4 Spalten
+  gap: 6px; // KOMPAKTER!
+  margin-bottom: 12px; // KOMPAKTER!
 }
 
 .modeButton {
-  padding: 10px 5px;
+  padding: 8px 6px; // KOMPAKTER!
   background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
   border: 2px solid #333;
   border-radius: $border-radius-sm;
   color: #666;
-  font-size: 10px;
+  font-size: 10px; // KLEINER für mehr Platz!
   font-weight: $font-weight-semibold;
   font-family: monospace;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
+  gap: 4px; // KOMPAKTER!
   transition: all 0.15s ease;
+  min-height: 45px; // KLEINER!
 
   &:hover:not(.disabled) {
     border-color: #444;
@@ -251,61 +280,63 @@
   transition: all 0.2s ease;
 }
 
-// Fader Controls
+// Fader Controls - KOMPAKT!
 .faderGroup {
-  margin-bottom: 15px;
+  margin-bottom: 12px; // KOMPAKTER!
 }
 
 .faderLabel {
   display: block;
-  margin-bottom: 8px;
-  font-size: $font-size-sm;
-  font-weight: $font-weight-semibold;
-  color: #888;
+  margin-bottom: 6px; // KOMPAKTER!
+  font-size: $font-size-sm; // KLEINER!
+  font-weight: $font-weight-bold;
+  color: #aaa;
   font-family: monospace;
   letter-spacing: 1px;
 }
 
 .fader {
   width: 100%;
-  height: 40px;
+  height: 40px; // KOMPAKTER!
   -webkit-appearance: none;
   background: linear-gradient(180deg, #1a1a1a, #0a0a0a);
-  border: 2px solid #333;
+  border: 2px solid #444;
   border-radius: $border-radius;
   outline: none;
   cursor: pointer;
 
-  // Thumb (slider handle)
+  // Thumb (slider handle) - KOMPAKT!
   &::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 20px;
-    height: 36px;
-    background: linear-gradient(145deg, #4a4a4a, #2a2a2a);
-    border: 2px solid #666;
+    width: 20px; // KLEINER!
+    height: 36px; // KLEINER!
+    background: linear-gradient(145deg, #5a5a5a, #3a3a3a);
+    border: 2px solid #777;
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.15s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
 
     &:hover {
-      background: linear-gradient(145deg, #5a5a5a, #3a3a3a);
-      border-color: #777;
+      background: linear-gradient(145deg, #6a6a6a, #4a4a4a);
+      border-color: #888;
     }
   }
 
   &::-moz-range-thumb {
     width: 20px;
     height: 36px;
-    background: linear-gradient(145deg, #4a4a4a, #2a2a2a);
-    border: 2px solid #666;
+    background: linear-gradient(145deg, #5a5a5a, #3a3a3a);
+    border: 2px solid #777;
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.15s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
 
     &:hover {
-      background: linear-gradient(145deg, #5a5a5a, #3a3a3a);
-      border-color: #777;
+      background: linear-gradient(145deg, #6a6a6a, #4a4a4a);
+      border-color: #888;
     }
   }
 
@@ -371,31 +402,68 @@
   }
 }
 
+// Dual Fader Group (Intensity + BPM Speed)
+.dualFaderGroup {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px; // KOMPAKTER!
+  margin-bottom: 10px; // KOMPAKTER!
+}
+
 // Moving Head Individual Colors
 .movingHeadColorsSection {
-  margin-top: 15px;
-  margin-bottom: 15px;
+  margin-top: 10px; // KOMPAKTER!
+  margin-bottom: 10px; // KOMPAKTER!
+}
+
+// Moving Head Grid (3 Groups: LEFT, TOP, RIGHT) - HORIZONTAL!
+.movingHeadGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); // 3 Spalten nebeneinander
+  gap: 8px; // KOMPAKTER!
+  margin-bottom: 10px; // KOMPAKTER!
+}
+
+.movingHeadGroup {
+  background: #0a0a0a;
+  border: 1px solid #222;
+  border-radius: $border-radius;
+  padding: 6px; // KOMPAKTER!
+}
+
+.groupLabel {
+  display: block;
+  font-size: 9px; // KLEINER!
+  font-weight: $font-weight-bold;
+  color: $color-orange;
+  font-family: monospace;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px; // KOMPAKTER!
+  text-align: center;
+  padding-bottom: 4px; // KOMPAKTER!
+  border-bottom: 1px solid #333;
 }
 
 .movingHeadColorRow {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
+  gap: 6px; // KOMPAKTER!
+  margin-bottom: 5px; // KOMPAKTER!
 }
 
 .movingHeadRowLabel {
-  font-size: 11px;
+  font-size: 10px; // KLEINER!
   font-weight: $font-weight-semibold;
   color: #888;
   font-family: monospace;
-  min-width: 40px;
+  min-width: 32px; // KLEINER!
 }
 
 .movingHeadColorButtons {
   display: flex;
-  gap: 6px;
+  gap: 3px; // NOCH KOMPAKTER für 8 Buttons!
   flex: 1;
+  flex-wrap: nowrap; // WICHTIG: Keine Wraps - alle in einer Reihe!
 }
 
 // Color Presets
@@ -412,21 +480,22 @@
 
 .colorPresetButton {
   width: 100%;
-  height: 35px;
-  border: 2px solid #333;
+  height: 36px; // KOMPAKTER!
+  border: 2px solid #444;
   border-radius: $border-radius-sm;
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
 
   &:hover:not(:disabled) {
-    border-color: #555;
+    border-color: #666;
     transform: scale(1.05);
   }
 
   &.active {
     border-color: $color-orange;
-    box-shadow: 0 0 10px rgba($color-orange, 0.5);
+    box-shadow: 0 0 10px rgba($color-orange, 0.6);
+    border-width: 2px;
 
     &::after {
       content: '✓';
@@ -435,20 +504,20 @@
       left: 50%;
       transform: translate(-50%, -50%);
       color: #000;
-      font-size: 18px;
+      font-size: 16px; // KLEINER!
       font-weight: bold;
-      text-shadow: 0 0 3px #fff;
+      text-shadow: 0 0 4px #fff;
     }
   }
 
   &.small {
-    height: 28px;
-    min-width: 28px;
+    height: 26px; // NOCH KOMPAKTER für 8 Buttons in einer Reihe!
+    min-width: 26px;
     width: auto;
     flex: 1;
 
     &.active::after {
-      font-size: 14px;
+      font-size: 12px; // Checkmark für kleinere Buttons
     }
   }
 
@@ -483,28 +552,41 @@
   }
 }
 
+// Quick Actions Grid
+.quickActions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px; // KOMPAKTER!
+  margin-top: 8px; // KOMPAKTER!
+
+  button {
+    padding: 8px; // KOMPAKTER!
+    font-size: 11px; // KLEINER!
+  }
+}
+
 // Effect Buttons
 .effectButtons {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  margin-bottom: 15px;
+  gap: 8px; // KOMPAKTER!
+  margin-bottom: 10px; // KOMPAKTER!
 }
 
 .effectButton {
-  padding: 15px;
+  padding: 10px; // KOMPAKTER!
   background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
   border: 2px solid #333;
   border-radius: $border-radius;
   color: #666;
-  font-size: $font-size-sm;
+  font-size: $font-size-xs; // KLEINER!
   font-weight: $font-weight-bold;
   font-family: monospace;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px; // KOMPAKTER!
   transition: all 0.15s ease;
 
   &:hover {
@@ -530,24 +612,24 @@
 
 // Strobe Trigger Section
 .strobeTriggerSection {
-  margin-top: 15px;
-  padding-top: 15px;
+  margin-top: 10px; // KOMPAKTER!
+  padding-top: 10px; // KOMPAKTER!
   border-top: 1px solid #222;
 }
 
 .triggerModeButtons {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 6px;
+  gap: 4px; // KOMPAKTER!
 }
 
 .triggerModeButton {
-  padding: 10px 5px;
+  padding: 8px 4px; // KOMPAKTER!
   background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
   border: 2px solid #333;
   border-radius: $border-radius-sm;
   color: #666;
-  font-size: 11px;
+  font-size: 10px; // KLEINER!
   font-weight: $font-weight-bold;
   font-family: monospace;
   cursor: pointer;
@@ -568,8 +650,8 @@
 
 // Keyboard Shortcuts Info
 .shortcuts {
-  margin-top: 20px;
-  padding: 10px;
+  margin-top: 10px; // KOMPAKTER!
+  padding: 8px; // KOMPAKTER!
   background: #0a0a0a;
   border: 1px solid #222;
   border-radius: $border-radius-sm;
@@ -578,7 +660,7 @@
   small {
     color: #555;
     font-family: monospace;
-    font-size: 11px;
+    font-size: 10px; // KLEINER!
   }
 }
 
