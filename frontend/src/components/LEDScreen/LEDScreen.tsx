@@ -17,7 +17,7 @@ const LEDScreen: React.FC<LEDScreenProps> = ({ isActive }) => {
   const mountedRef = useRef(true);
 
   // Logo Beam State
-  const currentEffectRef = useRef<LEDEffect>('static');
+  const currentEffectRef = useRef<LEDEffect>('off');
   const colorRef = useRef('#ff6b35'); // Orange default
   const intensityRef = useRef(0.8);
   const beatPulseRef = useRef(0);
