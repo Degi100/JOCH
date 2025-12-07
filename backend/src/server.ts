@@ -62,12 +62,20 @@ app.use('/api', routes);
 if (NODE_ENV === 'production') {
   const frontendDistPath = path.join(__dirname, '../../frontend/dist');
 
+  console.log('📂 Frontend dist path:', frontendDistPath);
+  console.log('📂 Index exists:', fs.existsSync(path.join(frontendDistPath, 'index.html')));
+
   // Serve static files from frontend/dist
   app.use(express.static(frontendDistPath));
 
   // Handle React Router - send all non-API requests to index.html
   app.get('*', (_req, res) => {
-    res.sendFile(path.join(frontendDistPath, 'index.html'));
+    const indexPath = path.join(frontendDistPath, 'index.html');
+    if (fs.existsSync(indexPath)) {
+      res.sendFile(indexPath);
+    } else {
+      res.status(404).send(`Frontend not found. Looking for: ${indexPath}`);
+    }
   });
 } else {
   // Root route (Development only)
