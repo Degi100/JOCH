@@ -2,14 +2,10 @@
 nixPkgs = ['nodejs_22']
 
 [phases.install]
-cmds = ['npm install --workspaces']
+cmds = ['npm install']
 
 [phases.build]
-cmds = [
-  'npm run build:shared',
-  'npm run build:backend',
-  'npm run build:frontend'
-]
+cmds = ['npm run build']
 
 [start]
-cmd = 'NODE_ENV=production npm start --workspace=backend'
+cmd = 'npm run start'
