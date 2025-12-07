@@ -11,4 +11,4 @@ cmds = ['npm run build']
 cmd = 'npm run start'
 
 [variables]
-PORT = '3000'
+PORT = '80'

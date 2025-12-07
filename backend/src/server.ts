@@ -62,9 +62,6 @@ app.use('/api', routes);
 if (NODE_ENV === 'production') {
   const frontendDistPath = path.join(__dirname, '../../frontend/dist');
 
-  console.log('📂 Frontend dist path:', frontendDistPath);
-  console.log('📂 Index exists:', fs.existsSync(path.join(frontendDistPath, 'index.html')));
-
   // Serve static files from frontend/dist
   app.use(express.static(frontendDistPath));
 
