@@ -4,6 +4,8 @@
 
 @use 'variables' as *;
 @use 'sass:math';
+@use 'sass:color';
+@use 'sass:map';
 
 // ============================================
 // Spacing Helper
@@ -19,14 +21,14 @@
 // Color Manipulation
 // ============================================
 
-// Lighten color
+// Lighten color (using new color.adjust)
 @function lighten-color($color, $amount: 10%) {
-  @return lighten($color, $amount);
+  @return color.adjust($color, $lightness: $amount);
 }
 
-// Darken color
+// Darken color (using new color.adjust)
 @function darken-color($color, $amount: 10%) {
-  @return darken($color, $amount);
+  @return color.adjust($color, $lightness: -$amount);
 }
 
 // Add alpha channel to color
@@ -58,14 +60,15 @@
     'dropdown': $z-index-dropdown,
     'sticky': $z-index-sticky,
     'fixed': $z-index-fixed,
+    'overlay': $z-index-modal-backdrop,
     'modal-backdrop': $z-index-modal-backdrop,
     'modal': $z-index-modal,
     'popover': $z-index-popover,
     'tooltip': $z-index-tooltip,
   );
 
-  @if map-has-key($z-layers, $layer) {
-    @return map-get($z-layers, $layer);
+  @if map.has-key($z-layers, $layer) {
+    @return map.get($z-layers, $layer);
   }
 
   @warn "Unknown z-index layer `#{$layer}`. Using 1.";
@@ -90,8 +93,8 @@
     'mega': $font-size-mega,
   );
 
-  @if map-has-key($font-sizes, $size) {
-    @return map-get($font-sizes, $size);
+  @if map.has-key($font-sizes, $size) {
+    @return map.get($font-sizes, $size);
   }
 
   @warn "Unknown font size `#{$size}`. Using base size.";
