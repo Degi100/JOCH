@@ -37,10 +37,6 @@ export interface BandMember {
   bio: string;
   image: string; // URL/path to image
   photo?: string; // Alias für image (backward compatibility)
-  imageScale?: number; // Zoom factor (0.5-2, default 1)
-  imagePositionX?: number; // Horizontal position (0-100%, default 50)
-  imagePositionY?: number; // Vertical position (0-100%, default 50)
-  imageAspectRatio?: number; // Height/width ratio for correct positioning
   instagram?: string;
   facebook?: string;
   twitter?: string;

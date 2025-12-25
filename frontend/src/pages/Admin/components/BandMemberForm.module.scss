@@ -232,7 +232,7 @@
 }
 
 // ============================================
-// Image Upload - Facebook-style Editor
+// Image Upload - Simple Preview
 // ============================================
 
 .imagePreview {
@@ -244,130 +244,23 @@
   gap: $spacing-md;
 }
 
-// Container for the image editor
-.editorContainer {
-  position: relative;
-  width: 300px;
-  height: 300px;
-  background: $color-black;
-  border-radius: $radius-lg;
-  overflow: hidden;
-  cursor: grab;
-  user-select: none;
-
-  &.dragging {
-    cursor: grabbing;
-  }
-
-  &.resizing {
-    cursor: nwse-resize;
-  }
-}
-
-// The actual image - positioned with transform
-.previewImage {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  max-width: none; // Allow image to be larger than container
-  height: auto;
-  transform-origin: center center;
-  pointer-events: none;
-  user-select: none;
-}
-
-// Circular overlay that shows the crop area (matches BandMemberCard exactly)
-.circleOverlay {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+// Simple circular preview container
+.previewContainer {
   width: 200px;
   height: 200px;
-  border: 4px solid $color-red; // Same as BandMemberCard
   border-radius: 50%;
-  pointer-events: none;
-  // Large box-shadow creates the dimmed area outside the circle
-  box-shadow:
-    0 4px 20px rgba($color-red, 0.3), // Glow effect like card
-    0 0 0 9999px rgba(0, 0, 0, 0.6); // Dimmed area outside
+  overflow: hidden;
+  border: 4px solid $color-red;
+  background: $color-gray-dark;
+  box-shadow: 0 4px 20px rgba($color-red, 0.3);
 }
 
-// Corner resize handles
-.resizeHandle {
-  position: absolute;
-  width: 24px;
-  height: 24px;
-  background: rgba($color-white, 0.9);
-  border: 2px solid $color-red;
-  border-radius: $radius-sm;
-  z-index: 10;
-  touch-action: none;
-  transition: transform $transition-base, background $transition-base;
-
-  &:hover {
-    background: $color-white;
-    transform: scale(1.1);
-  }
-
-  &:active {
-    background: $color-red;
-    transform: scale(0.95);
-  }
-
-  // Resize cursor icons inside handles
-  &::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 8px;
-    height: 8px;
-    border: 2px solid $color-red;
-    border-top: none;
-    border-left: none;
-    transform: translate(-50%, -50%) rotate(-45deg);
-  }
-}
-
-.topLeft {
-  top: 10px;
-  left: 10px;
-  cursor: nwse-resize;
-
-  &::after {
-    transform: translate(-30%, -30%) rotate(135deg);
-  }
-}
-
-.topRight {
-  top: 10px;
-  right: 10px;
-  cursor: nesw-resize;
-
-  &::after {
-    transform: translate(-70%, -30%) rotate(-135deg);
-  }
-}
-
-.bottomLeft {
-  bottom: 10px;
-  left: 10px;
-  cursor: nesw-resize;
-
-  &::after {
-    transform: translate(-30%, -70%) rotate(45deg);
-  }
-}
-
-.bottomRight {
-  bottom: 10px;
-  right: 10px;
-  cursor: nwse-resize;
-
-  &::after {
-    transform: translate(-70%, -70%) rotate(-45deg);
-  }
+// Image fills the circle with object-fit: cover
+.previewImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 // Help text
@@ -376,71 +269,6 @@
   color: $color-gray-light;
   text-align: center;
   opacity: 0.7;
-}
-
-.imageControls {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-sm;
-  width: 100%;
-  max-width: 300px;
-}
-
-.controlRow {
-  display: flex;
-  align-items: center;
-  gap: $spacing-sm;
-}
-
-.controlLabel {
-  font-size: $font-size-sm;
-  color: $color-gray-light;
-  white-space: nowrap;
-  min-width: 60px;
-}
-
-.controlSlider {
-  flex: 1;
-  height: 6px;
-  appearance: none;
-  background: rgba($color-gray-medium, 0.3);
-  border-radius: 3px;
-  cursor: pointer;
-
-  &::-webkit-slider-thumb {
-    appearance: none;
-    width: 16px;
-    height: 16px;
-    background: $color-red;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: transform $transition-base;
-
-    &:hover {
-      transform: scale(1.2);
-    }
-  }
-
-  &::-moz-range-thumb {
-    width: 16px;
-    height: 16px;
-    background: $color-red;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-}
-
-.controlValue {
-  font-size: $font-size-sm;
-  color: $color-gray-light;
-  min-width: 45px;
-  text-align: right;
 }
 
 .removeImageButton {
@@ -506,5 +334,3 @@
     cursor: not-allowed;
   }
 }
-
-// orDivider removed - only file upload now

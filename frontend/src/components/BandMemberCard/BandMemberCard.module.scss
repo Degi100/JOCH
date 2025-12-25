@@ -42,12 +42,10 @@
 }
 
 .photo {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  max-width: none;
-  height: auto;
-  transition: transform $transition-slow;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 .photoPlaceholder {

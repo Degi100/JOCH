@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { BandMember } from '@joch/shared';
 import styles from './BandMemberCard.module.scss';
 
@@ -21,21 +20,6 @@ interface BandMemberCardProps {
  * ```
  */
 export default function BandMemberCard({ member }: BandMemberCardProps) {
-  // Use saved aspect ratio, fallback to 1 if not available
-  const [aspectRatio, setAspectRatio] = useState(member.imageAspectRatio ?? 1);
-
-  // Calculate image dimensions and offsets
-  const scale = member.imageScale ?? 1;
-  const posX = member.imagePositionX ?? 50;
-  const posY = member.imagePositionY ?? 50;
-  const imageWidth = 250 * scale;
-  const imageHeight = imageWidth * aspectRatio;
-  const circleSize = 200;
-  const maxOffsetX = Math.max(0, (imageWidth - circleSize) / 2);
-  const maxOffsetY = Math.max(0, (imageHeight - circleSize) / 2);
-  const offsetX = ((50 - posX) / 50) * maxOffsetX;
-  const offsetY = ((50 - posY) / 50) * maxOffsetY;
-
   return (
     <article className={styles.memberCard}>
       {/* Photo */}
@@ -45,16 +29,6 @@ export default function BandMemberCard({ member }: BandMemberCardProps) {
             src={member.photo || member.image}
             alt={member.name}
             className={styles.photo}
-            style={{
-              width: `${imageWidth}px`,
-              transform: `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px))`,
-            }}
-            onLoad={(e) => {
-              const img = e.currentTarget;
-              if (img.naturalWidth > 0) {
-                setAspectRatio(img.naturalHeight / img.naturalWidth);
-              }
-            }}
           />
         ) : (
           <div className={styles.photoPlaceholder}>

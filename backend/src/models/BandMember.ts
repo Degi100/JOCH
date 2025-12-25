@@ -29,30 +29,6 @@ const bandMemberSchema = new Schema<BandMemberDocument>(
       type: String,
       required: [true, 'Bild ist erforderlich'],
     },
-    imageScale: {
-      type: Number,
-      min: [0.8, 'Zoom muss mindestens 0.8 sein'],
-      max: [3, 'Zoom darf maximal 3 sein'],
-      default: 1,
-    },
-    imagePositionX: {
-      type: Number,
-      min: [0, 'Position muss mindestens 0 sein'],
-      max: [100, 'Position darf maximal 100 sein'],
-      default: 50,
-    },
-    imagePositionY: {
-      type: Number,
-      min: [0, 'Position muss mindestens 0 sein'],
-      max: [100, 'Position darf maximal 100 sein'],
-      default: 50,
-    },
-    imageAspectRatio: {
-      type: Number,
-      min: [0.1, 'Aspect Ratio muss mindestens 0.1 sein'],
-      max: [10, 'Aspect Ratio darf maximal 10 sein'],
-      default: 1,
-    },
     order: {
       type: Number,
       required: [true, 'Reihenfolge ist erforderlich'],
