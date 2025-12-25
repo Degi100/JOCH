@@ -11,6 +11,20 @@ const songSchema = new Schema<SongDocument>(
       trim: true,
       maxlength: [200, 'Titel darf maximal 200 Zeichen lang sein'],
     },
+    artist: {
+      type: String,
+      trim: true,
+      maxlength: [200, 'Künstler darf maximal 200 Zeichen lang sein'],
+    },
+    album: {
+      type: String,
+      trim: true,
+      maxlength: [200, 'Album darf maximal 200 Zeichen lang sein'],
+    },
+    lyrics: {
+      type: String,
+      trim: true,
+    },
     duration: {
       type: Number,
       required: [true, 'Duration ist erforderlich'],
@@ -25,6 +39,12 @@ const songSchema = new Schema<SongDocument>(
     },
     releaseDate: {
       type: Date,
+    },
+    streamingLinks: {
+      spotify: { type: String },
+      appleMusic: { type: String },
+      youtube: { type: String },
+      soundcloud: { type: String },
     },
     order: {
       type: Number,

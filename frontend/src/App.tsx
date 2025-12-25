@@ -6,8 +6,10 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { AudioPlayerProvider } from './context/AudioPlayerContext';
 import Header from './components/Layout/Header';
 import Footer from './components/Layout/Footer';
+import MiniPlayer from './components/MiniPlayer/MiniPlayer';
 import Home from './pages/Home/Home';
 import Band from './pages/Band/Band';
 import Live from './pages/Live/Live';
@@ -36,15 +38,16 @@ import './styles/main.scss';
 const App: React.FC = () => {
   return (
     <AuthProvider>
-      <BrowserRouter
-        future={{
-          v7_startTransition: true,
-          v7_relativeSplatPath: true,
-        }}
-      >
-        <ScrollToTop />
-        <div className="app">
-          <Header />
+      <AudioPlayerProvider>
+        <BrowserRouter
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true,
+          }}
+        >
+          <ScrollToTop />
+          <div className="app">
+            <Header />
           <main className="main-content">
             <Routes>
               <Route path="/" element={<Home />} />
@@ -148,8 +151,10 @@ const App: React.FC = () => {
             </Routes>
           </main>
           <Footer />
+          <MiniPlayer />
         </div>
-      </BrowserRouter>
+        </BrowserRouter>
+      </AudioPlayerProvider>
     </AuthProvider>
   );
 };

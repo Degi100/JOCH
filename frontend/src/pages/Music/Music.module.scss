@@ -145,6 +145,27 @@
       opacity: 0.9;
     }
   }
+
+  &.playing {
+    .playingIndicator {
+      animation: pulse 1s ease-in-out infinite;
+    }
+  }
+}
+
+.playingIndicator {
+  display: inline-block;
+  color: $color-white;
+  font-size: $font-size-sm;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .trackNumber {

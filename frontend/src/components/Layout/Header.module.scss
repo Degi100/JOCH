@@ -71,25 +71,6 @@
 }
 
 // ============================================
-// Sound Toggle
-// ============================================
-
-.soundToggle {
-  display: flex;
-  align-items: center;
-  z-index: 10;
-
-  // On mobile, push to the right (before hamburger)
-  @include responsive(max-md) {
-    margin-left: auto;
-  }
-
-  @include md {
-    margin-left: $spacing-lg; // Space after navigation on desktop
-  }
-}
-
-// ============================================
 // Mobile Menu Button (Hamburger)
 // ============================================
 

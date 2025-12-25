@@ -1,5 +1,6 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import type { Song } from '@joch/shared';
+import { useAudioPlayer } from '../../context/AudioPlayerContext';
 import styles from './AudioPlayer.module.scss';
 
 /**
@@ -7,37 +8,42 @@ import styles from './AudioPlayer.module.scss';
  */
 interface AudioPlayerProps {
   /**
-   * Song to play
+   * Song to display
    */
   song: Song;
-  /**
-   * Optional autoplay
-   */
-  autoPlay?: boolean;
 }
 
 /**
- * Custom HTML5 Audio Player with controls
+ * AudioPlayer - Song detail view with playback controls
  *
  * Features:
- * - Play/Pause toggle
+ * - Cover art display
+ * - Play/Pause toggle (uses global audio context)
  * - Progress bar with seek
  * - Volume control
  * - Time display (current / total)
  * - Lyrics display toggle
+ * - Streaming links
  *
- * @example
- * ```tsx
- * <AudioPlayer song={songData} />
- * ```
+ * The actual audio playback is handled by the global AudioPlayerContext.
+ * This component provides a detailed view and controls for the current song.
  */
-export default function AudioPlayer({ song, autoPlay = false }: AudioPlayerProps) {
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(1);
+export default function AudioPlayer({ song }: AudioPlayerProps) {
+  const {
+    isPlaying,
+    currentTime,
+    duration,
+    volume,
+    togglePlay,
+    seek,
+    setVolume: setGlobalVolume,
+    currentSong,
+  } = useAudioPlayer();
+
   const [showLyrics, setShowLyrics] = useState(false);
+
+  // Check if this song is the currently playing song
+  const isCurrentSong = currentSong?._id === song._id;
 
   // Format time (seconds to MM:SS)
   const formatTime = (seconds: number): string => {
@@ -47,80 +53,32 @@ export default function AudioPlayer({ song, autoPlay = false }: AudioPlayerProps
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Play/Pause toggle
-  const togglePlayPause = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
-    }
-  };
-
-  // Handle time update
-  const handleTimeUpdate = () => {
-    if (audioRef.current) {
-      setCurrentTime(audioRef.current.currentTime);
-    }
-  };
-
-  // Handle loaded metadata (duration available)
-  const handleLoadedMetadata = () => {
-    if (audioRef.current) {
-      setDuration(audioRef.current.duration);
-    }
-  };
-
   // Handle seek (progress bar click)
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (audioRef.current) {
-      const progressBar = e.currentTarget;
-      const clickX = e.clientX - progressBar.getBoundingClientRect().left;
-      const width = progressBar.offsetWidth;
-      const percentage = clickX / width;
-      const newTime = percentage * duration;
-      audioRef.current.currentTime = newTime;
-      setCurrentTime(newTime);
-    }
+    if (!isCurrentSong) return;
+    const progressBar = e.currentTarget;
+    const clickX = e.clientX - progressBar.getBoundingClientRect().left;
+    const width = progressBar.offsetWidth;
+    const percentage = clickX / width;
+    const newTime = percentage * duration;
+    seek(newTime);
   };
 
   // Handle volume change
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseFloat(e.target.value);
-    setVolume(newVolume);
-    if (audioRef.current) {
-      audioRef.current.volume = newVolume;
-    }
+    setGlobalVolume(newVolume);
   };
 
-  // Handle song end
-  const handleEnded = () => {
-    setIsPlaying(false);
-    setCurrentTime(0);
-  };
-
-  // Progress percentage
-  const progressPercentage = duration > 0 ? (currentTime / duration) * 100 : 0;
-
-  // Audio source (with fallback)
-  const audioSrc = song.audioUrl || song.audioFile;
+  // Progress percentage (only show if this is the current song)
+  const progressPercentage = isCurrentSong && duration > 0 ? (currentTime / duration) * 100 : 0;
+  const displayCurrentTime = isCurrentSong ? currentTime : 0;
+  const displayDuration = isCurrentSong ? duration : song.duration;
 
   return (
     <div className={styles.audioPlayer}>
-      {/* Hidden HTML5 Audio Element */}
-      <audio
-        ref={audioRef}
-        src={audioSrc}
-        onTimeUpdate={handleTimeUpdate}
-        onLoadedMetadata={handleLoadedMetadata}
-        onEnded={handleEnded}
-        autoPlay={autoPlay}
-      />
-
-      {/* Cover Art */}
-      <div className={styles.coverArt}>
+      {/* Cover Art - Vinyl Style */}
+      <div className={`${styles.coverArt} ${isCurrentSong && isPlaying ? styles.spinning : ''}`}>
         {song.coverArt ? (
           <img src={song.coverArt} alt={song.title} />
         ) : (
@@ -143,11 +101,11 @@ export default function AudioPlayer({ song, autoPlay = false }: AudioPlayerProps
       <div className={styles.controls}>
         {/* Play/Pause Button */}
         <button
-          className={styles.playButton}
-          onClick={togglePlayPause}
-          aria-label={isPlaying ? 'Pause' : 'Play'}
+          className={`${styles.playButton} ${isCurrentSong && isPlaying ? styles.playing : ''}`}
+          onClick={togglePlay}
+          aria-label={isCurrentSong && isPlaying ? 'Pause' : 'Play'}
         >
-          {isPlaying ? (
+          {isCurrentSong && isPlaying ? (
             // Pause Icon
             <svg viewBox="0 0 24 24" fill="currentColor">
               <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
@@ -162,14 +120,14 @@ export default function AudioPlayer({ song, autoPlay = false }: AudioPlayerProps
 
         {/* Progress Bar */}
         <div className={styles.progressWrapper}>
-          <span className={styles.time}>{formatTime(currentTime)}</span>
-          <div className={styles.progressBar} onClick={handleSeek}>
+          <span className={styles.time}>{formatTime(displayCurrentTime)}</span>
+          <div className={`${styles.progressBar} ${!isCurrentSong ? styles.disabled : ''}`} onClick={handleSeek}>
             <div
               className={styles.progressFill}
               style={{ width: `${progressPercentage}%` }}
             />
           </div>
-          <span className={styles.time}>{formatTime(duration)}</span>
+          <span className={styles.time}>{formatTime(displayDuration)}</span>
         </div>
 
         {/* Volume Control */}

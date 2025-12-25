@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { Song } from '@joch/shared';
 import { songService } from '../../services/song.service';
+import { useAudioPlayer } from '../../context/AudioPlayerContext';
 import AudioPlayer from '../../components/AudioPlayer/AudioPlayer';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import styles from './Music.module.scss';
@@ -11,15 +12,16 @@ import styles from './Music.module.scss';
  * Features:
  * - Hero section
  * - Song list with selection
- * - AudioPlayer for selected song
+ * - AudioPlayer for selected song (uses global audio context)
  * - Lyrics display
  * - Streaming links
  */
 export default function Music() {
   const [songs, setSongs] = useState<Song[]>([]);
-  const [selectedSong, setSelectedSong] = useState<Song | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const { currentSong, playSong, isPlaying } = useAudioPlayer();
 
   useEffect(() => {
     loadSongs();
@@ -32,11 +34,6 @@ export default function Music() {
       // Sort by order
       const sortedData = data.sort((a, b) => a.order - b.order);
       setSongs(sortedData);
-
-      // Auto-select first song
-      if (sortedData.length > 0) {
-        setSelectedSong(sortedData[0]);
-      }
     } catch (err) {
       console.error('Error loading songs:', err);
       setError('Fehler beim Laden der Songs');
@@ -46,7 +43,8 @@ export default function Music() {
   };
 
   const handleSongSelect = (song: Song) => {
-    setSelectedSong(song);
+    // Use global audio player - pass the full playlist
+    playSong(song, songs);
   };
 
   // Format duration (seconds to MM:SS)
@@ -90,33 +88,40 @@ export default function Music() {
               <aside className={styles.songList}>
                 <h2 className={styles.sectionTitle}>Tracklist</h2>
                 <div className={styles.tracks}>
-                  {songs.map((song, index) => (
-                    <button
-                      key={song._id}
-                      className={`${styles.trackItem} ${
-                        selectedSong?._id === song._id ? styles.active : ''
-                      }`}
-                      onClick={() => handleSongSelect(song)}
-                    >
-                      <span className={styles.trackNumber}>{index + 1}</span>
-                      <div className={styles.trackInfo}>
-                        <span className={styles.trackTitle}>{song.title}</span>
-                        {song.artist && (
-                          <span className={styles.trackArtist}>{song.artist}</span>
-                        )}
-                      </div>
-                      <span className={styles.trackDuration}>
-                        {formatDuration(song.duration)}
-                      </span>
-                    </button>
-                  ))}
+                  {songs.map((song, index) => {
+                    const isCurrent = currentSong?._id === song._id;
+                    return (
+                      <button
+                        key={song._id}
+                        className={`${styles.trackItem} ${isCurrent ? styles.active : ''} ${isCurrent && isPlaying ? styles.playing : ''}`}
+                        onClick={() => handleSongSelect(song)}
+                      >
+                        <span className={styles.trackNumber}>
+                          {isCurrent && isPlaying ? (
+                            <span className={styles.playingIndicator}>▶</span>
+                          ) : (
+                            index + 1
+                          )}
+                        </span>
+                        <div className={styles.trackInfo}>
+                          <span className={styles.trackTitle}>{song.title}</span>
+                          {song.artist && (
+                            <span className={styles.trackArtist}>{song.artist}</span>
+                          )}
+                        </div>
+                        <span className={styles.trackDuration}>
+                          {formatDuration(song.duration)}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               </aside>
 
-              {/* Audio Player */}
+              {/* Audio Player / Song Details */}
               <main className={styles.playerSection}>
-                {selectedSong ? (
-                  <AudioPlayer song={selectedSong} key={selectedSong._id} />
+                {currentSong ? (
+                  <AudioPlayer song={currentSong} key={currentSong._id} />
                 ) : (
                   <div className={styles.noSelection}>
                     <p>Wähle einen Song aus der Tracklist</p>

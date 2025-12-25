@@ -12,20 +12,79 @@
   @include hover-lift;
 }
 
-// Cover Art
+// Cover Art - Vinyl Style
 .coverArt {
   width: 100%;
   max-width: 300px;
   aspect-ratio: 1;
   margin: 0 auto $spacing-lg;
-  border-radius: $radius-md;
+  border-radius: 50%;
   overflow: hidden;
   box-shadow: $card-shadow;
+  position: relative;
+  transition: box-shadow 0.3s ease;
 
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+
+  // Vinyl center hole overlay
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 30px;
+    height: 30px;
+    background: $color-gray-dark;
+    border-radius: 50%;
+    border: 3px solid rgba($color-white, 0.2);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  // Inner white dot
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    background: $color-white;
+    border-radius: 50%;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+}
+
+// When playing - add spin animation and glow
+.coverArt.spinning {
+  box-shadow: 0 0 40px rgba($color-red, 0.4), $card-shadow;
+
+  img {
+    animation: vinylSpin 6s linear infinite;
+  }
+
+  &::after,
+  &::before {
+    opacity: 1;
+  }
+}
+
+@keyframes vinylSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 
@@ -35,13 +94,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: $color-gray-dark;
+  background: linear-gradient(135deg, rgba($color-red, 0.2), rgba($color-orange, 0.2));
 
   svg {
     width: 40%;
     height: 40%;
     color: $color-gray-light;
-    opacity: 0.3;
+    opacity: 0.5;
   }
 }
 
@@ -92,22 +151,56 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: $transition-base;
+  transition: all 0.3s ease;
   margin: 0 auto;
-  box-shadow: $card-shadow;
+  box-shadow: 0 4px 15px rgba($color-red, 0.3);
+  position: relative;
 
   svg {
     width: 28px;
     height: 28px;
   }
 
+  // Glow ring
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, $color-red, $color-orange);
+    opacity: 0;
+    z-index: -1;
+    transition: all 0.3s ease;
+  }
+
   &:hover {
     transform: scale(1.1);
-    box-shadow: $card-shadow-hover;
+    box-shadow: 0 6px 25px rgba($color-red, 0.5);
+
+    &::before {
+      opacity: 0.4;
+      animation: playGlow 1.5s ease-in-out infinite;
+    }
   }
 
   &:active {
     transform: scale(0.95);
+  }
+
+  // Playing state
+  &.playing {
+    box-shadow: 0 0 30px rgba($color-red, 0.5);
+  }
+}
+
+@keyframes playGlow {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.2;
   }
 }
 
@@ -128,15 +221,31 @@
 .progressBar {
   flex: 1;
   height: 8px;
-  background: $color-gray-dark;
+  background: rgba($color-gray-medium, 0.3);
   border-radius: $radius-full;
   cursor: pointer;
   position: relative;
-  overflow: hidden;
+  transition: all 0.2s ease;
 
   &:hover {
+    height: 10px;
+
     .progressFill {
-      background: color.adjust($color-red, $lightness: 5%);
+      box-shadow: 0 0 15px rgba($color-red, 0.5);
+    }
+  }
+
+  // Disabled state when not the current song
+  &.disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+
+    &:hover {
+      height: 8px;
+
+      .progressFill {
+        box-shadow: none;
+      }
     }
   }
 }
@@ -145,20 +254,27 @@
   height: 100%;
   background: linear-gradient(90deg, $color-red, $color-orange);
   border-radius: $radius-full;
-  transition: width 0.1s linear, background $transition-base;
+  transition: all 0.15s ease;
   position: relative;
 
   &::after {
     content: '';
     position: absolute;
-    right: 0;
+    right: -6px;
     top: 50%;
     transform: translateY(-50%);
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
     background: $color-white;
     border-radius: 50%;
-    box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 8px rgba($color-black, 0.3);
+    transition: transform 0.15s ease;
+  }
+
+  .progressBar:hover & {
+    &::after {
+      transform: translateY(-50%) scale(1.2);
+    }
   }
 }
 

@@ -6,7 +6,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Navigation from './Navigation';
-import SoundToggle from '../SoundToggle/SoundToggle';
 import styles from './Header.module.scss';
 
 const Header: React.FC = () => {
@@ -57,11 +56,6 @@ const Header: React.FC = () => {
         {/* Desktop Navigation */}
         <div className={styles.desktopNav}>
           <Navigation onLinkClick={closeMobileMenu} />
-        </div>
-
-        {/* Sound Toggle */}
-        <div className={styles.soundToggle}>
-          <SoundToggle />
         </div>
 
         {/* Mobile Menu Button */}
