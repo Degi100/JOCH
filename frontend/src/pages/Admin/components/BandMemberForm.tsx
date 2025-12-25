@@ -115,7 +115,7 @@ export default function BandMemberForm({ member, onSuccess, onCancel }: BandMemb
       setIsSubmitting(true);
       let imageUrl = image.trim();
 
-      // Upload image to Cloudinary
+      // Upload image to server
       if (imageFile) {
         setIsUploading(true);
         try {

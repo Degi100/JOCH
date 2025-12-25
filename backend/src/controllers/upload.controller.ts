@@ -1,7 +1,25 @@
 import { Request, Response, NextFunction } from 'express';
 import { AppError, HTTP_STATUS } from '@joch/shared';
-import { uploadToCloudinary, uploadImageWithThumbnail } from '../config';
 import fs from 'fs';
+import path from 'path';
+
+/**
+ * Get the base URL for uploaded files
+ * In production, this will be the server URL
+ * In development, it defaults to localhost
+ */
+const getBaseUrl = (): string => {
+  return process.env.BASE_URL || `http://localhost:${process.env.PORT || 5000}`;
+};
+
+/**
+ * Convert local file path to public URL
+ */
+const getPublicUrl = (filePath: string): string => {
+  // Convert backslashes to forward slashes and make path relative
+  const relativePath = filePath.replace(/\\/g, '/');
+  return `${getBaseUrl()}/${relativePath}`;
+};
 
 /**
  * Upload single image
@@ -18,24 +36,19 @@ export const uploadSingleImage = async (
       throw new AppError(HTTP_STATUS.BAD_REQUEST, 'Keine Datei hochgeladen');
     }
 
-    // Upload to Cloudinary
-    const cloudinaryResult = await uploadToCloudinary(
-      req.file.path,
-      'images'
-    );
-
-    // Delete local file after successful upload
-    fs.unlinkSync(req.file.path);
+    // File is already saved by multer - just return the URL
+    const fileUrl = getPublicUrl(req.file.path);
+    const fileStats = fs.statSync(req.file.path);
 
     res.status(HTTP_STATUS.CREATED).json({
       success: true,
       message: 'Bild erfolgreich hochgeladen',
       data: {
-        filename: cloudinaryResult.publicId,
+        filename: req.file.filename,
         originalName: req.file.originalname,
         mimetype: req.file.mimetype,
-        size: cloudinaryResult.size,
-        url: cloudinaryResult.url,
+        size: fileStats.size,
+        url: fileUrl,
       },
     });
   } catch (error) {
@@ -52,7 +65,7 @@ export const uploadSingleImage = async (
 };
 
 /**
- * Upload multiple images with automatic thumbnail generation
+ * Upload multiple images
  * @route POST /api/upload/images
  * @access Private (Admin/Member)
  */
@@ -70,24 +83,21 @@ export const uploadMultipleImages = async (
 
     uploadedFiles.push(...req.files);
 
-    // Upload all files to Cloudinary with thumbnail generation
-    const uploadPromises = req.files.map(async (file) => {
-      const result = await uploadImageWithThumbnail(file.path, 'gallery');
-
-      // Delete local file after upload
-      fs.unlinkSync(file.path);
+    // Files are already saved by multer - just return the URLs
+    const files = req.files.map((file) => {
+      const fileUrl = getPublicUrl(file.path);
+      const fileStats = fs.statSync(file.path);
 
       return {
-        filename: result.publicId,
+        filename: file.filename,
         originalName: file.originalname,
         mimetype: file.mimetype,
-        size: result.size,
-        url: result.url,
-        thumbnailUrl: result.thumbnailUrl,
+        size: fileStats.size,
+        url: fileUrl,
+        // Thumbnail URL is the same - frontend handles sizing via CSS
+        thumbnailUrl: fileUrl,
       };
     });
-
-    const files = await Promise.all(uploadPromises);
 
     res.status(HTTP_STATUS.CREATED).json({
       success: true,
@@ -124,24 +134,19 @@ export const uploadSingleAudio = async (
       throw new AppError(HTTP_STATUS.BAD_REQUEST, 'Keine Datei hochgeladen');
     }
 
-    // Upload to Cloudinary
-    const cloudinaryResult = await uploadToCloudinary(
-      req.file.path,
-      'audio'
-    );
-
-    // Delete local file after successful upload
-    fs.unlinkSync(req.file.path);
+    // File is already saved by multer - just return the URL
+    const fileUrl = getPublicUrl(req.file.path);
+    const fileStats = fs.statSync(req.file.path);
 
     res.status(HTTP_STATUS.CREATED).json({
       success: true,
       message: 'Audio-Datei erfolgreich hochgeladen',
       data: {
-        filename: cloudinaryResult.publicId,
+        filename: req.file.filename,
         originalName: req.file.originalname,
         mimetype: req.file.mimetype,
-        size: cloudinaryResult.size,
-        url: cloudinaryResult.url,
+        size: fileStats.size,
+        url: fileUrl,
       },
     });
   } catch (error) {

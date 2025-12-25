@@ -182,7 +182,7 @@ export default function MusicForm({ song, onSuccess, onCancel }: MusicFormProps)
       let audioUrl = audioFile.trim();
       let coverUrl = coverArt.trim();
 
-      // Upload audio to Cloudinary
+      // Upload audio to server
       if (audioFileObj) {
         try {
           const uploadResponse = await uploadService.uploadAudio(audioFileObj, token);
@@ -195,7 +195,7 @@ export default function MusicForm({ song, onSuccess, onCancel }: MusicFormProps)
         }
       }
 
-      // Upload cover image to Cloudinary (optional)
+      // Upload cover image to server (optional)
       if (coverImageFile) {
         try {
           const uploadResponse = await uploadService.uploadImage(coverImageFile, token);

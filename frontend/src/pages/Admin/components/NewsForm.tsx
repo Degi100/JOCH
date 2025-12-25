@@ -108,7 +108,7 @@ export default function NewsForm({ newsPost, onSuccess, onCancel }: NewsFormProp
       setIsSubmitting(true);
       setIsUploading(true);
 
-      // Upload cover image to Cloudinary if a new file was selected
+      // Upload cover image to server if a new file was selected
       let coverImageUrl = coverImage;
       if (coverImageFile) {
         const uploadResponse = await uploadService.uploadImage(coverImageFile, token);

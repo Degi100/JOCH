@@ -6,12 +6,9 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
-import { connectDatabase, initCloudinary } from './config';
+import { connectDatabase } from './config';
 import { errorHandler, notFoundHandler } from './middleware';
 import routes from './routes';
-
-// Initialize Cloudinary after dotenv is loaded
-initCloudinary();
 
 // Ensure upload directories exist
 const uploadDirs = [

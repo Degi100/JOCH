@@ -132,7 +132,7 @@ export default function GalleryForm({ image, onSuccess, onCancel }: GalleryFormP
       setIsUploading(true);
       setUploadProgress(0);
 
-      // Upload all images to Cloudinary (with auto-thumbnail generation)
+      // Upload all images to server
       const files = imagesToUpload.map((img) => img.file);
       const uploadedImages = await uploadService.uploadImages(files, token);
 
