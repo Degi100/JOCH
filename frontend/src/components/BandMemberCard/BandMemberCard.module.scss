@@ -14,8 +14,8 @@
   &:hover {
     @include card-hover;
 
-    .photo {
-      transform: scale(1.05);
+    .photoWrapper {
+      box-shadow: 0 6px 30px rgba($color-red, 0.5);
     }
   }
 }
@@ -25,6 +25,7 @@
 // ============================================
 
 .photoWrapper {
+  position: relative;
   width: 200px;
   height: 200px;
   margin: 0 auto $spacing-md;
@@ -41,9 +42,11 @@
 }
 
 .photo {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  max-width: none;
+  height: auto;
   transition: transform $transition-slow;
 }
 

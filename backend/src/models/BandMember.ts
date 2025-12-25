@@ -21,14 +21,37 @@ const bandMemberSchema = new Schema<BandMemberDocument>(
     },
     bio: {
       type: String,
-      required: [true, 'Bio ist erforderlich'],
       trim: true,
-      minlength: [10, 'Bio muss mindestens 10 Zeichen lang sein'],
       maxlength: [1000, 'Bio darf maximal 1000 Zeichen lang sein'],
+      default: '',
     },
     image: {
       type: String,
       required: [true, 'Bild ist erforderlich'],
+    },
+    imageScale: {
+      type: Number,
+      min: [0.8, 'Zoom muss mindestens 0.8 sein'],
+      max: [3, 'Zoom darf maximal 3 sein'],
+      default: 1,
+    },
+    imagePositionX: {
+      type: Number,
+      min: [0, 'Position muss mindestens 0 sein'],
+      max: [100, 'Position darf maximal 100 sein'],
+      default: 50,
+    },
+    imagePositionY: {
+      type: Number,
+      min: [0, 'Position muss mindestens 0 sein'],
+      max: [100, 'Position darf maximal 100 sein'],
+      default: 50,
+    },
+    imageAspectRatio: {
+      type: Number,
+      min: [0.1, 'Aspect Ratio muss mindestens 0.1 sein'],
+      max: [10, 'Aspect Ratio darf maximal 10 sein'],
+      default: 1,
     },
     order: {
       type: Number,
