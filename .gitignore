@@ -47,3 +47,6 @@ shared/dist/
 *.tmp
 *.temp
 .cache/
+
+# Claude Code
+CLAUDE.md
