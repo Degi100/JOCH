@@ -146,6 +146,27 @@ export interface CreateGuestbookEntryDto {
   message: string;
 }
 
+// Social Media Link
+export interface SocialLink {
+  _id: ObjectId;
+  platform: 'instagram' | 'facebook' | 'youtube' | 'spotify' | 'tiktok' | 'twitter' | 'soundcloud' | 'bandcamp' | 'other';
+  url: string;
+  label?: string; // Custom label, z.B. "JOCH auf Instagram"
+  icon?: string; // Optional custom icon
+  order: number;
+  active: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CreateSocialLinkDto {
+  platform: SocialLink['platform'];
+  url: string;
+  label?: string;
+  order?: number;
+  active?: boolean;
+}
+
 // API Response Types
 export interface ApiResponse<T> {
   success: boolean;

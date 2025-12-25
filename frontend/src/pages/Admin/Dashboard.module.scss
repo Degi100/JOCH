@@ -132,6 +132,16 @@
   margin-bottom: $spacing-xxl;
 }
 
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-lg;
+  padding-bottom: $spacing-sm;
+  border-bottom: 2px solid $color-red;
+  gap: $spacing-md;
+}
+
 .sectionTitle {
   font-family: $font-family-heading;
   font-size: $font-size-xl;
@@ -139,9 +149,44 @@
   color: $color-white;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: $spacing-lg;
-  padding-bottom: $spacing-sm;
-  border-bottom: 2px solid $color-red;
+  margin: 0;
+}
+
+.viewToggle {
+  display: flex;
+  gap: $spacing-xs;
+  background: rgba($color-black, 0.3);
+  padding: $spacing-xs;
+  border-radius: $radius-md;
+}
+
+.toggleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: none;
+  border-radius: $radius-sm;
+  color: $color-gray-light;
+  cursor: pointer;
+  transition: $transition-base;
+
+  &:hover {
+    background: rgba($color-gray-medium, 0.3);
+    color: $color-white;
+  }
+
+  &.active {
+    background: $color-red;
+    color: $color-white;
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
 }
 
 .managementGrid {
@@ -221,5 +266,104 @@
 
   @include md {
     gap: $spacing-lg;
+  }
+}
+
+// ============================================
+// Table View
+// ============================================
+
+.managementTable {
+  background: $color-gray-dark;
+  border-radius: $radius-lg;
+  border: 1px solid rgba($color-gray-medium, 0.2);
+  overflow: hidden;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead {
+    background: rgba($color-black, 0.3);
+
+    th {
+      padding: $spacing-sm $spacing-md;
+      text-align: left;
+      font-family: $font-family-heading;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-bold;
+      color: $color-gray-light;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid rgba($color-gray-medium, 0.2);
+
+      &:first-child {
+        width: 40px;
+        text-align: center;
+      }
+
+      &:last-child {
+        width: 90px;
+        text-align: right;
+      }
+    }
+  }
+
+  tbody {
+    tr {
+      cursor: pointer;
+      transition: background-color $transition-base;
+      border-bottom: 1px solid rgba($color-gray-medium, 0.1);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &:hover {
+        background: rgba($color-black, 0.2);
+      }
+    }
+
+    td {
+      padding: $spacing-sm $spacing-md;
+      vertical-align: middle;
+    }
+  }
+}
+
+.iconCell {
+  font-size: $font-size-lg;
+  text-align: center;
+  width: 40px;
+}
+
+.titleCell {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-white;
+}
+
+.descCell {
+  font-size: $font-size-xs;
+  color: $color-gray-light;
+}
+
+.actionCell {
+  text-align: right;
+  width: 90px;
+
+  button {
+    padding: $spacing-xs $spacing-sm !important;
+    font-size: $font-size-xs !important;
+    min-height: auto !important;
+  }
+}
+
+.hideOnMobile {
+  display: none;
+
+  @include md {
+    display: table-cell;
   }
 }

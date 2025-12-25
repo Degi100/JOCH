@@ -28,6 +28,7 @@ import GuestbookManager from './pages/Admin/GuestbookManager';
 import BandManager from './pages/Admin/BandManager';
 import MessagesManager from './pages/Admin/MessagesManager';
 import UserManager from './pages/Admin/UserManager';
+import SocialManager from './pages/Admin/SocialManager';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import ScrollToTop from './components/ScrollToTop/ScrollToTop';
 import './styles/main.scss';
@@ -131,6 +132,14 @@ const App: React.FC = () => {
                 element={
                   <PrivateRoute requiredRoles={['admin']}>
                     <UserManager />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/admin/social"
+                element={
+                  <PrivateRoute requiredRoles={['admin', 'member']}>
+                    <SocialManager />
                   </PrivateRoute>
                 }
               />

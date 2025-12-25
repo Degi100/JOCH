@@ -5,3 +5,4 @@ export * from './Gig';
 export * from './Song';
 export * from './GalleryImage';
 export * from './ContactMessage';
+export * from './SocialLink';

@@ -1,0 +1,282 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+.socialManager {
+  min-height: 100vh;
+  background: linear-gradient(135deg, $color-black 0%, $color-gray-dark 100%);
+  padding: calc($header-height + $spacing-xl) $spacing-md $spacing-xl;
+  max-width: $container-xl;
+  margin: 0 auto;
+
+  @include md {
+    padding: calc($header-height + $spacing-xxl) $spacing-xl $spacing-xxl;
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: $spacing-xxl;
+  gap: $spacing-lg;
+
+  @include responsive(max-md) {
+    flex-direction: column;
+  }
+}
+
+.headerContent {
+  flex: 1;
+}
+
+.title {
+  font-size: $font-size-hero;
+  color: $color-white;
+  margin-bottom: $spacing-md;
+
+  @include responsive(max-md) {
+    font-size: $font-size-xxl;
+  }
+}
+
+.subtitle {
+  font-size: $font-size-lg;
+  color: $color-gray-light;
+
+  @include responsive(max-md) {
+    font-size: $font-size-md;
+  }
+}
+
+// Form
+.form {
+  background: $color-gray-dark;
+  border-radius: $radius-lg;
+  padding: $spacing-xl;
+  margin-bottom: $spacing-xxl;
+  border: 1px solid rgba($color-gray-medium, 0.3);
+}
+
+.formTitle {
+  font-size: $font-size-xl;
+  color: $color-white;
+  margin-bottom: $spacing-lg;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-lg;
+  margin-bottom: $spacing-lg;
+
+  @include responsive(max-md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.label {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-gray-light;
+  margin-bottom: $spacing-xs;
+}
+
+.select {
+  width: 100%;
+  padding: $spacing-sm $spacing-md;
+  font-size: $font-size-base;
+  font-family: $font-family-base;
+  color: $color-white;
+  background-color: $color-black;
+  border: 1px solid rgba($color-gray-medium, 0.5);
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: $transition-base;
+
+  &:hover {
+    border-color: rgba($color-gray-light, 0.5);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $color-red;
+    box-shadow: 0 0 0 2px rgba($color-red, 0.2);
+  }
+
+  option {
+    background-color: $color-gray-dark;
+    color: $color-white;
+    padding: $spacing-sm;
+  }
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  cursor: pointer;
+  font-size: $font-size-base;
+  color: $color-gray-light;
+
+  input[type='checkbox'] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: $color-red;
+  }
+
+  span {
+    user-select: none;
+  }
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-md;
+
+  @include responsive(max-md) {
+    flex-direction: column;
+  }
+}
+
+// List
+.listHeader {
+  margin-bottom: $spacing-lg;
+
+  p {
+    font-size: $font-size-md;
+    color: $color-gray-light;
+  }
+}
+
+.linksList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.linkCard {
+  background: $color-gray-dark;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  border: 1px solid rgba($color-gray-medium, 0.3);
+  transition: $transition-base;
+
+  &:hover {
+    border-color: rgba($color-gray-light, 0.4);
+    box-shadow: $card-shadow;
+  }
+
+  &.inactive {
+    opacity: 0.6;
+    background: rgba($color-gray-dark, 0.5);
+  }
+}
+
+.linkMain {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-lg;
+  margin-bottom: $spacing-md;
+}
+
+.linkIcon {
+  font-size: 2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.linkInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.linkPlatform {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-white;
+  margin-bottom: $spacing-xs;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.inactiveBadge {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $color-gray-light;
+  background: rgba($color-gray-medium, 0.3);
+  padding: 2px 8px;
+  border-radius: $radius-full;
+}
+
+.linkUrl {
+  font-family: $font-family-mono;
+  font-size: $font-size-sm;
+  color: $color-blue;
+  text-decoration: none;
+  word-break: break-all;
+  display: block;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.linkLabel {
+  font-size: $font-size-sm;
+  color: $color-gray-light;
+  margin-top: $spacing-xs;
+}
+
+.linkActions {
+  display: flex;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+
+  @include responsive(max-md) {
+    flex-direction: column;
+  }
+}
+
+// States
+.error {
+  text-align: center;
+  padding: $spacing-xxl;
+
+  p {
+    color: $color-red;
+    font-size: $font-size-lg;
+    margin-bottom: $spacing-md;
+  }
+}
+
+.empty {
+  text-align: center;
+  padding: $spacing-mega 0;
+
+  p {
+    color: $color-gray-medium;
+    font-size: $font-size-lg;
+    margin-top: $spacing-md;
+  }
+}
+
+.emptyIcon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: $spacing-md;
+}
+
+.emptyHint {
+  font-size: $font-size-base !important;
+  color: $color-gray-light !important;
+  margin-top: $spacing-sm !important;
+}

@@ -17,86 +17,138 @@
 
 .hero {
   position: relative;
-  height: 1024px;
-  min-height: 600px;
-  @include flex-center;
-  background-image: url('../../bilder/IMG-20241013-WA0076.jpg');
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+  margin-top: $header-height;
+  background-color: $color-black;
   overflow: hidden;
+
+  // Fließender Übergang an den Seiten
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to right,
+      $color-black 0%,
+      transparent 25%,
+      transparent 75%,
+      $color-black 100%
+    );
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  // Fließender Übergang unten
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      $color-black 0%,
+      $color-black 10%,
+      transparent 50%
+    );
+    z-index: 2;
+    pointer-events: none;
+  }
+}
+
+.heroImage {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 .heroOverlay {
-  @include absolute-full;
-  background:
-    // Dark base overlay
-    linear-gradient(
-      135deg,
-      rgba($color-black, 0.5) 0%,
-      rgba($color-gray-dark, 0.6) 100%
-    );
-  z-index: 1;
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
 }
 
 .heroContent {
-  @include flex-column-center;
-  position: relative;
-  z-index: 2;
+  position: absolute;
+  bottom: $spacing-xl;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  z-index: 4;
   text-align: center;
-  padding: 0 $spacing-lg;
+  padding: $spacing-lg;
   max-width: 800px;
-  animation: fadeInUp 1s $easing-ease-out;
+  width: 100%;
+  animation: fadeInUp 0.8s $easing-ease-out forwards;
+
+  @include sm {
+    bottom: $spacing-md;
+    padding: $spacing-md;
+  }
 }
 
 .heroTitle {
-  font-size: clamp($font-size-hero, 10vw, $font-size-mega);
+  font-size: clamp(3rem, 12vw, 5rem);
   font-weight: $font-weight-bold;
   color: $color-white;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: $spacing-md;
-  text-shadow: 0 4px 8px rgba($color-black, 0.5);
+  letter-spacing: 0.15em;
+  margin-bottom: $spacing-sm;
+  text-shadow:
+    0 2px 4px rgba($color-black, 0.8),
+    0 4px 16px rgba($color-black, 0.4);
+  line-height: 1;
 }
 
 .heroTagline {
-  font-size: clamp($font-size-lg, 3vw, $font-size-xl);
+  font-size: clamp($font-size-md, 3vw, $font-size-xl);
   font-weight: $font-weight-semibold;
   color: $color-red;
-  margin-bottom: $spacing-lg;
-  text-shadow: 0 2px 4px rgba($color-black, 0.5);
+  margin-bottom: $spacing-md;
+  text-shadow: 0 2px 8px rgba($color-black, 0.6);
+  letter-spacing: 0.05em;
 }
 
 .heroDescription {
-  font-size: clamp($font-size-base, 2vw, $font-size-md);
+  font-size: clamp($font-size-sm, 2vw, $font-size-base);
   line-height: $line-height-relaxed;
-  color: $color-gray-light;
-  margin-bottom: $spacing-xl;
-  max-width: 600px;
+  color: rgba($color-gray-light, 0.9);
+  margin-bottom: $spacing-lg;
+  max-width: 500px;
+
+  @include sm {
+    display: none; // Auf Mobile verstecken für kompakteres Design
+  }
 }
 
 .heroButtons {
   display: flex;
   flex-wrap: wrap;
-  gap: $spacing-md;
+  gap: $spacing-sm;
   justify-content: center;
 }
 
 .heroButton {
   @include button-base;
   @include button-primary;
-  padding: $spacing-md $spacing-xl;
-  font-size: $font-size-lg;
+  padding: $spacing-sm $spacing-lg;
+  font-size: $font-size-base;
 
   &.secondary {
     @include button-outline;
+  }
+
+  @include sm {
+    padding: $spacing-xs $spacing-md;
+    font-size: $font-size-sm;
   }
 }
 
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;

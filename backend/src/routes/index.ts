@@ -7,6 +7,7 @@ import songRoutes from './song.routes';
 import galleryRoutes from './gallery.routes';
 import contactRoutes from './contact.routes';
 import guestbookRoutes from './guestbook.routes';
+import socialLinkRoutes from './socialLink.routes';
 import uploadRoutes from './upload.routes';
 
 const router = Router();
@@ -29,6 +30,7 @@ router.use('/songs', songRoutes);
 router.use('/gallery', galleryRoutes);
 router.use('/contact', contactRoutes);
 router.use('/guestbook', guestbookRoutes);
+router.use('/social-links', socialLinkRoutes);
 router.use('/upload', uploadRoutes);
 
 export default router;

@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { gigService, newsService } from '../../services';
 import type { Gig, NewsPost } from '@joch/shared';
 import styles from './Home.module.scss';
+import heroImage from '../../bilder/joch-banner-optimized.png';
 
 const Home: React.FC = () => {
   const [upcomingGigs, setUpcomingGigs] = useState<Gig[]>([]);
@@ -39,10 +40,10 @@ const Home: React.FC = () => {
     <div className={styles.home}>
       {/* Hero Section */}
       <section className={styles.hero}>
+        <img src={heroImage} alt="JOCH Band" className={styles.heroImage} />
         <div className={styles.heroOverlay}></div>
 
         <div className={styles.heroContent}>
-          <h1 className={styles.heroTitle}>JOCH</h1>
           <p className={styles.heroTagline}>Ehrliche Musik. Ohne Filter.</p>
           <p className={styles.heroDescription}>
             Deutschrock aus Bremen-Nord seit 2022.
