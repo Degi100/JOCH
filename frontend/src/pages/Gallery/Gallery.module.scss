@@ -69,14 +69,50 @@
 // ============================================
 .filterBar {
   display: flex;
-  flex-wrap: wrap;
-  gap: $spacing-sm;
-  justify-content: center;
+  flex-direction: column;
+  gap: $spacing-md;
+  align-items: center;
   margin-bottom: $spacing-xl;
   padding: $spacing-md;
   background: rgba($color-black, 0.5);
   border-radius: $radius-lg;
   border: 1px solid rgba($color-gray-medium, 0.2);
+
+  @include md {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+.filterButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+  justify-content: center;
+}
+
+.slideshowButton {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-sm $spacing-lg;
+  background: $color-red;
+  color: $color-white;
+  border: none;
+  border-radius: $radius-md;
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: darken($color-red, 10%);
+    transform: scale(1.05);
+  }
 }
 
 .filterButton {
@@ -256,8 +292,12 @@
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  padding: $spacing-md;
+  padding: 80px $spacing-md $spacing-md;
   animation: fadeIn 0.2s ease;
+
+  @include md {
+    padding: 60px $spacing-lg $spacing-lg;
+  }
 }
 
 @keyframes fadeIn {
@@ -291,34 +331,7 @@
   }
 }
 
-.lightboxClose {
-  position: absolute;
-  top: -$spacing-xl;
-  right: 0;
-  background: rgba($color-red, 0.8);
-  color: $color-white;
-  border: none;
-  border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  font-size: $font-size-xl;
-  cursor: pointer;
-  transition: all $transition-base;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &:hover {
-    background: $color-red;
-    transform: scale(1.1);
-  }
-
-  @include md {
-    top: 0;
-    right: -60px;
-  }
-}
+// Removed - now using .controlButton in .lightboxControls
 
 .lightboxNav {
   position: absolute;
@@ -328,9 +341,8 @@
   color: $color-white;
   border: none;
   border-radius: 50%;
-  width: 56px;
-  height: 56px;
-  font-size: $font-size-xxl;
+  width: 44px;
+  height: 44px;
   cursor: pointer;
   transition: all $transition-base;
   z-index: 10;
@@ -338,36 +350,43 @@
   align-items: center;
   justify-content: center;
 
+  svg {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+
   &:hover {
     background: $color-blue;
     transform: translateY(-50%) scale(1.1);
   }
 
   &.prev {
-    left: -$spacing-md;
+    left: -22px;
 
     @include md {
-      left: -70px;
+      left: -28px;
     }
   }
 
   &.next {
-    right: -$spacing-md;
+    right: -22px;
 
     @include md {
-      right: -70px;
+      right: -28px;
     }
   }
 }
 
 .lightboxImageWrapper {
+  position: relative;
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   max-height: 70vh;
   width: 100%;
-  overflow: hidden;
+  overflow: visible; // Allow nav buttons to overflow
   border-radius: $radius-lg;
   background: rgba($color-black, 0.5);
 }
@@ -424,4 +443,93 @@
   font-weight: $font-weight-medium;
   text-transform: uppercase;
   letter-spacing: 1px;
+}
+
+// ============================================
+// Lightbox Controls (Top Bar)
+// ============================================
+.lightboxControls {
+  position: fixed;
+  top: $spacing-lg;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-md;
+  z-index: 10000;
+
+  @include md {
+    top: $spacing-md;
+  }
+}
+
+.imageCounter {
+  font-family: $font-family-mono;
+  font-size: $font-size-sm;
+  color: $color-gray-light;
+  background: rgba($color-black, 0.8);
+  padding: $spacing-xs $spacing-md;
+  border-radius: $radius-md;
+}
+
+.controlButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: rgba($color-gray-dark, 0.8);
+  color: $color-white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover {
+    background: $color-gray-medium;
+    transform: scale(1.1);
+  }
+
+  &.playing {
+    background: $color-red;
+
+    &:hover {
+      background: darken($color-red, 10%);
+    }
+  }
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+// ============================================
+// Slideshow Progress Bar
+// ============================================
+.progressBar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba($color-black, 0.5);
+  border-radius: 0 0 $radius-lg $radius-lg;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, $color-red, $color-orange);
+  animation: progress 4s linear forwards;
+}
+
+@keyframes progress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
 }

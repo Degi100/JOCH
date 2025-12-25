@@ -20,12 +20,12 @@ router.post(
   uploadSingleImage
 );
 
-// Multiple images upload (max 10)
+// Multiple images upload (max 20)
 router.post(
   '/images',
   authenticate,
   authorize('admin', 'member'),
-  uploadImage.array('images', 10),
+  uploadImage.array('images', 20),
   uploadMultipleImages
 );
 
