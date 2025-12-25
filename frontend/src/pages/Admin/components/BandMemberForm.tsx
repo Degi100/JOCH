@@ -28,6 +28,7 @@ export default function BandMemberForm({ member, onSuccess, onCancel }: BandMemb
   const [role, setRole] = useState('');
   const [bio, setBio] = useState('');
   const [image, setImage] = useState('');
+  const [order, setOrder] = useState(0);
   const [instagram, setInstagram] = useState('');
   const [facebook, setFacebook] = useState('');
   const [twitter, setTwitter] = useState('');
@@ -48,6 +49,7 @@ export default function BandMemberForm({ member, onSuccess, onCancel }: BandMemb
       const existingImage = member.image ?? member.photo ?? '';
       setImage(existingImage);
       setImagePreview(existingImage);
+      setOrder(member.order);
       setInstagram(member.instagram ?? '');
       setFacebook(member.facebook ?? '');
       setTwitter(member.twitter ?? '');
@@ -140,7 +142,7 @@ export default function BandMemberForm({ member, onSuccess, onCancel }: BandMemb
         instagram: instagram.trim() || undefined,
         facebook: facebook.trim() || undefined,
         twitter: twitter.trim() || undefined,
-        order: member?.order ?? 0,
+        order,
       };
 
       if (isEditMode && member?._id) {
@@ -233,7 +235,7 @@ export default function BandMemberForm({ member, onSuccess, onCancel }: BandMemb
             </div>
 
             {/* Role */}
-            <div className={styles.formGroupFull}>
+            <div className={styles.formGroup}>
               <Input
                 label="Rolle (optional)"
                 type="text"
@@ -242,6 +244,21 @@ export default function BandMemberForm({ member, onSuccess, onCancel }: BandMemb
                 placeholder="z.B. Lead Vocals, Rhythmusgitarre"
                 disabled={isSubmitting}
               />
+            </div>
+
+            {/* Position */}
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Position *</label>
+              <select
+                value={order}
+                onChange={(e) => setOrder(parseInt(e.target.value))}
+                className={styles.select}
+                disabled={isSubmitting}
+              >
+                <option value={0}>Links</option>
+                <option value={1}>Mitte</option>
+                <option value={2}>Rechts</option>
+              </select>
             </div>
 
             {/* Image Upload */}
