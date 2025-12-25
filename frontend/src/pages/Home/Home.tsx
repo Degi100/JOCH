@@ -114,7 +114,7 @@ const Home: React.FC = () => {
         <section className={`${styles.section} ${styles.newsSection}`}>
           <div className="container">
             <div className={styles.sectionHeader}>
-              <h2 className={styles.sectionTitle}>Neueste News</h2>
+              <h2 className={styles.sectionTitle}>News</h2>
               <Link to="/news" className={styles.sectionLink}>
                 Alle News →
               </Link>

@@ -17,7 +17,7 @@ const Navigation: React.FC<NavigationProps> = ({ onLinkClick }) => {
 
   const publicNavLinks = [
     { to: '/', label: 'Home' },
-    { to: '/band', label: 'Die Band' },
+    { to: '/band', label: 'Band' },
     { to: '/live', label: 'Live' },
     { to: '/music', label: 'Musik' },
     { to: '/news', label: 'News' },
